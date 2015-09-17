@@ -1,0 +1,75 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    tools:context="com.example.thomasthiebaud.android.movie.fragment.DetailActivityFragment">
+
+    <ImageView
+        android:id="@+id/poster"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/Label"
+                android:text= "@string/overview_label"/>
+
+            <View style="@style/Divider"/>
+
+            <TextView
+                android:id="@+id/overview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="@dimen/default_padding" />
+
+            <View style="@style/Divider"/>
+
+            <TextView
+                style="@style/Label"
+                android:text= "@string/release_date_label"/>
+
+            <View style="@style/Divider"/>
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="@dimen/default_padding"/>
+
+            <View style="@style/Divider"/>
+
+            <TextView
+                style="@style/Label"
+                android:text= "@string/rating_label"/>
+
+            <View style="@style/Divider"/>
+
+            <RatingBar
+                android:id="@+id/ratingBar"
+                style="?android:attr/ratingBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:numStars="10"
+                android:stepSize="1.0"
+                android:isIndicator="true"
+                android:padding="@dimen/default_padding"/>
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</LinearLayout>
+

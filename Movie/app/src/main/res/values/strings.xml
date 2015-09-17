@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Movie</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="pref_sort_label">Sort</string>
+    <string name="pref_sort_key">sort</string>
+    <string name="pref_sort_popularity">popularity</string>
+    <string name="pref_sort_popularity_label">Popularity</string>
+    <string name="pref_sort_vote">vote_average</string>
+    <string name="pref_sort_vote_label">Vote</string>
+    <string name="overview_label">Overview</string>
+    <string name="release_date_label">Release date</string>
+    <string name="rating_label">Rating</string>
+</resources>
