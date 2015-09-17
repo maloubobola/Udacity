@@ -3,6 +3,7 @@ package com.example.thomasthiebaud.android.movie.fragment;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,15 +86,16 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
             try {
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-                url = new URL(
-                        Constants.API_BASE_URL +
-                        Constants.API_SORT_BY_LABEL +
-                        prefs.getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity)) +
-                        Constants.API_SORT_DESC_LABEL +
-                        Constants.API_KEY_LABEL +
-                        Constants.API_KEY
-                );
+                Uri.Builder builder = new Uri.Builder();
+                builder.scheme(Constants.API_SCHEME)
+                        .authority(Constants.API_AUTHORITY)
+                        .appendPath(Constants.API_VERSION)
+                        .appendPath(Constants.API_DISCOVER)
+                        .appendPath(Constants.API_MOVIE)
+                        .appendQueryParameter(Constants.API_SORT_BY_LABEL,prefs.getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity))+Constants.API_SORT_DESC_LABEL)
+                        .appendQueryParameter(Constants.API_KEY_LABEL,Constants.API_KEY);
 
+                url = new URL(builder.build().toString());
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod(Constants.HTTP_GET);
                 urlConnection.connect();
@@ -152,7 +155,15 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
             MovieItem item = new MovieItem();
             JSONObject jsonMovie = results.getJSONObject(i);
 
-            item.setPosterPath(Constants.POSTER_BASE_URL + Constants.POSTER_FORMAT + jsonMovie.getString(Constants.JSON_POSTER_PATH));
+            Uri.Builder builder = new Uri.Builder();
+            builder.scheme(Constants.POSTER_SCHEME)
+                    .authority(Constants.POSTER_AUTHORITY)
+                    .appendPath(Constants.POSTER_PATH_T)
+                    .appendPath(Constants.POSTER_PATH_P)
+                    .appendPath(Constants.POSTER_QUALITY)
+                    .appendPath(jsonMovie.getString(Constants.JSON_POSTER_PATH).replace("/",""));
+
+            item.setPosterPath(builder.build().toString());
             item.setTitle(jsonMovie.getString(Constants.JSON_TITLE));
             item.setId(jsonMovie.getInt(Constants.JSON_ID));
             item.setOverview(jsonMovie.getString(Constants.JSON_OVERVIEW));
