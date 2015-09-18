@@ -1,0 +1,1 @@
+This application needs an API key from www.themoviedb.org. This key must be put into the Constants.java file inside the model package.

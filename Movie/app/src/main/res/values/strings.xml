@@ -11,7 +11,7 @@
     <string name="pref_sort_popularity_label">Popularity</string>
     <string name="pref_sort_vote">vote_average</string>
     <string name="pref_sort_vote_label">Vote</string>
-    <string name="overview_label">Overview</string>
+    <string name="overview_label">Synopsis</string>
     <string name="release_date_label">Release date</string>
     <string name="rating_label">Rating</string>
 </resources>

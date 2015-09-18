@@ -1,10 +1,11 @@
-package com.example.thomasthiebaud.android.movie.bean;
+package com.example.thomasthiebaud.android.movie.model;
 
 /**
  * Created by thiebaudthomas on 10/09/15.
  */
 public interface Constants {
     //The API KEY MUST NOT BE PUBLISH. Is it possible to generate a new one for free from www.themoviedb.org
+    //Remove before commit !!!
     String API_KEY = "";
 
     String API_SCHEME = "http";
