@@ -13,9 +13,11 @@ public interface Constants {
     String API_VERSION = "3";
     String API_DISCOVER = "discover";
     String API_MOVIE = "movie";
+    String API_VIDEOS = "videos";
     String API_SORT_BY_LABEL = "sort_by";
     String API_SORT_DESC_LABEL = ".desc";
     String API_KEY_LABEL = "api_key";
+    String API_REVIEWS = "reviews";
 
     String JSON_RESULTS = "results";
     String JSON_ID = "id";
@@ -30,6 +32,4 @@ public interface Constants {
     String POSTER_PATH_T = "t";
     String POSTER_PATH_P = "p";
     String POSTER_QUALITY = "w500";
-
-    String HTTP_GET = "GET";
 }
