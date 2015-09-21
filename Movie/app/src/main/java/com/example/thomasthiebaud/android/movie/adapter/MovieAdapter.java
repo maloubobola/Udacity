@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
-import com.example.thomasthiebaud.android.movie.model.MovieItem;
+import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

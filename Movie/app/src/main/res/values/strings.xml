@@ -14,4 +14,6 @@
     <string name="overview_label">Synopsis</string>
     <string name="release_date_label">Release date</string>
     <string name="rating_label">Rating</string>
+    <string name="trailers_label">Trailers</string>
+    <string name="reviews_label">Reviews</string>
 </resources>

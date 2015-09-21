@@ -1,4 +1,4 @@
-package com.example.thomasthiebaud.android.movie.model;
+package com.example.thomasthiebaud.android.movie.model.item;
 
 import java.io.Serializable;
 

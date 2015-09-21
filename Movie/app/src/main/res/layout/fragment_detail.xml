@@ -1,78 +1,122 @@
-<LinearLayout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.example.thomasthiebaud.android.movie.fragment.DetailActivityFragment">
+    android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/poster"
-        android:layout_weight="1"
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"/>
+        android:orientation="vertical"
+        tools:context="com.example.thomasthiebaud.android.movie.fragment.DetailActivityFragment">
 
-    <ScrollView
-        android:layout_weight="1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:layout_height="match_parent"
+        <ImageView
+            android:id="@+id/poster"
+            android:layout_weight="1"
             android:layout_width="match_parent"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"/>
 
-            <TextView
-                style="@style/Label"
-                android:text= "@string/overview_label"/>
+        <ScrollView
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            <View style="@style/Divider"/>
-
-            <TextView
-                android:id="@+id/overview"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:padding="@dimen/default_padding"/>
-
-            <View style="@style/Divider"/>
-
-
-            <TextView
-                style="@style/Label"
-                android:text= "@string/release_date_label"/>
-
-            <View style="@style/Divider"/>
-
-            <TextView
-                android:id="@+id/date"
+            <LinearLayout
+                android:layout_height="match_parent"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="@dimen/default_padding"/>
+                android:orientation="vertical">
 
-            <View style="@style/Divider"/>
+                <TextView
+                    style="@style/Label"
+                    android:text= "@string/overview_label"/>
 
-            <TextView
-                style="@style/Label"
-                android:text= "@string/rating_label"/>
+                <View style="@style/Divider"/>
 
-            <View style="@style/Divider"/>
+                <TextView
+                    android:id="@+id/overview"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:padding="@dimen/default_padding"/>
 
-            <RatingBar
-                android:id="@+id/ratingBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:numStars="10"
-                android:stepSize="1.0"
-                android:isIndicator="true"
-                android:padding="@dimen/default_padding"
-                style="?android:attr/ratingBarStyleSmall"/>
-        </LinearLayout>
-
-    </ScrollView>
+                <View style="@style/Divider"/>
 
 
-</LinearLayout>
+                <TextView
+                    style="@style/Label"
+                    android:text= "@string/release_date_label"/>
 
+                <View style="@style/Divider"/>
+
+                <TextView
+                    android:id="@+id/date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="@dimen/default_padding"/>
+
+                <View style="@style/Divider"/>
+
+                <TextView
+                    style="@style/Label"
+                    android:text= "@string/rating_label"/>
+
+                <View style="@style/Divider"/>
+
+                <RatingBar
+                    android:id="@+id/ratingBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:numStars="10"
+                    android:stepSize="1.0"
+                    android:isIndicator="true"
+                    android:padding="@dimen/default_padding"
+                    style="?android:attr/ratingBarStyleSmall"/>
+
+                <View style="@style/Divider"/>
+
+                <TextView
+                    style="@style/Label"
+                    android:text= "@string/trailers_label"/>
+
+                <View style="@style/Divider"/>
+
+                <com.example.thomasthiebaud.android.movie.view.NestedListView
+                    android:id="@+id/trailers_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:orientation="vertical"/>
+
+                <View style="@style/Divider"/>
+
+                <TextView
+                    style="@style/Label"
+                    android:text= "@string/reviews_label"/>
+
+                <View style="@style/Divider"/>
+
+                <com.example.thomasthiebaud.android.movie.view.NestedListView
+                    android:id="@+id/reviews_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:orientation="vertical"/>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/favorite_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/default_margin"
+        android:clickable="true"
+        android:src="@drawable/ic_favorite_white"
+        app:layout_anchor="@id/poster"
+        app:layout_anchorGravity="top|right|end"/>
+</android.support.design.widget.CoordinatorLayout>

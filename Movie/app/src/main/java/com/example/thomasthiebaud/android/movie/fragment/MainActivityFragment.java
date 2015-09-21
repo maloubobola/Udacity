@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import com.example.thomasthiebaud.android.movie.model.Constants;
+import com.example.thomasthiebaud.android.movie.model.contract.APIContract;
 import com.example.thomasthiebaud.android.movie.adapter.MovieAdapter;
-import com.example.thomasthiebaud.android.movie.model.MovieItem;
+import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 import com.example.thomasthiebaud.android.movie.R;
 import com.example.thomasthiebaud.android.movie.activity.DetailActivity;
 import com.example.thomasthiebaud.android.movie.http.HttpService;
@@ -52,7 +52,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
     private void updateMovies() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String sortBy = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity)) + Constants.API_SORT_DESC_LABEL;
+        String sortBy = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity)) + APIContract.API_SORT_DESC_LABEL;
 
         new HttpService().getMovies(sortBy).callback(new HttpResponse() {
             @Override
@@ -82,24 +82,24 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
         List<MovieItem> movies = new ArrayList<>();
         JSONArray results;
         try {
-            results = json.getJSONArray(Constants.JSON_RESULTS);
+            results = json.getJSONArray(APIContract.JSON_RESULTS);
             for(int i=0; i<results.length(); i++) {
                 MovieItem item = new MovieItem();
                 JSONObject jsonMovie = results.getJSONObject(i);
 
                 Uri.Builder builder = new Uri.Builder();
-                builder.scheme(Constants.POSTER_SCHEME)
-                        .authority(Constants.POSTER_AUTHORITY)
-                        .appendPath(Constants.POSTER_PATH_T)
-                        .appendPath(Constants.POSTER_PATH_P)
-                        .appendPath(Constants.POSTER_QUALITY);
+                builder.scheme(APIContract.POSTER_SCHEME)
+                        .authority(APIContract.POSTER_AUTHORITY)
+                        .appendPath(APIContract.POSTER_PATH_T)
+                        .appendPath(APIContract.POSTER_PATH_P)
+                        .appendPath(APIContract.POSTER_QUALITY);
 
-                item.setPosterPath(builder.build().toString() + jsonMovie.getString(Constants.JSON_POSTER_PATH));
-                item.setTitle(jsonMovie.getString(Constants.JSON_TITLE));
-                item.setId(jsonMovie.getInt(Constants.JSON_ID));
-                item.setOverview(jsonMovie.getString(Constants.JSON_OVERVIEW));
-                item.setVoteAverage(jsonMovie.getDouble(Constants.JSON_VOTE_AVERAGE));
-                item.setReleaseDate(jsonMovie.getString(Constants.JSON_RELEASE_DATE));
+                item.setPosterPath(builder.build().toString() + jsonMovie.getString(APIContract.JSON_POSTER_PATH));
+                item.setTitle(jsonMovie.getString(APIContract.JSON_TITLE));
+                item.setId(jsonMovie.getInt(APIContract.JSON_ID));
+                item.setOverview(jsonMovie.getString(APIContract.JSON_OVERVIEW));
+                item.setVoteAverage(jsonMovie.getDouble(APIContract.JSON_VOTE_AVERAGE));
+                item.setReleaseDate(jsonMovie.getString(APIContract.JSON_RELEASE_DATE));
                 movies.add(item);
             }
         } catch (JSONException e) {
