@@ -1,11 +1,16 @@
 package com.example.thomasthiebaud.android.movie.adapter;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
+import com.example.thomasthiebaud.android.movie.R;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 import com.squareup.picasso.Picasso;
 
@@ -16,6 +21,7 @@ import java.util.List;
  * Created by thiebaudthomas on 09/09/15.
  */
 public class MovieAdapter extends BaseAdapter {
+    private final String TAG = MovieAdapter.class.getSimpleName();
     private final Context context;
     private List<MovieItem> movies = new ArrayList<>();
 
@@ -49,9 +55,10 @@ public class MovieAdapter extends BaseAdapter {
         }
 
         MovieItem movie = getItem(position);
-
         Picasso.with(context)
                 .load(movie.getPosterPath())
+                .placeholder(R.drawable.ic_cached_black)
+                .error(R.drawable.ic_report_problem_black)
                 .into(view);
 
         return view;
@@ -59,11 +66,6 @@ public class MovieAdapter extends BaseAdapter {
 
     public void clear() {
         movies.clear();
-    }
-
-    public void add(MovieItem item) {
-        movies.add(item);
-        this.notifyDataSetChanged();
     }
 
     public void addAll(List<MovieItem> movies) {

@@ -61,13 +61,12 @@ public class TrailerAdapter extends BaseAdapter {
         trailers.clear();
     }
 
-    public void add(TrailerItem item) {
-        trailers.add(item);
-        this.notifyDataSetChanged();
-    }
-
     public void addAll(List<TrailerItem> movies) {
         this.trailers = movies;
         this.notifyDataSetChanged();
+    }
+
+    public List<TrailerItem> getItems() {
+        return trailers;
     }
 }

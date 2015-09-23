@@ -7,4 +7,6 @@ import org.json.JSONObject;
  */
 public interface HttpResponse {
     void onResponse(JSONObject object);
+
+    void onError(Exception exception);
 }

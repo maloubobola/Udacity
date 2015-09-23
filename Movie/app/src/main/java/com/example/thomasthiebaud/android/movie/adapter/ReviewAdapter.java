@@ -52,7 +52,7 @@ public class ReviewAdapter extends BaseAdapter {
         view.setText(reviewItem.getContent());
 
         int padding = (int) context.getResources().getDimension(R.dimen.default_padding);
-        view.setPadding(padding,padding,padding,padding);
+        view.setPadding(padding, padding, padding, padding);
 
         return view;
     }
@@ -61,13 +61,12 @@ public class ReviewAdapter extends BaseAdapter {
         reviews.clear();
     }
 
-    public void add(ReviewItem item) {
-        reviews.add(item);
+    public void addAll(List<ReviewItem> reviews) {
+        this.reviews = reviews;
         this.notifyDataSetChanged();
     }
 
-    public void addAll(List<ReviewItem> movies) {
-        this.reviews = movies;
-        this.notifyDataSetChanged();
+    public List<ReviewItem> getItems() {
+        return reviews;
     }
 }

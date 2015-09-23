@@ -9,8 +9,12 @@
         android:id="@+id/cover_grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:numColumns="@integer/gridview_column_number"
-        android:verticalSpacing="0dp"
-        android:horizontalSpacing="0dp"
-        android:gravity="center"/>
+        android:numColumns="auto_fit"
+        android:verticalSpacing="@dimen/default_spacing"
+        android:horizontalSpacing="@dimen/default_spacing"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:stretchMode="columnWidth"
+        android:columnWidth="@dimen/column_width"
+        android:listSelector="@null"/>
 </FrameLayout>

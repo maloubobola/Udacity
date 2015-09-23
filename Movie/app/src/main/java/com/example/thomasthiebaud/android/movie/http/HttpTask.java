@@ -26,6 +26,7 @@ public class HttpTask extends AsyncTask<Void, Void, JSONObject> {
     private HttpMethod httpMethod = HttpMethod.GET;
     private JSONObject body = new JSONObject();
     private HttpResponse callback;
+    private Exception exception;
 
     private Uri.Builder builder = new Uri.Builder();
 
@@ -111,12 +112,12 @@ public class HttpTask extends AsyncTask<Void, Void, JSONObject> {
                 return new JSONObject(buffer.toString());
             } catch (JSONException e) {
                 Log.e(TAG, "Error parsing json", e);
-                e.printStackTrace();
+                exception = e;
                 return null;
             }
         } catch (IOException e) {
             Log.e(TAG, "IO Exception", e);
-            e.printStackTrace();
+            exception = e;
             return null;
         } finally{
             if (urlConnection != null) {
@@ -126,6 +127,7 @@ public class HttpTask extends AsyncTask<Void, Void, JSONObject> {
                 try {
                     reader.close();
                 } catch (final IOException e) {
+                    exception = e;
                     Log.e(TAG, "Error closing stream", e);
                 }
             }
@@ -134,6 +136,9 @@ public class HttpTask extends AsyncTask<Void, Void, JSONObject> {
 
     @Override
     protected void onPostExecute(JSONObject response) {
-        this.callback.onResponse(response);
+        if(response == null)
+            callback.onError(exception);
+        else
+            callback.onResponse(response);
     }
 }

@@ -90,6 +90,13 @@
                     android:scrollbars="none"
                     android:orientation="vertical"/>
 
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:id="@+id/empty_trailers_label"
+                    android:padding="@dimen/default_padding"
+                    android:text="@string/no_trailers"/>
+
                 <View style="@style/Divider"/>
 
                 <TextView
@@ -104,6 +111,13 @@
                     android:layout_height="wrap_content"
                     android:scrollbars="none"
                     android:orientation="vertical"/>
+
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:id="@+id/empty_reviews_label"
+                    android:padding="@dimen/default_padding"
+                    android:text="@string/no_reviews"/>
             </LinearLayout>
 
         </ScrollView>
@@ -115,7 +129,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/default_margin"
         android:clickable="true"
-        android:src="@drawable/ic_favorite_white"
+        android:src="@drawable/ic_favorite_border_black"
+        app:backgroundTint="@android:color/white"
         app:layout_anchor="@id/poster"
         app:layout_anchorGravity="bottom|left|start"/>
 </android.support.design.widget.CoordinatorLayout>

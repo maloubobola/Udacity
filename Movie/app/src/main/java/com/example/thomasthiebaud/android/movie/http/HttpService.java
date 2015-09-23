@@ -17,7 +17,7 @@ public class HttpService {
                 .appendQuery(APIContract.API_KEY_LABEL, APIContract.API_KEY);
     }
 
-    public HttpTask getVideos(String id) {
+    public HttpTask getTrailers(String id) {
         return HttpTask
                 .authority(APIContract.API_AUTHORITY)
                 .scheme(APIContract.API_SCHEME)

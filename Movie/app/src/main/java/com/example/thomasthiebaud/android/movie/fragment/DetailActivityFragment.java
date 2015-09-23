@@ -1,8 +1,11 @@
 package com.example.thomasthiebaud.android.movie.fragment;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.net.Uri;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,6 +22,7 @@ import com.example.thomasthiebaud.android.movie.adapter.TrailerAdapter;
 import com.example.thomasthiebaud.android.movie.http.HttpResponse;
 import com.example.thomasthiebaud.android.movie.http.HttpService;
 import com.example.thomasthiebaud.android.movie.model.contract.APIContract;
+import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 import com.example.thomasthiebaud.android.movie.R;
 import com.example.thomasthiebaud.android.movie.model.item.ReviewItem;
@@ -29,6 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,12 +43,18 @@ import java.util.List;
 public class DetailActivityFragment extends Fragment {
 
     private final String TAG = DetailActivityFragment.class.getSimpleName();
+    private ReviewAdapter reviewAdapter;
+    private TrailerAdapter trailerAdapter;
+    private boolean isFavorite = false;
 
     public DetailActivityFragment() {}
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+
+        reviewAdapter = new ReviewAdapter(getContext());
+        trailerAdapter = new TrailerAdapter(getContext());
 
         Intent intent = getActivity().getIntent();
         MovieItem item = null;
@@ -62,6 +73,8 @@ public class DetailActivityFragment extends Fragment {
 
         Picasso.with(getContext())
                 .load(item.getPosterPath())
+                .placeholder(R.drawable.ic_cached_black)
+                .error(R.drawable.ic_report_problem_black)
                 .into(imageView);
 
         //Use navbar to display title
@@ -71,10 +84,12 @@ public class DetailActivityFragment extends Fragment {
         ((TextView)rootView.findViewById(R.id.date)).setText(item.getReleaseDate());
         ((RatingBar)rootView.findViewById(R.id.ratingBar)).setRating((float) item.getVoteAverage());
 
-        new HttpService().getVideos(item.getId()+"").callback(new HttpResponse() {
+        final int itemId = item.getId();
+
+        new HttpService().getTrailers(item.getId() + "").callback(new HttpResponse() {
             @Override
             public void onResponse(JSONObject object) {
-                final TrailerAdapter trailerAdapter = new TrailerAdapter(getContext());
+                trailerAdapter = new TrailerAdapter(getContext());
                 ListView listView = ((ListView) rootView.findViewById(R.id.trailers_list));
                 listView.setAdapter(trailerAdapter);
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -86,12 +101,27 @@ public class DetailActivityFragment extends Fragment {
                 });
                 trailerAdapter.addAll(getTrailers(object));
             }
+
+            @Override
+            public void onError(Exception exception) {
+                if (exception instanceof IOException) {
+                    Cursor cursor = getActivity().getContentResolver().query(
+                            DatabaseContract.TrailerEntry.CONTENT_URI,
+                            null,
+                            DatabaseContract.TrailerEntry.COLUMN_ID_MOVIE + "= ?",
+                            new String[]{itemId + ""},
+                            null
+                    );
+                    trailerAdapter.clear();
+                    trailerAdapter.addAll(cursorToTrailers(cursor));
+                }
+            }
         }).execute();
 
-        new HttpService().getReview(item.getId()+"").callback(new HttpResponse() {
+        new HttpService().getReview(item.getId() + "").callback(new HttpResponse() {
             @Override
             public void onResponse(JSONObject object) {
-                final ReviewAdapter reviewAdapter = new ReviewAdapter(getContext());
+                reviewAdapter = new ReviewAdapter(getContext());
                 ListView listView = ((ListView) rootView.findViewById(R.id.reviews_list));
                 listView.setAdapter(reviewAdapter);
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -103,7 +133,115 @@ public class DetailActivityFragment extends Fragment {
                 });
                 reviewAdapter.addAll(getReviews(object));
             }
+
+            @Override
+            public void onError(Exception exception) {
+                if(exception instanceof IOException) {
+                    Cursor cursor = getActivity().getContentResolver().query(
+                            DatabaseContract.ReviewEntry.CONTENT_URI,
+                            null,
+                            DatabaseContract.ReviewEntry.COLUMN_ID_MOVIE + "= ?",
+                            new String[]{itemId +""},
+                            null
+                    );
+                    reviewAdapter.clear();
+                    reviewAdapter.addAll(cursorToReviews(cursor));
+                }
+            }
         }).execute();
+
+        Cursor cursor = getActivity().getContentResolver().query(
+                DatabaseContract.MovieEntry.CONTENT_URI,
+                null,
+                DatabaseContract.MovieEntry._ID + "= ?",
+                new String[]{itemId +""},
+                null
+        );
+
+        if(cursor.moveToFirst()) {
+            ((FloatingActionButton) rootView.findViewById(R.id.favorite_button)).setImageResource(R.drawable.ic_favorite_black);
+            isFavorite = true;
+        }
+
+
+        final ContentValues movieValues = new ContentValues();
+        movieValues.put(DatabaseContract.MovieEntry._ID,item.getId());
+        movieValues.put(DatabaseContract.MovieEntry.COLUMN_OVERVIEW,item.getOverview());
+        movieValues.put(DatabaseContract.MovieEntry.COLUMN_POSTER_PATH,item.getPosterPath());
+        movieValues.put(DatabaseContract.MovieEntry.COLUMN_RELEASE_DATE,item.getReleaseDate());
+        movieValues.put(DatabaseContract.MovieEntry.COLUMN_TITLE, item.getTitle());
+        movieValues.put(DatabaseContract.MovieEntry.COLUMN_VOTE_AVERAGE, item.getVoteAverage());
+
+        final List<ContentValues> reviewValues = new ArrayList<>();
+        final List<ContentValues> trailerValues = new ArrayList<>();
+
+        for(ReviewItem r : reviewAdapter.getItems()) {
+            ContentValues value = new ContentValues();
+            value.put(DatabaseContract.ReviewEntry._ID, r.getId());
+            value.put(DatabaseContract.ReviewEntry.COLUMN_AUTHOR, r.getAuthor());
+            value.put(DatabaseContract.ReviewEntry.COLUMN_CONTENT, r.getContent());
+            value.put(DatabaseContract.ReviewEntry.COLUMN_URL, r.getUrl());
+            value.put(DatabaseContract.ReviewEntry.COLUMN_ID_MOVIE, itemId);
+            reviewValues.add(value);
+        }
+
+        for(TrailerItem t : trailerAdapter.getItems()) {
+            ContentValues value = new ContentValues();
+            value.put(DatabaseContract.TrailerEntry._ID, t.getId());
+            value.put(DatabaseContract.TrailerEntry.COLUMN_NAME, t.getName());
+            value.put(DatabaseContract.TrailerEntry.COLUMN_KEY, t.getKey());
+            value.put(DatabaseContract.TrailerEntry.COLUMN_ID_MOVIE, itemId);
+            trailerValues.add(value);
+        }
+
+        ((FloatingActionButton) rootView.findViewById(R.id.favorite_button)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isFavorite) {
+                    getContext().getContentResolver().delete(
+                            DatabaseContract.ReviewEntry.CONTENT_URI,
+                            DatabaseContract.ReviewEntry.COLUMN_ID_MOVIE + " = ?",
+                            new String[]{itemId + ""});
+                    getContext().getContentResolver().delete(
+                            DatabaseContract.TrailerEntry.CONTENT_URI,
+                            DatabaseContract.TrailerEntry.COLUMN_ID_MOVIE + " = ?",
+                            new String[]{itemId + ""});
+                    getContext().getContentResolver().delete(
+                            DatabaseContract.MovieEntry.CONTENT_URI,
+                            DatabaseContract.MovieEntry._ID + " = ?",
+                            new String[]{itemId + ""});
+                    ((FloatingActionButton) rootView.findViewById(R.id.favorite_button)).setImageResource(R.drawable.ic_favorite_border_black);
+                    isFavorite = false;
+                } else {
+                    getContext().getContentResolver().insert(
+                            DatabaseContract.MovieEntry.CONTENT_URI,
+                            movieValues);
+                    getContext().getContentResolver().bulkInsert(
+                            DatabaseContract.ReviewEntry.CONTENT_URI,
+                            reviewValues.toArray(new ContentValues[reviewValues.size()])
+                    );
+                    getContext().getContentResolver().bulkInsert(
+                            DatabaseContract.TrailerEntry.CONTENT_URI,
+                            trailerValues.toArray(new ContentValues[trailerValues.size()])
+                    );
+                    ((FloatingActionButton) rootView.findViewById(R.id.favorite_button)).setImageResource(R.drawable.ic_favorite_black);
+                    isFavorite = true;
+                }
+            }
+        });
+
+        ((ListView)rootView.findViewById(R.id.trailers_list)).setEmptyView(rootView.findViewById(R.id.empty_trailers_label));
+        ((ListView)rootView.findViewById(R.id.reviews_list)).setEmptyView(rootView.findViewById(R.id.empty_reviews_label));
+
+        //rootView.findViewById(R.id.empty_reviews_label).setVisibility((reviewAdapter.getCount() == 0) ? View.GONE : View.VISIBLE);
+        //rootView.findViewById(R.id.empty_trailers_label).setVisibility((trailerAdapter.getCount() == 0) ? View.GONE : View.VISIBLE);
+/*
+        if(reviewAdapter.getCount() == 0) {
+            ReviewItem review = new ReviewItem();
+            review.setContent("No reviews");
+            reviewAdapter.add(new ReviewItem());
+        }
+*/
 
         return rootView;
     }
@@ -145,5 +283,30 @@ public class DetailActivityFragment extends Fragment {
             e.printStackTrace();
         }
         return reviews;
+    }
+
+    private List<ReviewItem> cursorToReviews(Cursor cursor) {
+        List<ReviewItem> reviews = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            ReviewItem item = new ReviewItem();
+            item.setId(cursor.getString(cursor.getColumnIndex(DatabaseContract.ReviewEntry._ID)));
+            item.setAuthor(cursor.getString(cursor.getColumnIndex(DatabaseContract.ReviewEntry.COLUMN_AUTHOR)));
+            item.setContent(cursor.getString(cursor.getColumnIndex(DatabaseContract.ReviewEntry.COLUMN_CONTENT)));
+            item.setUrl(cursor.getString(cursor.getColumnIndex(DatabaseContract.ReviewEntry.COLUMN_URL)));
+            reviews.add(item);
+        }
+        return reviews;
+    }
+
+    private List<TrailerItem> cursorToTrailers(Cursor cursor) {
+        List<TrailerItem> trailers = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            TrailerItem item = new TrailerItem();
+            item.setId(cursor.getString(cursor.getColumnIndex(DatabaseContract.TrailerEntry._ID)));
+            item.setKey(cursor.getString(cursor.getColumnIndex(DatabaseContract.TrailerEntry.COLUMN_KEY)));
+            item.setName(cursor.getString(cursor.getColumnIndex(DatabaseContract.TrailerEntry.COLUMN_NAME)));
+            trailers.add(item);
+        }
+        return trailers;
     }
 }
