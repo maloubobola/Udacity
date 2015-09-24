@@ -4,7 +4,6 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -52,6 +51,10 @@ public class MovieDatabaseProvider extends ContentProvider {
         switch (match) {
             case MOVIE:
                 return DatabaseContract.MovieEntry.CONTENT_TYPE;
+            case REVIEW:
+                return DatabaseContract.ReviewEntry.CONTENT_TYPE;
+            case TRAILER:
+                return DatabaseContract.ReviewEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown Uri" + uri);
         }

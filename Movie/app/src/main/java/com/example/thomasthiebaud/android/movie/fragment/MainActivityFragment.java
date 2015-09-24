@@ -1,13 +1,10 @@
 package com.example.thomasthiebaud.android.movie.fragment;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +12,10 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.example.thomasthiebaud.android.movie.model.loader.LoaderResponse;
+import com.example.thomasthiebaud.android.movie.model.loader.MovieLoader;
 import com.example.thomasthiebaud.android.movie.model.contract.APIContract;
 import com.example.thomasthiebaud.android.movie.adapter.MovieAdapter;
-import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 import com.example.thomasthiebaud.android.movie.R;
 import com.example.thomasthiebaud.android.movie.activity.DetailActivity;
@@ -39,7 +37,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
     private static final String TAG = MainActivityFragment.class.getSimpleName();
 
-    MovieAdapter movieAdapter;
+    private MovieAdapter movieAdapter;
 
     public MainActivityFragment() {}
 
@@ -61,21 +59,18 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
         //Update title to show sort order
         getActivity().setTitle("Movie - Sort by " + sortBy);
 
-        if(sortBy.equals("favorite")) {
-            Cursor cursor = getActivity().getContentResolver().query(
-                    DatabaseContract.MovieEntry.CONTENT_URI,
-                    null,
-                    null,
-                    null,
-                    null
-            );
-            movieAdapter.clear();
-            movieAdapter.addAll(cursorToList(cursor));
-        }
-        else {
-            new HttpService().getMovies(sortBy + APIContract.API_SORT_DESC_LABEL).callback(new HttpResponse() {
+        if(sortBy.equals("favorite"))
+            getLoaderManager().initLoader(MovieLoader.ALL_MOVIE_LOADER, null, new MovieLoader(getActivity()).onResponse(new LoaderResponse<MovieItem>() {
                 @Override
-                public void onResponse(JSONObject object) {
+                public void onSuccess(List<MovieItem> items) {
+                    movieAdapter.clear();
+                    movieAdapter.addAll(items);
+                }
+            }));
+        else {
+            new HttpService().getMovies(sortBy + APIContract.API_SORT_DESC_LABEL).onResponse(new HttpResponse() {
+                @Override
+                public void onSuccess(JSONObject object) {
                     List<MovieItem> movies = getMovieItem(object);
                     if (movies != null && !movies.isEmpty()) {
                         movieAdapter.clear();
@@ -85,17 +80,14 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
                 @Override
                 public void onError(Exception exception) {
-                    if(exception instanceof IOException) {
-                        Cursor cursor = getActivity().getContentResolver().query(
-                                DatabaseContract.MovieEntry.CONTENT_URI,
-                                null,
-                                null,
-                                null,
-                                null
-                        );
-                        movieAdapter.clear();
-                        movieAdapter.addAll(cursorToList(cursor));
-
+                    if (exception instanceof IOException) {
+                        getLoaderManager().initLoader(MovieLoader.ALL_MOVIE_LOADER, null, new MovieLoader(getActivity()).onResponse(new LoaderResponse<MovieItem>() {
+                            @Override
+                            public void onSuccess(List<MovieItem> items) {
+                                movieAdapter.clear();
+                                movieAdapter.addAll(items);
+                            }
+                        }));
                         Toast.makeText(getActivity(), "Network unreachable.", Toast.LENGTH_LONG).show();
                     }
                 }
@@ -141,21 +133,6 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
             }
         } catch (JSONException e) {
             e.printStackTrace();
-        }
-        return movies;
-    }
-
-    private List<MovieItem> cursorToList(Cursor cursor) {
-        List<MovieItem> movies = new ArrayList<>();
-        while (cursor.moveToNext()) {
-            MovieItem item = new MovieItem();
-            item.setId(cursor.getInt(cursor.getColumnIndex(DatabaseContract.MovieEntry._ID)));
-            item.setTitle(cursor.getString(cursor.getColumnIndex(DatabaseContract.MovieEntry.COLUMN_TITLE)));
-            item.setPosterPath(cursor.getString(cursor.getColumnIndex(DatabaseContract.MovieEntry.COLUMN_POSTER_PATH)));
-            item.setOverview(cursor.getString(cursor.getColumnIndex(DatabaseContract.MovieEntry.COLUMN_OVERVIEW)));
-            item.setVoteAverage(cursor.getDouble(cursor.getColumnIndex(DatabaseContract.MovieEntry.COLUMN_VOTE_AVERAGE)));
-            item.setReleaseDate(cursor.getString(cursor.getColumnIndex(DatabaseContract.MovieEntry.COLUMN_RELEASE_DATE)));
-            movies.add(item);
         }
         return movies;
     }

@@ -25,7 +25,7 @@ public class HttpTask extends AsyncTask<Void, Void, JSONObject> {
 
     private HttpMethod httpMethod = HttpMethod.GET;
     private JSONObject body = new JSONObject();
-    private HttpResponse callback;
+    private HttpResponse response;
     private Exception exception;
 
     private Uri.Builder builder = new Uri.Builder();
@@ -63,8 +63,8 @@ public class HttpTask extends AsyncTask<Void, Void, JSONObject> {
         return this;
     }
 
-    public HttpTask callback(HttpResponse callback) {
-        this.callback = callback;
+    public HttpTask onResponse(HttpResponse response) {
+        this.response = response;
         return this;
     }
 
@@ -92,7 +92,6 @@ public class HttpTask extends AsyncTask<Void, Void, JSONObject> {
                     out.close ();
                 }
             }
-
 
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
@@ -137,8 +136,8 @@ public class HttpTask extends AsyncTask<Void, Void, JSONObject> {
     @Override
     protected void onPostExecute(JSONObject response) {
         if(response == null)
-            callback.onError(exception);
+            this.response.onError(exception);
         else
-            callback.onResponse(response);
+            this.response.onSuccess(response);
     }
 }

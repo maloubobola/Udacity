@@ -3,7 +3,6 @@ package com.example.thomasthiebaud.android.movie.fragment;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -21,6 +20,10 @@ import com.example.thomasthiebaud.android.movie.adapter.ReviewAdapter;
 import com.example.thomasthiebaud.android.movie.adapter.TrailerAdapter;
 import com.example.thomasthiebaud.android.movie.http.HttpResponse;
 import com.example.thomasthiebaud.android.movie.http.HttpService;
+import com.example.thomasthiebaud.android.movie.model.loader.LoaderResponse;
+import com.example.thomasthiebaud.android.movie.model.loader.MovieLoader;
+import com.example.thomasthiebaud.android.movie.model.loader.ReviewLoader;
+import com.example.thomasthiebaud.android.movie.model.loader.TrailerLoader;
 import com.example.thomasthiebaud.android.movie.model.contract.APIContract;
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
@@ -43,6 +46,7 @@ import java.util.List;
 public class DetailActivityFragment extends Fragment {
 
     private final String TAG = DetailActivityFragment.class.getSimpleName();
+
     private ReviewAdapter reviewAdapter;
     private TrailerAdapter trailerAdapter;
     private boolean isFavorite = false;
@@ -84,11 +88,11 @@ public class DetailActivityFragment extends Fragment {
         ((TextView)rootView.findViewById(R.id.date)).setText(item.getReleaseDate());
         ((RatingBar)rootView.findViewById(R.id.ratingBar)).setRating((float) item.getVoteAverage());
 
-        final int itemId = item.getId();
+        final int movieId = item.getId();
 
-        new HttpService().getTrailers(item.getId() + "").callback(new HttpResponse() {
+        new HttpService().getTrailers(item.getId() + "").onResponse(new HttpResponse() {
             @Override
-            public void onResponse(JSONObject object) {
+            public void onSuccess(JSONObject object) {
                 trailerAdapter = new TrailerAdapter(getContext());
                 ListView listView = ((ListView) rootView.findViewById(R.id.trailers_list));
                 listView.setAdapter(trailerAdapter);
@@ -104,23 +108,14 @@ public class DetailActivityFragment extends Fragment {
 
             @Override
             public void onError(Exception exception) {
-                if (exception instanceof IOException) {
-                    Cursor cursor = getActivity().getContentResolver().query(
-                            DatabaseContract.TrailerEntry.CONTENT_URI,
-                            null,
-                            DatabaseContract.TrailerEntry.COLUMN_ID_MOVIE + "= ?",
-                            new String[]{itemId + ""},
-                            null
-                    );
-                    trailerAdapter.clear();
-                    trailerAdapter.addAll(cursorToTrailers(cursor));
-                }
+                if (exception instanceof IOException)
+                    getLoaderManager().initLoader(TrailerLoader.TRAILER_LOADER_ID, null, new TrailerLoader(getActivity(), trailerAdapter, movieId));
             }
         }).execute();
 
-        new HttpService().getReview(item.getId() + "").callback(new HttpResponse() {
+        new HttpService().getReview(item.getId() + "").onResponse(new HttpResponse() {
             @Override
-            public void onResponse(JSONObject object) {
+            public void onSuccess(JSONObject object) {
                 reviewAdapter = new ReviewAdapter(getContext());
                 ListView listView = ((ListView) rootView.findViewById(R.id.reviews_list));
                 listView.setAdapter(reviewAdapter);
@@ -136,33 +131,20 @@ public class DetailActivityFragment extends Fragment {
 
             @Override
             public void onError(Exception exception) {
-                if(exception instanceof IOException) {
-                    Cursor cursor = getActivity().getContentResolver().query(
-                            DatabaseContract.ReviewEntry.CONTENT_URI,
-                            null,
-                            DatabaseContract.ReviewEntry.COLUMN_ID_MOVIE + "= ?",
-                            new String[]{itemId +""},
-                            null
-                    );
-                    reviewAdapter.clear();
-                    reviewAdapter.addAll(cursorToReviews(cursor));
-                }
+                if (exception instanceof IOException)
+                    getLoaderManager().initLoader(ReviewLoader.REVIEW_LOADER_ID, null, new ReviewLoader(getActivity(), reviewAdapter, movieId));
             }
         }).execute();
 
-        Cursor cursor = getActivity().getContentResolver().query(
-                DatabaseContract.MovieEntry.CONTENT_URI,
-                null,
-                DatabaseContract.MovieEntry._ID + "= ?",
-                new String[]{itemId +""},
-                null
-        );
-
-        if(cursor.moveToFirst()) {
-            ((FloatingActionButton) rootView.findViewById(R.id.favorite_button)).setImageResource(R.drawable.ic_favorite_black);
-            isFavorite = true;
-        }
-
+        getLoaderManager().initLoader(MovieLoader.ONE_MOVIE_LOADER, null, new MovieLoader(getActivity()).setMovieId(movieId).onResponse(new LoaderResponse<MovieItem>() {
+            @Override
+            public void onSuccess(List<MovieItem> items) {
+                if (!items.isEmpty()) {
+                    ((FloatingActionButton) rootView.findViewById(R.id.favorite_button)).setImageResource(R.drawable.ic_favorite_black);
+                    isFavorite = true;
+                }
+            }
+        }));
 
         final ContentValues movieValues = new ContentValues();
         movieValues.put(DatabaseContract.MovieEntry._ID,item.getId());
@@ -181,7 +163,7 @@ public class DetailActivityFragment extends Fragment {
             value.put(DatabaseContract.ReviewEntry.COLUMN_AUTHOR, r.getAuthor());
             value.put(DatabaseContract.ReviewEntry.COLUMN_CONTENT, r.getContent());
             value.put(DatabaseContract.ReviewEntry.COLUMN_URL, r.getUrl());
-            value.put(DatabaseContract.ReviewEntry.COLUMN_ID_MOVIE, itemId);
+            value.put(DatabaseContract.ReviewEntry.COLUMN_ID_MOVIE, movieId);
             reviewValues.add(value);
         }
 
@@ -190,26 +172,26 @@ public class DetailActivityFragment extends Fragment {
             value.put(DatabaseContract.TrailerEntry._ID, t.getId());
             value.put(DatabaseContract.TrailerEntry.COLUMN_NAME, t.getName());
             value.put(DatabaseContract.TrailerEntry.COLUMN_KEY, t.getKey());
-            value.put(DatabaseContract.TrailerEntry.COLUMN_ID_MOVIE, itemId);
+            value.put(DatabaseContract.TrailerEntry.COLUMN_ID_MOVIE, movieId);
             trailerValues.add(value);
         }
 
-        ((FloatingActionButton) rootView.findViewById(R.id.favorite_button)).setOnClickListener(new View.OnClickListener() {
+        rootView.findViewById(R.id.favorite_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isFavorite) {
                     getContext().getContentResolver().delete(
                             DatabaseContract.ReviewEntry.CONTENT_URI,
                             DatabaseContract.ReviewEntry.COLUMN_ID_MOVIE + " = ?",
-                            new String[]{itemId + ""});
+                            new String[]{movieId + ""});
                     getContext().getContentResolver().delete(
                             DatabaseContract.TrailerEntry.CONTENT_URI,
                             DatabaseContract.TrailerEntry.COLUMN_ID_MOVIE + " = ?",
-                            new String[]{itemId + ""});
+                            new String[]{movieId + ""});
                     getContext().getContentResolver().delete(
                             DatabaseContract.MovieEntry.CONTENT_URI,
                             DatabaseContract.MovieEntry._ID + " = ?",
-                            new String[]{itemId + ""});
+                            new String[]{movieId + ""});
                     ((FloatingActionButton) rootView.findViewById(R.id.favorite_button)).setImageResource(R.drawable.ic_favorite_border_black);
                     isFavorite = false;
                 } else {
@@ -232,16 +214,6 @@ public class DetailActivityFragment extends Fragment {
 
         ((ListView)rootView.findViewById(R.id.trailers_list)).setEmptyView(rootView.findViewById(R.id.empty_trailers_label));
         ((ListView)rootView.findViewById(R.id.reviews_list)).setEmptyView(rootView.findViewById(R.id.empty_reviews_label));
-
-        //rootView.findViewById(R.id.empty_reviews_label).setVisibility((reviewAdapter.getCount() == 0) ? View.GONE : View.VISIBLE);
-        //rootView.findViewById(R.id.empty_trailers_label).setVisibility((trailerAdapter.getCount() == 0) ? View.GONE : View.VISIBLE);
-/*
-        if(reviewAdapter.getCount() == 0) {
-            ReviewItem review = new ReviewItem();
-            review.setContent("No reviews");
-            reviewAdapter.add(new ReviewItem());
-        }
-*/
 
         return rootView;
     }
@@ -283,30 +255,5 @@ public class DetailActivityFragment extends Fragment {
             e.printStackTrace();
         }
         return reviews;
-    }
-
-    private List<ReviewItem> cursorToReviews(Cursor cursor) {
-        List<ReviewItem> reviews = new ArrayList<>();
-        while (cursor.moveToNext()) {
-            ReviewItem item = new ReviewItem();
-            item.setId(cursor.getString(cursor.getColumnIndex(DatabaseContract.ReviewEntry._ID)));
-            item.setAuthor(cursor.getString(cursor.getColumnIndex(DatabaseContract.ReviewEntry.COLUMN_AUTHOR)));
-            item.setContent(cursor.getString(cursor.getColumnIndex(DatabaseContract.ReviewEntry.COLUMN_CONTENT)));
-            item.setUrl(cursor.getString(cursor.getColumnIndex(DatabaseContract.ReviewEntry.COLUMN_URL)));
-            reviews.add(item);
-        }
-        return reviews;
-    }
-
-    private List<TrailerItem> cursorToTrailers(Cursor cursor) {
-        List<TrailerItem> trailers = new ArrayList<>();
-        while (cursor.moveToNext()) {
-            TrailerItem item = new TrailerItem();
-            item.setId(cursor.getString(cursor.getColumnIndex(DatabaseContract.TrailerEntry._ID)));
-            item.setKey(cursor.getString(cursor.getColumnIndex(DatabaseContract.TrailerEntry.COLUMN_KEY)));
-            item.setName(cursor.getString(cursor.getColumnIndex(DatabaseContract.TrailerEntry.COLUMN_NAME)));
-            trailers.add(item);
-        }
-        return trailers;
     }
 }
