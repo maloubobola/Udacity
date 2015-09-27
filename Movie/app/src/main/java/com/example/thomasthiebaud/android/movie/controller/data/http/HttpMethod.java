@@ -1,4 +1,4 @@
-package com.example.thomasthiebaud.android.movie.http;
+package com.example.thomasthiebaud.android.movie.controller.data.http;
 
 /**
  * Created by thiebaudthomas on 18/09/15.

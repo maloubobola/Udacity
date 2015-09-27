@@ -1,4 +1,4 @@
-package com.example.thomasthiebaud.android.movie.model.loader;
+package com.example.thomasthiebaud.android.movie.controller.data.database.loader;
 
 import java.util.List;
 

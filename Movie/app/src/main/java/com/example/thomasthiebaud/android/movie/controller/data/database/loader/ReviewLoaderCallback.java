@@ -1,4 +1,4 @@
-package com.example.thomasthiebaud.android.movie.model.loader;
+package com.example.thomasthiebaud.android.movie.controller.data.database.loader;
 
 import android.app.Activity;
 import android.database.Cursor;
@@ -7,7 +7,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 
-import com.example.thomasthiebaud.android.movie.adapter.ReviewAdapter;
+import com.example.thomasthiebaud.android.movie.controller.data.adapter.ReviewAdapter;
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.model.item.ReviewItem;
 

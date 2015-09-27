@@ -1,4 +1,4 @@
-package com.example.thomasthiebaud.android.movie.model.helper;
+package com.example.thomasthiebaud.android.movie.controller.data.database.helper;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

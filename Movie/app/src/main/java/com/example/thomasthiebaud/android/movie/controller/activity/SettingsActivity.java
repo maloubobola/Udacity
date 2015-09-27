@@ -1,4 +1,4 @@
-package com.example.thomasthiebaud.android.movie.activity;
+package com.example.thomasthiebaud.android.movie.controller.activity;
 
 import android.preference.ListPreference;
 import android.preference.Preference;

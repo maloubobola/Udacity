@@ -1,4 +1,4 @@
-package com.example.thomasthiebaud.android.movie.fragment;
+package com.example.thomasthiebaud.android.movie.controller.fragment;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -16,15 +16,15 @@ import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.example.thomasthiebaud.android.movie.adapter.ReviewAdapter;
-import com.example.thomasthiebaud.android.movie.adapter.TrailerAdapter;
-import com.example.thomasthiebaud.android.movie.http.HttpService;
-import com.example.thomasthiebaud.android.movie.http.ReviewHttpCallback;
-import com.example.thomasthiebaud.android.movie.http.TrailerHttpCallback;
-import com.example.thomasthiebaud.android.movie.model.loader.LoaderResponse;
-import com.example.thomasthiebaud.android.movie.model.loader.MovieLoaderCallback;
-import com.example.thomasthiebaud.android.movie.model.loader.ReviewLoaderCallback;
-import com.example.thomasthiebaud.android.movie.model.loader.TrailerLoaderCallback;
+import com.example.thomasthiebaud.android.movie.controller.data.adapter.ReviewAdapter;
+import com.example.thomasthiebaud.android.movie.controller.data.adapter.TrailerAdapter;
+import com.example.thomasthiebaud.android.movie.controller.data.http.HttpService;
+import com.example.thomasthiebaud.android.movie.controller.data.http.ReviewHttpCallback;
+import com.example.thomasthiebaud.android.movie.controller.data.http.TrailerHttpCallback;
+import com.example.thomasthiebaud.android.movie.controller.data.database.loader.LoaderResponse;
+import com.example.thomasthiebaud.android.movie.controller.data.database.loader.MovieLoaderCallback;
+import com.example.thomasthiebaud.android.movie.controller.data.database.loader.ReviewLoaderCallback;
+import com.example.thomasthiebaud.android.movie.controller.data.database.loader.TrailerLoaderCallback;
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 import com.example.thomasthiebaud.android.movie.R;
@@ -135,10 +135,10 @@ public class DetailActivityFragment extends Fragment {
         getLoaderManager().initLoader(MovieLoaderCallback.ONE_MOVIE_LOADER, null, new MovieLoaderCallback(getActivity()).setMovieId(movieId).onResponse(new LoaderResponse<MovieItem>() {
             @Override
             public void onSuccess(List<MovieItem> items) {
-            if (!items.isEmpty()) {
-                ((FloatingActionButton) rootView.findViewById(R.id.favorite_button)).setImageResource(R.drawable.ic_favorite_black);
-                isFavorite = true;
-            }
+                if (!items.isEmpty()) {
+                    ((FloatingActionButton) rootView.findViewById(R.id.favorite_button)).setImageResource(R.drawable.ic_favorite_black);
+                    isFavorite = true;
+                }
             }
         }));
 

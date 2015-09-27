@@ -1,4 +1,4 @@
-package com.example.thomasthiebaud.android.movie.model.loader;
+package com.example.thomasthiebaud.android.movie.controller.data.database.loader;
 
 import android.app.Activity;
 
@@ -8,7 +8,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 
-import com.example.thomasthiebaud.android.movie.adapter.TrailerAdapter;
+import com.example.thomasthiebaud.android.movie.controller.data.adapter.TrailerAdapter;
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.model.item.TrailerItem;
 

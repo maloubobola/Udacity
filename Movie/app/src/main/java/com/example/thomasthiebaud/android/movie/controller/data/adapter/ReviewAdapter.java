@@ -1,4 +1,4 @@
-package com.example.thomasthiebaud.android.movie.adapter;
+package com.example.thomasthiebaud.android.movie.controller.data.adapter;
 
 import android.content.Context;
 import android.view.View;

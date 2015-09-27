@@ -1,4 +1,4 @@
-package com.example.thomasthiebaud.android.movie.model.provider;
+package com.example.thomasthiebaud.android.movie.controller.data.database.provider;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -12,7 +12,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
-import com.example.thomasthiebaud.android.movie.model.helper.MovieDatabaseHelper;
+import com.example.thomasthiebaud.android.movie.controller.data.database.helper.MovieDatabaseHelper;
 
 /**
  * Created by thiebaudthomas on 22/09/15.

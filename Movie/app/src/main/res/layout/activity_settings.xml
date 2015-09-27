@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.thomasthiebaud.android.movie.activity.SettingsActivity">
+    tools:context="com.example.thomasthiebaud.android.movie.controller.activity.SettingsActivity">
 
     <TextView
         android:text="@string/hello_world"

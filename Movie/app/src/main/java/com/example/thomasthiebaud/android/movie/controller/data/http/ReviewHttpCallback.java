@@ -1,4 +1,4 @@
-package com.example.thomasthiebaud.android.movie.http;
+package com.example.thomasthiebaud.android.movie.controller.data.http;
 
 import com.example.thomasthiebaud.android.movie.model.contract.APIContract;
 import com.example.thomasthiebaud.android.movie.model.item.ReviewItem;
