@@ -18,14 +18,14 @@ import java.util.List;
 /**
  * Created by thiebaudthomas on 24/09/15.
  */
-public class TrailerLoader implements LoaderManager.LoaderCallbacks<Cursor> {
+public class TrailerLoaderCallback implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final int TRAILER_LOADER_ID = 200;
 
     private Activity activity;
     private TrailerAdapter adapter;
     private int movieId;
 
-    public TrailerLoader(Activity activity, TrailerAdapter adapter, int movieId) {
+    public TrailerLoaderCallback(Activity activity, TrailerAdapter adapter, int movieId) {
         this.activity = activity;
         this.adapter = adapter;
         this.movieId = movieId;

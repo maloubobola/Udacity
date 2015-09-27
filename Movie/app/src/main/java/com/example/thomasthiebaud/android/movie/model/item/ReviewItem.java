@@ -1,5 +1,9 @@
 package com.example.thomasthiebaud.android.movie.model.item;
 
+import android.content.ContentValues;
+
+import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
+
 /**
  * Created by thiebaudthomas on 21/09/15.
  */
@@ -49,5 +53,15 @@ public class ReviewItem {
                 ", content='" + content + '\'' +
                 ", url='" + url + '\'' +
                 '}';
+    }
+
+    public ContentValues toContentValues(int movieId) {
+        ContentValues value = new ContentValues();
+        value.put(DatabaseContract.ReviewEntry._ID, id);
+        value.put(DatabaseContract.ReviewEntry.COLUMN_AUTHOR, author);
+        value.put(DatabaseContract.ReviewEntry.COLUMN_CONTENT, content);
+        value.put(DatabaseContract.ReviewEntry.COLUMN_URL, url);
+        value.put(DatabaseContract.ReviewEntry.COLUMN_ID_MOVIE, movieId);
+        return value;
     }
 }

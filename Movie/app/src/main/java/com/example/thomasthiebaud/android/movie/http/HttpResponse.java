@@ -2,11 +2,13 @@ package com.example.thomasthiebaud.android.movie.http;
 
 import org.json.JSONObject;
 
+import java.util.List;
+
 /**
  * Created by thiebaudthomas on 18/09/15.
  */
-public interface HttpResponse {
-    void onSuccess(JSONObject object);
+public interface HttpResponse<T> {
+    void onSuccess(List<T> object);
 
-    void onError(Exception exception);
+    List<T> fromJson(JSONObject json);
 }

@@ -2,7 +2,6 @@ package com.example.thomasthiebaud.android.movie.fragment;
 
 import android.support.v4.app.Fragment;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
@@ -12,22 +11,17 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.example.thomasthiebaud.android.movie.http.MovieHttpCallback;
 import com.example.thomasthiebaud.android.movie.model.loader.LoaderResponse;
-import com.example.thomasthiebaud.android.movie.model.loader.MovieLoader;
+import com.example.thomasthiebaud.android.movie.model.loader.MovieLoaderCallback;
 import com.example.thomasthiebaud.android.movie.model.contract.APIContract;
 import com.example.thomasthiebaud.android.movie.adapter.MovieAdapter;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 import com.example.thomasthiebaud.android.movie.R;
 import com.example.thomasthiebaud.android.movie.activity.DetailActivity;
 import com.example.thomasthiebaud.android.movie.http.HttpService;
-import com.example.thomasthiebaud.android.movie.http.HttpResponse;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,11 +50,8 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     private void updateMovies() {
         String sortBy = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity));
 
-        //Update title to show sort order
-        getActivity().setTitle("Movie - Sort by " + sortBy);
-
         if(sortBy.equals("favorite"))
-            getLoaderManager().initLoader(MovieLoader.ALL_MOVIE_LOADER, null, new MovieLoader(getActivity()).onResponse(new LoaderResponse<MovieItem>() {
+            getLoaderManager().initLoader(MovieLoaderCallback.ALL_MOVIE_LOADER, null, new MovieLoaderCallback(getActivity()).onResponse(new LoaderResponse<MovieItem>() {
                 @Override
                 public void onSuccess(List<MovieItem> items) {
                     movieAdapter.clear();
@@ -68,10 +59,9 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
                 }
             }));
         else {
-            new HttpService().getMovies(sortBy + APIContract.API_SORT_DESC_LABEL).onResponse(new HttpResponse() {
+            new HttpService().getMovies(sortBy + APIContract.API_SORT_DESC_LABEL).onResponse(new MovieHttpCallback() {
                 @Override
-                public void onSuccess(JSONObject object) {
-                    List<MovieItem> movies = getMovieItem(object);
+                public void onSuccess(List<MovieItem> movies) {
                     if (movies != null && !movies.isEmpty()) {
                         movieAdapter.clear();
                         movieAdapter.addAll(movies);
@@ -81,7 +71,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
                 @Override
                 public void onError(Exception exception) {
                     if (exception instanceof IOException) {
-                        getLoaderManager().initLoader(MovieLoader.ALL_MOVIE_LOADER, null, new MovieLoader(getActivity()).onResponse(new LoaderResponse<MovieItem>() {
+                        getLoaderManager().initLoader(MovieLoaderCallback.ALL_MOVIE_LOADER, null, new MovieLoaderCallback(getActivity()).onResponse(new LoaderResponse<MovieItem>() {
                             @Override
                             public void onSuccess(List<MovieItem> items) {
                                 movieAdapter.clear();
@@ -105,35 +95,5 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra(MovieItem.class.getSimpleName(),movieAdapter.getItem(position));
         startActivity(intent);
-    }
-
-    private List<MovieItem> getMovieItem(JSONObject json) {
-        List<MovieItem> movies = new ArrayList<>();
-        JSONArray results;
-        try {
-            results = json.getJSONArray(APIContract.JSON_RESULTS);
-            for(int i=0; i<results.length(); i++) {
-                MovieItem item = new MovieItem();
-                JSONObject jsonMovie = results.getJSONObject(i);
-
-                Uri.Builder builder = new Uri.Builder();
-                builder.scheme(APIContract.POSTER_SCHEME)
-                        .authority(APIContract.POSTER_AUTHORITY)
-                        .appendPath(APIContract.POSTER_PATH_T)
-                        .appendPath(APIContract.POSTER_PATH_P)
-                        .appendPath(APIContract.POSTER_QUALITY);
-
-                item.setPosterPath(builder.build().toString() + jsonMovie.getString(APIContract.JSON_POSTER_PATH));
-                item.setTitle(jsonMovie.getString(APIContract.JSON_TITLE));
-                item.setId(jsonMovie.getInt(APIContract.JSON_ID));
-                item.setOverview(jsonMovie.getString(APIContract.JSON_OVERVIEW));
-                item.setVoteAverage(jsonMovie.getDouble(APIContract.JSON_VOTE_AVERAGE));
-                item.setReleaseDate(jsonMovie.getString(APIContract.JSON_RELEASE_DATE));
-                movies.add(item);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return movies;
     }
 }

@@ -1,5 +1,9 @@
 package com.example.thomasthiebaud.android.movie.model.item;
 
+import android.content.ContentValues;
+
+import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
+
 /**
  * Created by thiebaudthomas on 21/09/15.
  */
@@ -39,5 +43,14 @@ public class TrailerItem {
                 ", name='" + name + '\'' +
                 ", key='" + key + '\'' +
                 '}';
+    }
+
+    public ContentValues toContentValues(int movieId) {
+        ContentValues value = new ContentValues();
+        value.put(DatabaseContract.TrailerEntry._ID, id);
+        value.put(DatabaseContract.TrailerEntry.COLUMN_NAME, name);
+        value.put(DatabaseContract.TrailerEntry.COLUMN_KEY, key);
+        value.put(DatabaseContract.TrailerEntry.COLUMN_ID_MOVIE, movieId);
+        return value;
     }
 }

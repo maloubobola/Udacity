@@ -25,7 +25,7 @@ public class HttpTask extends AsyncTask<Void, Void, JSONObject> {
 
     private HttpMethod httpMethod = HttpMethod.GET;
     private JSONObject body = new JSONObject();
-    private HttpResponse response;
+    private JsonResponse response;
     private Exception exception;
 
     private Uri.Builder builder = new Uri.Builder();
@@ -63,7 +63,7 @@ public class HttpTask extends AsyncTask<Void, Void, JSONObject> {
         return this;
     }
 
-    public HttpTask onResponse(HttpResponse response) {
+    public HttpTask onResponse(JsonResponse response) {
         this.response = response;
         return this;
     }

@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Created by thiebaudthomas on 24/09/15.
  */
-public class MovieLoader implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MovieLoaderCallback implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final int ALL_MOVIE_LOADER = 0;
     public static final int ONE_MOVIE_LOADER = 1;
@@ -25,16 +25,16 @@ public class MovieLoader implements LoaderManager.LoaderCallbacks<Cursor> {
     private LoaderResponse<MovieItem> response;
     private int movieId;
 
-    public MovieLoader(Activity activity) {
+    public MovieLoaderCallback(Activity activity) {
         this.activity = activity;
     }
 
-    public MovieLoader onResponse(LoaderResponse<MovieItem> response) {
+    public MovieLoaderCallback onResponse(LoaderResponse<MovieItem> response) {
         this.response = response;
         return this;
     }
 
-    public MovieLoader setMovieId(int movieId) {
+    public MovieLoaderCallback setMovieId(int movieId) {
         this.movieId = movieId;
         return this;
     }

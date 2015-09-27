@@ -18,23 +18,19 @@ import android.widget.TextView;
 
 import com.example.thomasthiebaud.android.movie.adapter.ReviewAdapter;
 import com.example.thomasthiebaud.android.movie.adapter.TrailerAdapter;
-import com.example.thomasthiebaud.android.movie.http.HttpResponse;
 import com.example.thomasthiebaud.android.movie.http.HttpService;
+import com.example.thomasthiebaud.android.movie.http.ReviewHttpCallback;
+import com.example.thomasthiebaud.android.movie.http.TrailerHttpCallback;
 import com.example.thomasthiebaud.android.movie.model.loader.LoaderResponse;
-import com.example.thomasthiebaud.android.movie.model.loader.MovieLoader;
-import com.example.thomasthiebaud.android.movie.model.loader.ReviewLoader;
-import com.example.thomasthiebaud.android.movie.model.loader.TrailerLoader;
-import com.example.thomasthiebaud.android.movie.model.contract.APIContract;
+import com.example.thomasthiebaud.android.movie.model.loader.MovieLoaderCallback;
+import com.example.thomasthiebaud.android.movie.model.loader.ReviewLoaderCallback;
+import com.example.thomasthiebaud.android.movie.model.loader.TrailerLoaderCallback;
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 import com.example.thomasthiebaud.android.movie.R;
 import com.example.thomasthiebaud.android.movie.model.item.ReviewItem;
 import com.example.thomasthiebaud.android.movie.model.item.TrailerItem;
 import com.squareup.picasso.Picasso;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,7 +40,6 @@ import java.util.List;
  * A placeholder fragment containing a simple view.
  */
 public class DetailActivityFragment extends Fragment {
-
     private final String TAG = DetailActivityFragment.class.getSimpleName();
 
     private ReviewAdapter reviewAdapter;
@@ -90,9 +85,9 @@ public class DetailActivityFragment extends Fragment {
 
         final int movieId = item.getId();
 
-        new HttpService().getTrailers(item.getId() + "").onResponse(new HttpResponse() {
+        new HttpService().getTrailers(movieId + "").onResponse(new TrailerHttpCallback() {
             @Override
-            public void onSuccess(JSONObject object) {
+            public void onSuccess(List<TrailerItem> trailers) {
                 trailerAdapter = new TrailerAdapter(getContext());
                 ListView listView = ((ListView) rootView.findViewById(R.id.trailers_list));
                 listView.setAdapter(trailerAdapter);
@@ -103,19 +98,19 @@ public class DetailActivityFragment extends Fragment {
                         startActivity(intent);
                     }
                 });
-                trailerAdapter.addAll(getTrailers(object));
+                trailerAdapter.addAll(trailers);
             }
 
             @Override
             public void onError(Exception exception) {
                 if (exception instanceof IOException)
-                    getLoaderManager().initLoader(TrailerLoader.TRAILER_LOADER_ID, null, new TrailerLoader(getActivity(), trailerAdapter, movieId));
+                    getLoaderManager().initLoader(TrailerLoaderCallback.TRAILER_LOADER_ID, null, new TrailerLoaderCallback(getActivity(), trailerAdapter, movieId));
             }
         }).execute();
 
-        new HttpService().getReview(item.getId() + "").onResponse(new HttpResponse() {
+        new HttpService().getReview(movieId + "").onResponse(new ReviewHttpCallback() {
             @Override
-            public void onSuccess(JSONObject object) {
+            public void onSuccess(List<ReviewItem> reviews) {
                 reviewAdapter = new ReviewAdapter(getContext());
                 ListView listView = ((ListView) rootView.findViewById(R.id.reviews_list));
                 listView.setAdapter(reviewAdapter);
@@ -126,55 +121,36 @@ public class DetailActivityFragment extends Fragment {
                         startActivity(intent);
                     }
                 });
-                reviewAdapter.addAll(getReviews(object));
+                reviewAdapter.addAll(reviews);
             }
 
             @Override
             public void onError(Exception exception) {
+
                 if (exception instanceof IOException)
-                    getLoaderManager().initLoader(ReviewLoader.REVIEW_LOADER_ID, null, new ReviewLoader(getActivity(), reviewAdapter, movieId));
+                    getLoaderManager().initLoader(ReviewLoaderCallback.REVIEW_LOADER_ID, null, new ReviewLoaderCallback(getActivity(), reviewAdapter, movieId));
             }
         }).execute();
 
-        getLoaderManager().initLoader(MovieLoader.ONE_MOVIE_LOADER, null, new MovieLoader(getActivity()).setMovieId(movieId).onResponse(new LoaderResponse<MovieItem>() {
+        getLoaderManager().initLoader(MovieLoaderCallback.ONE_MOVIE_LOADER, null, new MovieLoaderCallback(getActivity()).setMovieId(movieId).onResponse(new LoaderResponse<MovieItem>() {
             @Override
             public void onSuccess(List<MovieItem> items) {
-                if (!items.isEmpty()) {
-                    ((FloatingActionButton) rootView.findViewById(R.id.favorite_button)).setImageResource(R.drawable.ic_favorite_black);
-                    isFavorite = true;
-                }
+            if (!items.isEmpty()) {
+                ((FloatingActionButton) rootView.findViewById(R.id.favorite_button)).setImageResource(R.drawable.ic_favorite_black);
+                isFavorite = true;
+            }
             }
         }));
 
-        final ContentValues movieValues = new ContentValues();
-        movieValues.put(DatabaseContract.MovieEntry._ID,item.getId());
-        movieValues.put(DatabaseContract.MovieEntry.COLUMN_OVERVIEW,item.getOverview());
-        movieValues.put(DatabaseContract.MovieEntry.COLUMN_POSTER_PATH,item.getPosterPath());
-        movieValues.put(DatabaseContract.MovieEntry.COLUMN_RELEASE_DATE,item.getReleaseDate());
-        movieValues.put(DatabaseContract.MovieEntry.COLUMN_TITLE, item.getTitle());
-        movieValues.put(DatabaseContract.MovieEntry.COLUMN_VOTE_AVERAGE, item.getVoteAverage());
-
+        final ContentValues movieValues = item.toContentValues();
         final List<ContentValues> reviewValues = new ArrayList<>();
         final List<ContentValues> trailerValues = new ArrayList<>();
 
-        for(ReviewItem r : reviewAdapter.getItems()) {
-            ContentValues value = new ContentValues();
-            value.put(DatabaseContract.ReviewEntry._ID, r.getId());
-            value.put(DatabaseContract.ReviewEntry.COLUMN_AUTHOR, r.getAuthor());
-            value.put(DatabaseContract.ReviewEntry.COLUMN_CONTENT, r.getContent());
-            value.put(DatabaseContract.ReviewEntry.COLUMN_URL, r.getUrl());
-            value.put(DatabaseContract.ReviewEntry.COLUMN_ID_MOVIE, movieId);
-            reviewValues.add(value);
-        }
+        for(ReviewItem r : reviewAdapter.getItems())
+            reviewValues.add(r.toContentValues(movieId));
 
-        for(TrailerItem t : trailerAdapter.getItems()) {
-            ContentValues value = new ContentValues();
-            value.put(DatabaseContract.TrailerEntry._ID, t.getId());
-            value.put(DatabaseContract.TrailerEntry.COLUMN_NAME, t.getName());
-            value.put(DatabaseContract.TrailerEntry.COLUMN_KEY, t.getKey());
-            value.put(DatabaseContract.TrailerEntry.COLUMN_ID_MOVIE, movieId);
-            trailerValues.add(value);
-        }
+        for(TrailerItem t : trailerAdapter.getItems())
+            trailerValues.add(t.toContentValues(movieId));
 
         rootView.findViewById(R.id.favorite_button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -218,42 +194,4 @@ public class DetailActivityFragment extends Fragment {
         return rootView;
     }
 
-    private List<TrailerItem> getTrailers(JSONObject json) {
-        List<TrailerItem> trailers = new ArrayList<>();
-        JSONArray results;
-        try {
-            results = json.getJSONArray(APIContract.JSON_RESULTS);
-            for(int i=0; i<results.length(); i++) {
-                JSONObject jsonTrailer = results.getJSONObject(i);
-                TrailerItem trailerItem = new TrailerItem();
-                trailerItem.setId(jsonTrailer.getString(APIContract.JSON_ID));
-                trailerItem.setName(jsonTrailer.getString(APIContract.JSON_NAME));
-                trailerItem.setKey(jsonTrailer.getString(APIContract.JSON_KEY));
-                trailers.add(trailerItem);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return trailers;
-    }
-
-    private List<ReviewItem> getReviews(JSONObject json) {
-        List<ReviewItem> reviews = new ArrayList<>();
-        JSONArray results;
-        try {
-            results = json.getJSONArray(APIContract.JSON_RESULTS);
-            for(int i=0; i<results.length(); i++) {
-                JSONObject jsonReview = results.getJSONObject(i);
-                ReviewItem reviewItem = new ReviewItem();
-                reviewItem.setId(jsonReview.getString(APIContract.JSON_ID));
-                reviewItem.setAuthor(jsonReview.getString(APIContract.JSON_AUTHOR));
-                reviewItem.setContent(jsonReview.getString(APIContract.JSON_CONTENT));
-                reviewItem.setUrl(jsonReview.getString((APIContract.JSON_URL)));
-                reviews.add(reviewItem);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return reviews;
-    }
 }

@@ -1,5 +1,9 @@
 package com.example.thomasthiebaud.android.movie.model.item;
 
+import android.content.ContentValues;
+
+import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
+
 import java.io.Serializable;
 
 /**
@@ -75,5 +79,16 @@ public class MovieItem implements Serializable {
                 ", title='" + title + '\'' +
                 ", id=" + id +
                 '}';
+    }
+
+    public ContentValues toContentValues() {
+        ContentValues movieValues = new ContentValues();
+        movieValues.put(DatabaseContract.MovieEntry._ID,this.getId());
+        movieValues.put(DatabaseContract.MovieEntry.COLUMN_OVERVIEW,this.getOverview());
+        movieValues.put(DatabaseContract.MovieEntry.COLUMN_POSTER_PATH,this.getPosterPath());
+        movieValues.put(DatabaseContract.MovieEntry.COLUMN_RELEASE_DATE,this.getReleaseDate());
+        movieValues.put(DatabaseContract.MovieEntry.COLUMN_TITLE, this.getTitle());
+        movieValues.put(DatabaseContract.MovieEntry.COLUMN_VOTE_AVERAGE, this.getVoteAverage());
+        return movieValues;
     }
 }

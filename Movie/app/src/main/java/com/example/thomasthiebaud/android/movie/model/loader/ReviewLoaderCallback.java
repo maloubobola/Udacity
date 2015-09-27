@@ -17,14 +17,14 @@ import java.util.List;
 /**
  * Created by thiebaudthomas on 24/09/15.
  */
-public class ReviewLoader implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ReviewLoaderCallback implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final int REVIEW_LOADER_ID = 100;
 
     private Activity activity;
     private ReviewAdapter adapter;
     private int movieId;
 
-    public ReviewLoader(Activity activity, ReviewAdapter adapter, int movieId) {
+    public ReviewLoaderCallback(Activity activity, ReviewAdapter adapter, int movieId) {
         this.activity = activity;
         this.adapter = adapter;
         this.movieId = movieId;
