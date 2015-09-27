@@ -7,13 +7,29 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.thomasthiebaud.android.movie.R;
+import com.example.thomasthiebaud.android.movie.controller.fragment.DetailFragment;
+import com.example.thomasthiebaud.android.movie.controller.fragment.MainFragment;
+import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MainFragment.MovieClickCallback {
+    private boolean isTwoPane = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if(findViewById(R.id.movie_detail_container) != null) {
+            this.isTwoPane = true;
+            if(savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.movie_detail_container, new DetailFragment())
+                        .commit();
+            }
+            else {
+                isTwoPane = false;
+            }
+        }
     }
 
 
@@ -34,5 +50,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onMovieSelected(MovieItem movie) {
+        if(isTwoPane) {
+            Bundle argument = new Bundle();
+            argument.putParcelable(MovieItem.class.getSimpleName(), movie);
+
+            DetailFragment fragment = new DetailFragment();
+            fragment.setArguments(argument);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.movie_detail_container,fragment)
+                    .commit();
+        } else {
+            Intent intent = new Intent(this, DetailActivity.class).putExtra(MovieItem.class.getSimpleName(),movie);
+            startActivity(intent);
+        }
     }
 }

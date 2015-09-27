@@ -32,7 +32,7 @@ public class HttpTask extends AsyncTask<Void, Void, JSONObject> {
 
     private HttpTask(String authority) {
         builder.authority(authority);
-    };
+    }
 
     public static HttpTask authority(String authority) {
         return new HttpTask(authority);
@@ -46,7 +46,7 @@ public class HttpTask extends AsyncTask<Void, Void, JSONObject> {
     public HttpTask appendPath(String path) {
         builder.appendPath(path);
         return this;
-    };
+    }
 
     public HttpTask appendQuery(String key, String value) {
         builder.appendQueryParameter(key, value);

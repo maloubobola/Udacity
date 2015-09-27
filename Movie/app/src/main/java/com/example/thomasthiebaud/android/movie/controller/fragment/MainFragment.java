@@ -1,7 +1,6 @@
 package com.example.thomasthiebaud.android.movie.controller.fragment;
 
 import android.support.v4.app.Fragment;
-import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
@@ -18,7 +17,6 @@ import com.example.thomasthiebaud.android.movie.model.contract.APIContract;
 import com.example.thomasthiebaud.android.movie.controller.data.adapter.MovieAdapter;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 import com.example.thomasthiebaud.android.movie.R;
-import com.example.thomasthiebaud.android.movie.controller.activity.DetailActivity;
 import com.example.thomasthiebaud.android.movie.controller.data.http.HttpService;
 
 import java.io.IOException;
@@ -27,13 +25,17 @@ import java.util.List;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class MainFragment extends Fragment implements AdapterView.OnItemClickListener {
 
-    private static final String TAG = MainActivityFragment.class.getSimpleName();
+    private static final String TAG = MainFragment.class.getSimpleName();
 
     private MovieAdapter movieAdapter;
 
-    public MainActivityFragment() {}
+    public MainFragment() {}
+
+    public interface MovieClickCallback {
+        void onMovieSelected(MovieItem movie);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -93,7 +95,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra(MovieItem.class.getSimpleName(),movieAdapter.getItem(position));
-        startActivity(intent);
+        MovieItem movie = movieAdapter.getItem(position);
+        ((MovieClickCallback) getActivity()).onMovieSelected(movie);
     }
 }

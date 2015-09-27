@@ -55,6 +55,7 @@ public class MovieAdapter extends BaseAdapter {
                 .load(movie.getPosterPath())
                 .placeholder(R.drawable.ic_cached_black)
                 .error(R.drawable.ic_report_problem_black)
+                .fit()
                 .into(view);
 
         return view;

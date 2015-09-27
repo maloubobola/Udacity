@@ -39,14 +39,14 @@ import java.util.List;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailActivityFragment extends Fragment {
-    private final String TAG = DetailActivityFragment.class.getSimpleName();
+public class DetailFragment extends Fragment {
+    private final String TAG = DetailFragment.class.getSimpleName();
 
     private ReviewAdapter reviewAdapter;
     private TrailerAdapter trailerAdapter;
     private boolean isFavorite = false;
 
-    public DetailActivityFragment() {}
+    public DetailFragment() {}
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,9 +58,10 @@ public class DetailActivityFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         MovieItem item = null;
 
-        if (intent != null && intent.hasExtra(MovieItem.class.getSimpleName()))
-            if(intent.getSerializableExtra(MovieItem.class.getSimpleName()) instanceof MovieItem)
-                item = (MovieItem) intent.getSerializableExtra(MovieItem.class.getSimpleName());
+        Bundle argument = getArguments();
+
+        if(argument != null)
+            item = argument.getParcelable(MovieItem.class.getSimpleName());
 
         if(item == null)
             return rootView;
