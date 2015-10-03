@@ -6,11 +6,13 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -65,6 +67,9 @@ public class MovieLoaderCallback implements LoaderManager.LoaderCallbacks<Cursor
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        Log.e("Cursor",cursor.toString()    );
+
+
         response.onSuccess(cursorToMovies(cursor));
         cursor.close();
     }
@@ -76,6 +81,7 @@ public class MovieLoaderCallback implements LoaderManager.LoaderCallbacks<Cursor
 
     private List<MovieItem> cursorToMovies(Cursor cursor) {
         List<MovieItem> movies = new ArrayList<>();
+
         while (cursor.moveToNext()) {
             MovieItem item = new MovieItem();
             item.setId(cursor.getInt(cursor.getColumnIndex(DatabaseContract.MovieEntry._ID)));
@@ -86,6 +92,7 @@ public class MovieLoaderCallback implements LoaderManager.LoaderCallbacks<Cursor
             item.setReleaseDate(cursor.getString(cursor.getColumnIndex(DatabaseContract.MovieEntry.COLUMN_RELEASE_DATE)));
             movies.add(item);
         }
+
         return movies;
     }
 }

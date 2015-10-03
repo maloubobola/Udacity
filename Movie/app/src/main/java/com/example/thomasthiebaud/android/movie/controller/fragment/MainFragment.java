@@ -1,5 +1,7 @@
 package com.example.thomasthiebaud.android.movie.controller.fragment;
 
+
+import android.database.Cursor;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -8,19 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
-import com.example.thomasthiebaud.android.movie.controller.data.http.MovieHttpCallback;
-import com.example.thomasthiebaud.android.movie.controller.data.database.loader.LoaderResponse;
-import com.example.thomasthiebaud.android.movie.controller.data.database.loader.MovieLoaderCallback;
-import com.example.thomasthiebaud.android.movie.model.contract.APIContract;
 import com.example.thomasthiebaud.android.movie.controller.data.adapter.MovieAdapter;
+import com.example.thomasthiebaud.android.movie.controller.data.database.loader.MovieCursorLoaderCallback;
+import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 import com.example.thomasthiebaud.android.movie.R;
-import com.example.thomasthiebaud.android.movie.controller.data.http.HttpService;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -33,16 +28,12 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
 
     public MainFragment() {}
 
-    public interface MovieClickCallback {
-        void onMovieSelected(MovieItem movie);
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
         GridView gv = (GridView) view.findViewById(R.id.cover_grid);
-        movieAdapter = new MovieAdapter(view.getContext());
+        movieAdapter = new MovieAdapter(getContext(),null,0);
         gv.setAdapter(movieAdapter);
         gv.setOnItemClickListener(this);
 
@@ -51,40 +42,10 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
 
     private void updateMovies() {
         String sortBy = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity));
-
-        if(sortBy.equals("favorite"))
-            getLoaderManager().initLoader(MovieLoaderCallback.ALL_MOVIE_LOADER, null, new MovieLoaderCallback(getActivity()).onResponse(new LoaderResponse<MovieItem>() {
-                @Override
-                public void onSuccess(List<MovieItem> items) {
-                    movieAdapter.clear();
-                    movieAdapter.addAll(items);
-                }
-            }));
-        else {
-            new HttpService().getMovies(sortBy + APIContract.API_SORT_DESC_LABEL).onResponse(new MovieHttpCallback() {
-                @Override
-                public void onSuccess(List<MovieItem> movies) {
-                    if (movies != null && !movies.isEmpty()) {
-                        movieAdapter.clear();
-                        movieAdapter.addAll(movies);
-                    }
-                }
-
-                @Override
-                public void onError(Exception exception) {
-                    if (exception instanceof IOException) {
-                        getLoaderManager().initLoader(MovieLoaderCallback.ALL_MOVIE_LOADER, null, new MovieLoaderCallback(getActivity()).onResponse(new LoaderResponse<MovieItem>() {
-                            @Override
-                            public void onSuccess(List<MovieItem> items) {
-                                movieAdapter.clear();
-                                movieAdapter.addAll(items);
-                            }
-                        }));
-                        Toast.makeText(getActivity(), "Network unreachable.", Toast.LENGTH_LONG).show();
-                    }
-                }
-            }).execute();
-        }
+        getLoaderManager().restartLoader(MovieCursorLoaderCallback.ALL_MOVIE_LOADER, null, new MovieCursorLoaderCallback(getActivity(), movieAdapter, sortBy));
+        View v = getActivity().findViewById(R.id.movie_detail_container);
+        if(v != null)
+            v.setVisibility(View.GONE);
     }
 
     @Override
@@ -93,9 +54,29 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
         updateMovies();
     }
 
+
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        MovieItem movie = movieAdapter.getItem(position);
-        ((MovieClickCallback) getActivity()).onMovieSelected(movie);
+        Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+        if(cursor != null) {
+            MovieItem movie = new MovieItem();
+            movie.setId(cursor.getInt(DatabaseContract.MovieEntry._ID_INDEX));
+            movie.setTitle(cursor.getString(DatabaseContract.MovieEntry.COLUMN_TITLE_INDEX));
+            movie.setPosterPath(cursor.getString(DatabaseContract.MovieEntry.COLUMN_POSTER_PATH_INDEX));
+            movie.setOverview(cursor.getString(DatabaseContract.MovieEntry.COLUMN_OVERVIEW_INDEX));
+            movie.setVoteAverage(cursor.getDouble(DatabaseContract.MovieEntry.COLUMN_VOTE_AVERAGE_INDEX));
+            movie.setReleaseDate(cursor.getString(DatabaseContract.MovieEntry.COLUMN_RELEASE_DATE_INDEX));
+
+            ((MovieClickCallback) getActivity()).onMovieSelected(movie);
+
+            View v = getActivity().findViewById(R.id.movie_detail_container);
+            if(v != null)
+                v.setVisibility(View.VISIBLE);
+        }
+    }
+
+    //TODO MOve to separate file or into activity
+    public interface MovieClickCallback {
+        void onMovieSelected(MovieItem movie);
     }
 }

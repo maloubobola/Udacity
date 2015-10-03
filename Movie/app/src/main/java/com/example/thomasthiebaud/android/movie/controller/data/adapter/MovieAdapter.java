@@ -1,72 +1,44 @@
 package com.example.thomasthiebaud.android.movie.controller.data.adapter;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.CursorAdapter;
 import android.widget.ImageView;
 
 import com.example.thomasthiebaud.android.movie.R;
-import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
+import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Created by thiebaudthomas on 09/09/15.
+ * Created by thomasthiebaud on 02/10/15.
  */
-public class MovieAdapter extends BaseAdapter {
-    private final String TAG = MovieAdapter.class.getSimpleName();
-    private final Context context;
-    private List<MovieItem> movies = new ArrayList<>();
+public class MovieAdapter extends CursorAdapter {
 
-    public MovieAdapter(Context context) {
-        this.context = context;
+    public MovieAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
     }
 
     @Override
-    public int getCount() {
-        return movies.size();
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        return LayoutInflater.from(context).inflate(R.layout.grid_view_item,parent,false);
     }
 
     @Override
-    public MovieItem getItem(int position) {
-        return movies.get(position);
-    }
+    public void bindView(View view, Context context, Cursor cursor) {
+        ImageView imageView = (ImageView) view.findViewById(R.id.grid_item_image);
+        if (imageView == null)
+            imageView = new ImageView(context);
 
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
+        imageView.setAdjustViewBounds(true);
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView view = null;
-        if (view == null) {
-            view = new ImageView(context);
-            view.setAdjustViewBounds(true);
-        } else {
-            view = (ImageView) convertView;
-        }
-
-        MovieItem movie = getItem(position);
         Picasso.with(context)
-                .load(movie.getPosterPath())
+                .load(cursor.getString(DatabaseContract.MovieEntry.COLUMN_POSTER_PATH_INDEX))
                 .placeholder(R.drawable.ic_cached_black)
                 .error(R.drawable.ic_report_problem_black)
                 .fit()
-                .into(view);
-
-        return view;
-    }
-
-    public void clear() {
-        movies.clear();
-    }
-
-    public void addAll(List<MovieItem> movies) {
-        this.movies = movies;
-        this.notifyDataSetChanged();
+                .into(imageView);
     }
 }

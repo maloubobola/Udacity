@@ -23,6 +23,13 @@ public class DatabaseContract {
         public static final String COLUMN_VOTE_AVERAGE = "voteAverage";
         public static final String COLUMN_RELEASE_DATE = "releaseDate";
 
+        public static final int _ID_INDEX = 0;
+        public static final int COLUMN_TITLE_INDEX = 1;
+        public static final int COLUMN_POSTER_PATH_INDEX = 2;
+        public static final int COLUMN_OVERVIEW_INDEX = 3;
+        public static final int COLUMN_VOTE_AVERAGE_INDEX = 4;
+        public static final int COLUMN_RELEASE_DATE_INDEX = 5;
+
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE).build();

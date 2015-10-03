@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.example.thomasthiebaud.android.movie.R;
 import com.example.thomasthiebaud.android.movie.controller.fragment.DetailFragment;
@@ -21,14 +22,13 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Movi
 
         if(findViewById(R.id.movie_detail_container) != null) {
             this.isTwoPane = true;
-            if(savedInstanceState == null) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.movie_detail_container, new DetailFragment())
-                        .commit();
-            }
-            else {
-                isTwoPane = false;
-            }
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.movie_detail_container, new DetailFragment())
+                    .commit();
+            findViewById(R.id.movie_detail_container).setVisibility(View.GONE);
+        }
+        else {
+            isTwoPane = false;
         }
     }
 

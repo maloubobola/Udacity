@@ -19,7 +19,7 @@ import java.net.URL;
 /**
  * Created by thiebaudthomas on 18/09/15.
  */
-public class HttpTask extends AsyncTask<Void, Void, JSONObject> {
+public class HttpTask {
 
     private final String TAG = HttpTask.class.getSimpleName();
 
@@ -68,8 +68,7 @@ public class HttpTask extends AsyncTask<Void, Void, JSONObject> {
         return this;
     }
 
-    @Override
-    protected JSONObject doInBackground(Void... params) {
+    public JSONObject execute() {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
@@ -131,13 +130,5 @@ public class HttpTask extends AsyncTask<Void, Void, JSONObject> {
                 }
             }
         }
-    }
-
-    @Override
-    protected void onPostExecute(JSONObject response) {
-        if(response == null)
-            this.response.onError(exception);
-        else
-            this.response.onSuccess(response);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.thomasthiebaud.android.movie.controller.data.http;
 
 import android.net.Uri;
+import android.util.Log;
 
 import com.example.thomasthiebaud.android.movie.model.contract.APIContract;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
