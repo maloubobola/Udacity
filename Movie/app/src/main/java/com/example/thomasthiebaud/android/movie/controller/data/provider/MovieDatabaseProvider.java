@@ -1,4 +1,4 @@
-package com.example.thomasthiebaud.android.movie.controller.data.database.provider;
+package com.example.thomasthiebaud.android.movie.controller.data.provider;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -10,33 +10,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.example.thomasthiebaud.android.movie.R;
-import com.example.thomasthiebaud.android.movie.controller.data.http.HttpMethod;
 import com.example.thomasthiebaud.android.movie.controller.data.http.HttpService;
-import com.example.thomasthiebaud.android.movie.controller.data.http.HttpTask;
-import com.example.thomasthiebaud.android.movie.controller.data.http.JsonResponse;
-import com.example.thomasthiebaud.android.movie.controller.data.http.MovieHttpCallback;
 import com.example.thomasthiebaud.android.movie.model.contract.APIContract;
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.controller.data.database.helper.MovieDatabaseHelper;
-import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.List;
 
 /**
  * Created by thiebaudthomas on 22/09/15.
@@ -51,12 +34,9 @@ public class MovieDatabaseProvider extends ContentProvider {
     static final int ALL_MOVIE = 101;
     static final int FAVORITE_MOVIE = 102;
     static final int TRAILER = 200;
+    static final int FAVORITE_TRAILER = 201;
     static final int REVIEW = 300;
-
-    private HttpMethod httpMethod = HttpMethod.GET;
-    private JSONObject body = new JSONObject();
-    private JsonResponse response;
-    private Exception exception;
+    static final int FAVORITE_REVIEW = 301;
 
     private static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -64,10 +44,12 @@ public class MovieDatabaseProvider extends ContentProvider {
 
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/*", ALL_MOVIE);
-        matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/#", MOVIE);
+        matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/*/#", MOVIE);
         matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/favorite", FAVORITE_MOVIE);
-        matcher.addURI(authority, DatabaseContract.PATH_TRAILER, TRAILER);
-        matcher.addURI(authority, DatabaseContract.PATH_REVIEW, REVIEW);
+        matcher.addURI(authority, DatabaseContract.PATH_TRAILER + "/*/*", TRAILER);
+        matcher.addURI(authority, DatabaseContract.PATH_TRAILER + "/favorite", FAVORITE_TRAILER);
+        matcher.addURI(authority, DatabaseContract.PATH_REVIEW + "/*/*", REVIEW);
+        matcher.addURI(authority, DatabaseContract.PATH_REVIEW + "/favorite", FAVORITE_REVIEW);
         return matcher;
     }
 
@@ -89,6 +71,8 @@ public class MovieDatabaseProvider extends ContentProvider {
             case FAVORITE_MOVIE:
                 return DatabaseContract.MovieEntry.CONTENT_TYPE;
             case REVIEW:
+                return DatabaseContract.ReviewEntry.CONTENT_TYPE;
+            case FAVORITE_REVIEW:
                 return DatabaseContract.ReviewEntry.CONTENT_TYPE;
             case TRAILER:
                 return DatabaseContract.ReviewEntry.CONTENT_TYPE;
@@ -112,46 +96,57 @@ public class MovieDatabaseProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
-            case ALL_MOVIE:
-                cursor = new MatrixCursor(new String[]{
-                        DatabaseContract.MovieEntry._ID,
-                        DatabaseContract.MovieEntry.COLUMN_TITLE,
-                        DatabaseContract.MovieEntry.COLUMN_POSTER_PATH,
-                        DatabaseContract.MovieEntry.COLUMN_OVERVIEW,
-                        DatabaseContract.MovieEntry.COLUMN_VOTE_AVERAGE,
-                        DatabaseContract.MovieEntry.COLUMN_RELEASE_DATE
-                });
+            case ALL_MOVIE: {
+                    cursor = new MatrixCursor(new String[]{
+                            DatabaseContract.MovieEntry._ID,
+                            DatabaseContract.MovieEntry.COLUMN_TITLE,
+                            DatabaseContract.MovieEntry.COLUMN_POSTER_PATH,
+                            DatabaseContract.MovieEntry.COLUMN_OVERVIEW,
+                            DatabaseContract.MovieEntry.COLUMN_VOTE_AVERAGE,
+                            DatabaseContract.MovieEntry.COLUMN_RELEASE_DATE
+                    });
 
-                JSONObject json = new HttpService().getMovies(uri.getLastPathSegment() + APIContract.API_SORT_DESC_LABEL).execute();
+                    JSONObject json = new HttpService().getMovies(uri.getLastPathSegment() + APIContract.API_SORT_DESC_LABEL).execute();
 
-                JSONArray results;
-                try {
-                    results = json.getJSONArray(APIContract.JSON_RESULTS);
-                    for(int i=0; i<results.length(); i++) {
+                    JSONArray results;
+                    try {
+                        results = json.getJSONArray(APIContract.JSON_RESULTS);
+                        for (int i = 0; i < results.length(); i++) {
 
-                        JSONObject jsonMovie = results.getJSONObject(i);
+                            JSONObject jsonMovie = results.getJSONObject(i);
 
-                        Uri.Builder builder = new Uri.Builder();
-                        builder.scheme(APIContract.POSTER_SCHEME)
-                                .authority(APIContract.POSTER_AUTHORITY)
-                                .appendPath(APIContract.POSTER_PATH_T)
-                                .appendPath(APIContract.POSTER_PATH_P)
-                                .appendPath(APIContract.POSTER_QUALITY);
+                            Uri.Builder builder = new Uri.Builder();
+                            builder.scheme(APIContract.POSTER_SCHEME)
+                                    .authority(APIContract.POSTER_AUTHORITY)
+                                    .appendPath(APIContract.POSTER_PATH_T)
+                                    .appendPath(APIContract.POSTER_PATH_P)
+                                    .appendPath(APIContract.POSTER_QUALITY);
 
-                        ((MatrixCursor)cursor).addRow(new String[]{
-                                jsonMovie.getInt(APIContract.JSON_ID) + "",
-                                jsonMovie.getString(APIContract.JSON_TITLE),
-                                builder.build().toString() + jsonMovie.getString(APIContract.JSON_POSTER_PATH),
-                                jsonMovie.getString(APIContract.JSON_OVERVIEW),
-                                jsonMovie.getDouble(APIContract.JSON_VOTE_AVERAGE) + "",
-                                jsonMovie.getString(APIContract.JSON_RELEASE_DATE)
-                        });
+                            ((MatrixCursor) cursor).addRow(new String[]{
+                                    jsonMovie.getInt(APIContract.JSON_ID) + "",
+                                    jsonMovie.getString(APIContract.JSON_TITLE),
+                                    builder.build().toString() + jsonMovie.getString(APIContract.JSON_POSTER_PATH),
+                                    jsonMovie.getString(APIContract.JSON_OVERVIEW),
+                                    jsonMovie.getDouble(APIContract.JSON_VOTE_AVERAGE) + "",
+                                    jsonMovie.getString(APIContract.JSON_RELEASE_DATE)
+                            });
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
                 break;
-            case TRAILER:
+            case MOVIE:
+                cursor = openHelper.getReadableDatabase().query(
+                        DatabaseContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            case FAVORITE_TRAILER:
                 cursor = openHelper.getReadableDatabase().query(
                         DatabaseContract.TrailerEntry.TABLE_NAME,
                         projection,
@@ -161,7 +156,32 @@ public class MovieDatabaseProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
-            case REVIEW:
+            case TRAILER: {
+                    cursor = new MatrixCursor(new String[]{
+                            DatabaseContract.TrailerEntry._ID,
+                            DatabaseContract.TrailerEntry.COLUMN_NAME,
+                            DatabaseContract.TrailerEntry.COLUMN_KEY
+                    });
+
+                    JSONObject json = new HttpService().getTrailers(uri.getLastPathSegment()).execute();
+
+                    JSONArray results;
+                    try {
+                        results = json.getJSONArray(APIContract.JSON_RESULTS);
+                        for (int i = 0; i < results.length(); i++) {
+                            JSONObject jsonReview = results.getJSONObject(i);
+                            ((MatrixCursor) cursor).addRow(new String[]{
+                                    jsonReview.getString(APIContract.JSON_ID).hashCode() + "",
+                                    jsonReview.getString(APIContract.JSON_NAME),
+                                    jsonReview.getString(APIContract.JSON_KEY)
+                            });
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case FAVORITE_REVIEW:
                 cursor = openHelper.getReadableDatabase().query(
                         DatabaseContract.ReviewEntry.TABLE_NAME,
                         projection,
@@ -171,9 +191,36 @@ public class MovieDatabaseProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
+            case REVIEW:
+                cursor = new MatrixCursor(new String[]{
+                        DatabaseContract.ReviewEntry._ID,
+                        DatabaseContract.ReviewEntry.COLUMN_AUTHOR,
+                        DatabaseContract.ReviewEntry.COLUMN_CONTENT,
+                        DatabaseContract.ReviewEntry.COLUMN_URL
+                });
+
+                JSONObject json = new HttpService().getReview(uri.getLastPathSegment()).execute();
+
+                JSONArray results;
+                try {
+                    results = json.getJSONArray(APIContract.JSON_RESULTS);
+                    for(int i=0; i<results.length(); i++) {
+                        JSONObject jsonReview = results.getJSONObject(i);
+                        ((MatrixCursor)cursor).addRow(new String[]{
+                                jsonReview.getString(APIContract.JSON_ID).hashCode()+"",
+                                jsonReview.getString(APIContract.JSON_AUTHOR),
+                                jsonReview.getString(APIContract.JSON_CONTENT),
+                                jsonReview.getString(APIContract.JSON_URL),
+                        });
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
     }
 

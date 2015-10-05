@@ -1,72 +1,37 @@
 package com.example.thomasthiebaud.android.movie.controller.data.adapter;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.example.thomasthiebaud.android.movie.R;
-import com.example.thomasthiebaud.android.movie.model.item.TrailerItem;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 
 /**
- * Created by thiebaudthomas on 21/09/15.
+ * Created by thomasthiebaud on 04/10/15.
  */
-public class TrailerAdapter extends BaseAdapter {
+public class TrailerAdapter extends CursorAdapter {
 
-    private final Context context;
-    private List<TrailerItem> trailers = new ArrayList<>();
-
-    public TrailerAdapter(Context context) {
-        this.context = context;
+    public TrailerAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
     }
 
     @Override
-    public int getCount() {
-        return trailers.size();
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        return LayoutInflater.from(context).inflate(R.layout.default_list_item_layout,parent,false);
     }
 
     @Override
-    public TrailerItem getItem(int position) {
-        return trailers.get(position);
-    }
+    public void bindView(View view, Context context, Cursor cursor) {
+        TextView textView = (TextView) view.findViewById(R.id.default_list_item);
 
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
+        if(textView == null)
+            textView = new TextView(context);
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        TextView view = null;
-        if (view == null) {
-            view = new TextView(context);
-        }else {
-            view = (TextView) convertView;
-        }
-
-        TrailerItem trailerItem = getItem(position);
-        view.setText(trailerItem.getName());
-
-        int padding = (int) context.getResources().getDimension(R.dimen.default_padding);
-        view.setPadding(padding, padding, padding, padding);
-
-        return view;
-    }
-
-    public void clear() {
-        trailers.clear();
-    }
-
-    public void addAll(List<TrailerItem> movies) {
-        this.trailers = movies;
-        this.notifyDataSetChanged();
-    }
-
-    public List<TrailerItem> getItems() {
-        return trailers;
+        textView.setText(cursor.getString(DatabaseContract.TrailerEntry.COLUMN_NAME_INDEX));
     }
 }

@@ -1,72 +1,37 @@
 package com.example.thomasthiebaud.android.movie.controller.data.adapter;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.example.thomasthiebaud.android.movie.R;
-import com.example.thomasthiebaud.android.movie.model.item.ReviewItem;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 
 /**
- * Created by thiebaudthomas on 21/09/15.
+ * Created by thomasthiebaud on 04/10/15.
  */
-public class ReviewAdapter extends BaseAdapter {
+public class ReviewAdapter extends CursorAdapter {
 
-    private final Context context;
-    private List<ReviewItem> reviews = new ArrayList<>();
-
-    public ReviewAdapter(Context context) {
-        this.context = context;
+    public ReviewAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
     }
 
     @Override
-    public int getCount() {
-        return reviews.size();
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        return LayoutInflater.from(context).inflate(R.layout.default_list_item_layout,parent,false);
     }
 
     @Override
-    public ReviewItem getItem(int position) {
-        return reviews.get(position);
-    }
+    public void bindView(View view, Context context, Cursor cursor) {
+        TextView textView = (TextView) view.findViewById(R.id.default_list_item);
 
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
+        if(textView == null)
+            textView = new TextView(context);
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        TextView view = null;
-        if (convertView == null) {
-            view = new TextView(context);
-        } else {
-            view = (TextView) convertView;
-        }
-
-        ReviewItem reviewItem = getItem(position);
-        view.setText(reviewItem.getContent());
-
-        int padding = (int) context.getResources().getDimension(R.dimen.default_padding);
-        view.setPadding(padding, padding, padding, padding);
-
-        return view;
-    }
-
-    public void clear() {
-        reviews.clear();
-    }
-
-    public void addAll(List<ReviewItem> reviews) {
-        this.reviews = reviews;
-        this.notifyDataSetChanged();
-    }
-
-    public List<ReviewItem> getItems() {
-        return reviews;
+        textView.setText(cursor.getString(DatabaseContract.ReviewEntry.COLUMN_CONTENT_INDEX));
     }
 }

@@ -36,6 +36,6 @@
         </activity>
         <provider
             android:authorities="com.example.thomasthiebaud.android.movie"
-            android:name=".controller.data.database.provider.MovieDatabaseProvider"/>
+            android:name=".controller.data.provider.MovieDatabaseProvider"/>
     </application>
 </manifest>

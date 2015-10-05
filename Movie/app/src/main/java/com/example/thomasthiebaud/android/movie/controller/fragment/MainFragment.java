@@ -12,7 +12,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.example.thomasthiebaud.android.movie.controller.data.adapter.MovieAdapter;
-import com.example.thomasthiebaud.android.movie.controller.data.database.loader.MovieCursorLoaderCallback;
+import com.example.thomasthiebaud.android.movie.controller.data.loader.MovieCursorLoaderCallback;
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 import com.example.thomasthiebaud.android.movie.R;
@@ -43,17 +43,17 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
     private void updateMovies() {
         String sortBy = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity));
         getLoaderManager().restartLoader(MovieCursorLoaderCallback.ALL_MOVIE_LOADER, null, new MovieCursorLoaderCallback(getActivity(), movieAdapter, sortBy));
+
         View v = getActivity().findViewById(R.id.movie_detail_container);
         if(v != null)
             v.setVisibility(View.GONE);
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         updateMovies();
     }
-
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

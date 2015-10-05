@@ -1,16 +1,12 @@
 package com.example.thomasthiebaud.android.movie.controller.fragment;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.net.Uri;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RatingBar;
@@ -18,22 +14,13 @@ import android.widget.TextView;
 
 import com.example.thomasthiebaud.android.movie.controller.data.adapter.ReviewAdapter;
 import com.example.thomasthiebaud.android.movie.controller.data.adapter.TrailerAdapter;
-import com.example.thomasthiebaud.android.movie.controller.data.http.HttpService;
-import com.example.thomasthiebaud.android.movie.controller.data.http.ReviewHttpCallback;
-import com.example.thomasthiebaud.android.movie.controller.data.http.TrailerHttpCallback;
-import com.example.thomasthiebaud.android.movie.controller.data.database.loader.LoaderResponse;
-import com.example.thomasthiebaud.android.movie.controller.data.database.loader.MovieLoaderCallback;
-import com.example.thomasthiebaud.android.movie.controller.data.database.loader.ReviewLoaderCallback;
-import com.example.thomasthiebaud.android.movie.controller.data.database.loader.TrailerLoaderCallback;
-import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
+import com.example.thomasthiebaud.android.movie.controller.data.loader.MovieCursorLoaderCallback;
+import com.example.thomasthiebaud.android.movie.controller.data.loader.ReviewCursorLoaderCallback;
+import com.example.thomasthiebaud.android.movie.controller.data.loader.TrailerCursorLoaderCallback;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 import com.example.thomasthiebaud.android.movie.R;
-import com.example.thomasthiebaud.android.movie.model.item.ReviewItem;
-import com.example.thomasthiebaud.android.movie.model.item.TrailerItem;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,7 +31,7 @@ public class DetailFragment extends Fragment {
 
     private ReviewAdapter reviewAdapter;
     private TrailerAdapter trailerAdapter;
-    private boolean isFavorite = false;
+    private Boolean isFavorite = false;
 
     public DetailFragment() {}
 
@@ -52,8 +39,8 @@ public class DetailFragment extends Fragment {
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        reviewAdapter = new ReviewAdapter(getContext());
-        trailerAdapter = new TrailerAdapter(getContext());
+        reviewAdapter = new ReviewAdapter(rootView.getContext(),null,0);
+        trailerAdapter = new TrailerAdapter(rootView.getContext(),null,0);
 
         Intent intent = getActivity().getIntent();
         MovieItem item = null;
@@ -86,54 +73,18 @@ public class DetailFragment extends Fragment {
 
         final int movieId = item.getId();
 
-        new HttpService().getTrailers(movieId + "").onResponse(new TrailerHttpCallback() {
-            @Override
-            public void onSuccess(List<TrailerItem> trailers) {
-                trailerAdapter = new TrailerAdapter(getContext());
-                ListView listView = ((ListView) rootView.findViewById(R.id.trailers_list));
-                listView.setAdapter(trailerAdapter);
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + trailerAdapter.getItem(position).getKey()));
-                        startActivity(intent);
-                    }
-                });
-                trailerAdapter.addAll(trailers);
-            }
+        ListView reviewsList = ((ListView) rootView.findViewById(R.id.reviews_list));
+        reviewsList.setAdapter(reviewAdapter);
 
-            @Override
-            public void onError(Exception exception) {
-                if (exception instanceof IOException)
-                    getLoaderManager().initLoader(TrailerLoaderCallback.TRAILER_LOADER_ID, null, new TrailerLoaderCallback(getActivity(), trailerAdapter, movieId));
-            }
-        }).execute();
+        ListView trailersList = ((ListView) rootView.findViewById(R.id.trailers_list));
+        trailersList.setAdapter(trailerAdapter);
 
-        new HttpService().getReview(movieId + "").onResponse(new ReviewHttpCallback() {
-            @Override
-            public void onSuccess(List<ReviewItem> reviews) {
-                reviewAdapter = new ReviewAdapter(getContext());
-                ListView listView = ((ListView) rootView.findViewById(R.id.reviews_list));
-                listView.setAdapter(reviewAdapter);
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(reviewAdapter.getItem(position).getUrl()));
-                        startActivity(intent);
-                    }
-                });
-                reviewAdapter.addAll(reviews);
-            }
+        getLoaderManager().initLoader(ReviewCursorLoaderCallback.ALL_REVIEW_LOADER, null, new ReviewCursorLoaderCallback(getActivity(), reviewAdapter, movieId, "popularity"));
 
-            @Override
-            public void onError(Exception exception) {
+        getLoaderManager().initLoader(TrailerCursorLoaderCallback.ALL_TRAILER_LOADER, null, new TrailerCursorLoaderCallback(getActivity(), trailerAdapter, movieId, "popularity"));
 
-                if (exception instanceof IOException)
-                    getLoaderManager().initLoader(ReviewLoaderCallback.REVIEW_LOADER_ID, null, new ReviewLoaderCallback(getActivity(), reviewAdapter, movieId));
-            }
-        }).execute();
-
-        getLoaderManager().initLoader(MovieLoaderCallback.ONE_MOVIE_LOADER, null, new MovieLoaderCallback(getActivity()).setMovieId(movieId).onResponse(new LoaderResponse<MovieItem>() {
+/*
+        getLoaderManager().initLoader(MovieCursorLoaderCallback.ONE_MOVIE_LOADER, null, new MovieLoaderCallback(getActivity()).setMovieId(movieId).onResponse(new LoaderResponse<MovieItem>() {
             @Override
             public void onSuccess(List<MovieItem> items) {
                 if (!items.isEmpty()) {
@@ -142,7 +93,9 @@ public class DetailFragment extends Fragment {
                 }
             }
         }));
+        */
 
+        /*
         final ContentValues movieValues = item.toContentValues();
         final List<ContentValues> reviewValues = new ArrayList<>();
         final List<ContentValues> trailerValues = new ArrayList<>();
@@ -188,6 +141,7 @@ public class DetailFragment extends Fragment {
                 }
             }
         });
+        */
 
         ((ListView)rootView.findViewById(R.id.trailers_list)).setEmptyView(rootView.findViewById(R.id.empty_trailers_label));
         ((ListView)rootView.findViewById(R.id.reviews_list)).setEmptyView(rootView.findViewById(R.id.empty_reviews_label));

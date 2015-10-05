@@ -42,6 +42,12 @@ public class DatabaseContract {
         public static final String COLUMN_URL = "url";
         public static final String COLUMN_ID_MOVIE = "idMovie";
 
+        public static final int _ID_INDEX = 0;
+        public static final int COLUMN_AUTHOR_INDEX = 1;
+        public static final int COLUMN_CONTENT_INDEX = 2;
+        public static final int COLUMN_URL_INDEX = 3;
+        public static final int COLUMN_ID_MOVIE_INDEX = 4;
+
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEW;
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEW;
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_REVIEW).build();
@@ -52,6 +58,11 @@ public class DatabaseContract {
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_KEY = "key";
         public static final String COLUMN_ID_MOVIE = "idMovie";
+
+        public static final int _ID_INDEX = 0;
+        public static final int COLUMN_NAME_INDEX = 1;
+        public static final int COLUMN_KEY_INDEX = 2;
+        public static final int COLUMN_ID_MOVIE_INDEX = 3;
 
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TRAILER;
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TRAILER;

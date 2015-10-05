@@ -2,6 +2,7 @@ package com.example.thomasthiebaud.android.movie.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,8 +27,7 @@ public class NestedListView extends ListView implements View.OnTouchListener, Ab
     }
 
     @Override
-    public void onScroll(AbsListView view, int firstVisibleItem,
-                         int visibleItemCount, int totalItemCount) {
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         if (getAdapter() != null && getAdapter().getCount() > MAXIMUM_LIST_ITEMS_VIEWABLE) {
             if (listViewTouchAction == MotionEvent.ACTION_MOVE) {
                 scrollBy(0, -1);
@@ -50,13 +50,11 @@ public class NestedListView extends ListView implements View.OnTouchListener, Ab
             ListAdapter listAdapter = getAdapter();
             if (listAdapter != null && !listAdapter.isEmpty()) {
                 int listPosition = 0;
-                for (listPosition = 0; listPosition < listAdapter.getCount()
-                        && listPosition < MAXIMUM_LIST_ITEMS_VIEWABLE; listPosition++) {
+                for (listPosition = 0; listPosition < listAdapter.getCount() && listPosition < MAXIMUM_LIST_ITEMS_VIEWABLE; listPosition++) {
                     View listItem = listAdapter.getView(listPosition, null, this);
                     //now it will not throw a NPE if listItem is a ViewGroup instance
                     if (listItem instanceof ViewGroup) {
-                        listItem.setLayoutParams(new LayoutParams(
-                                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                        listItem.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                     }
                     listItem.measure(widthMeasureSpec, heightMeasureSpec);
                     newHeight += listItem.getMeasuredHeight();

@@ -25,8 +25,6 @@ public class HttpTask {
 
     private HttpMethod httpMethod = HttpMethod.GET;
     private JSONObject body = new JSONObject();
-    private JsonResponse response;
-    private Exception exception;
 
     private Uri.Builder builder = new Uri.Builder();
 
@@ -53,20 +51,6 @@ public class HttpTask {
         return this;
     }
 
-    public HttpTask setMethod(HttpMethod method) {
-        this.httpMethod = method;
-        return this;
-    }
-
-    public HttpTask setBody(JSONObject body) {
-        this.body = body;
-        return this;
-    }
-
-    public HttpTask onResponse(JsonResponse response) {
-        this.response = response;
-        return this;
-    }
 
     public JSONObject execute() {
         HttpURLConnection urlConnection = null;
@@ -110,12 +94,10 @@ public class HttpTask {
                 return new JSONObject(buffer.toString());
             } catch (JSONException e) {
                 Log.e(TAG, "Error parsing json", e);
-                exception = e;
                 return null;
             }
         } catch (IOException e) {
             Log.e(TAG, "IO Exception", e);
-            exception = e;
             return null;
         } finally{
             if (urlConnection != null) {
@@ -125,7 +107,6 @@ public class HttpTask {
                 try {
                     reader.close();
                 } catch (final IOException e) {
-                    exception = e;
                     Log.e(TAG, "Error closing stream", e);
                 }
             }
