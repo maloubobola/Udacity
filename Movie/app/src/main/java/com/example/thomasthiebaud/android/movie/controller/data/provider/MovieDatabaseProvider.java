@@ -44,7 +44,7 @@ public class MovieDatabaseProvider extends ContentProvider {
 
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/*", ALL_MOVIE);
-        matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/*/#", MOVIE);
+        matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/#", MOVIE);
         matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/favorite", FAVORITE_MOVIE);
         matcher.addURI(authority, DatabaseContract.PATH_TRAILER + "/*/*", TRAILER);
         matcher.addURI(authority, DatabaseContract.PATH_TRAILER + "/favorite", FAVORITE_TRAILER);

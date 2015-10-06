@@ -42,7 +42,7 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
 
     private void updateMovies() {
         String sortBy = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity));
-        getLoaderManager().restartLoader(MovieCursorLoaderCallback.ALL_MOVIE_LOADER, null, new MovieCursorLoaderCallback(getActivity(), movieAdapter, sortBy));
+        getLoaderManager().restartLoader(MovieCursorLoaderCallback.ALL_MOVIE_LOADER, null, new MovieCursorLoaderCallback(getActivity()).setAdapter(movieAdapter).setSortOrder(sortBy));
 
         View v = getActivity().findViewById(R.id.movie_detail_container);
         if(v != null)

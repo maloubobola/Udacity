@@ -1,7 +1,9 @@
 package com.example.thomasthiebaud.android.movie.controller.fragment;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,12 +17,17 @@ import android.widget.TextView;
 import com.example.thomasthiebaud.android.movie.controller.data.adapter.ReviewAdapter;
 import com.example.thomasthiebaud.android.movie.controller.data.adapter.TrailerAdapter;
 import com.example.thomasthiebaud.android.movie.controller.data.loader.MovieCursorLoaderCallback;
+import com.example.thomasthiebaud.android.movie.controller.data.loader.OnResponseCallback;
 import com.example.thomasthiebaud.android.movie.controller.data.loader.ReviewCursorLoaderCallback;
 import com.example.thomasthiebaud.android.movie.controller.data.loader.TrailerCursorLoaderCallback;
+import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 import com.example.thomasthiebaud.android.movie.R;
+import com.example.thomasthiebaud.android.movie.model.item.ReviewItem;
+import com.example.thomasthiebaud.android.movie.model.item.TrailerItem;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,7 +38,7 @@ public class DetailFragment extends Fragment {
 
     private ReviewAdapter reviewAdapter;
     private TrailerAdapter trailerAdapter;
-    private Boolean isFavorite = false;
+    private boolean isFavorite = false;
 
     public DetailFragment() {}
 
@@ -83,17 +90,15 @@ public class DetailFragment extends Fragment {
 
         getLoaderManager().initLoader(TrailerCursorLoaderCallback.ALL_TRAILER_LOADER, null, new TrailerCursorLoaderCallback(getActivity(), trailerAdapter, movieId, "popularity"));
 
-/*
-        getLoaderManager().initLoader(MovieCursorLoaderCallback.ONE_MOVIE_LOADER, null, new MovieLoaderCallback(getActivity()).setMovieId(movieId).onResponse(new LoaderResponse<MovieItem>() {
+        getLoaderManager().initLoader(MovieCursorLoaderCallback.ONE_MOVIE_LOADER, null, new MovieCursorLoaderCallback(getActivity()).setMovieId(movieId).setIsFavoriteCallback(new OnResponseCallback<Boolean>() {
             @Override
-            public void onSuccess(List<MovieItem> items) {
-                if (!items.isEmpty()) {
+            public void onResponse(Boolean object) {
+                if(object.booleanValue()) {
                     ((FloatingActionButton) rootView.findViewById(R.id.favorite_button)).setImageResource(R.drawable.ic_favorite_black);
                     isFavorite = true;
                 }
             }
         }));
-        */
 
         /*
         final ContentValues movieValues = item.toContentValues();

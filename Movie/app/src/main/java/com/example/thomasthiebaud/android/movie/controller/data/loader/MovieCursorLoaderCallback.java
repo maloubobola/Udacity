@@ -20,12 +20,32 @@ public class MovieCursorLoaderCallback implements LoaderManager.LoaderCallbacks<
 
     private Activity activity;
     private CursorAdapter adapter;
-    private String sortBy = "";
+    private String sortBy;
+    private int movieId;
+    private OnResponseCallback<Boolean> isFavoriteCallback;
 
-    public MovieCursorLoaderCallback(Activity activity, CursorAdapter adapter, String sortBy) {
+    public MovieCursorLoaderCallback(Activity activity) {
         this.activity = activity;
+    }
+
+    public MovieCursorLoaderCallback setAdapter(CursorAdapter adapter) {
         this.adapter = adapter;
+        return this;
+    }
+
+    public MovieCursorLoaderCallback setSortOrder(String sortBy) {
         this.sortBy = sortBy;
+        return this;
+    }
+
+    public MovieCursorLoaderCallback setIsFavoriteCallback(OnResponseCallback<Boolean> isFavoriteCallback) {
+        this.isFavoriteCallback = isFavoriteCallback;
+        return this;
+    }
+
+    public MovieCursorLoaderCallback setMovieId(int movieId) {
+        this.movieId = movieId;
+        return this;
     }
 
     @Override
@@ -54,9 +74,18 @@ public class MovieCursorLoaderCallback implements LoaderManager.LoaderCallbacks<
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(data.moveToFirst())
-            while (data.moveToNext())
-                adapter.swapCursor(data);
+        if(isFavoriteCallback != null) {
+            boolean isFavorite = false;
+            if(data.moveToFirst())
+                isFavorite = true;
+            isFavoriteCallback.onResponse(new Boolean(isFavorite));
+        }
+
+        if(adapter != null) {
+            if(data.moveToFirst())
+                while (data.moveToNext())
+                    adapter.swapCursor(data);
+        }
     }
 
     @Override
