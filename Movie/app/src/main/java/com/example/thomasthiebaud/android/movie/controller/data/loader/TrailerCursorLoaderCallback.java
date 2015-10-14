@@ -9,14 +9,12 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
+import com.example.thomasthiebaud.android.movie.model.contract.LoaderContract;
 
 /**
  * Created by thomasthiebaud on 04/10/15.
  */
 public class TrailerCursorLoaderCallback implements LoaderManager.LoaderCallbacks<Cursor> {
-
-    public static final int ALL_TRAILER_LOADER = 300;
-
     private Activity activity;
     private CursorAdapter adapter;
     private int movieId;
@@ -33,7 +31,7 @@ public class TrailerCursorLoaderCallback implements LoaderManager.LoaderCallback
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         CursorLoader cursorLoader = null;
         switch (id) {
-            case ALL_TRAILER_LOADER:
+            case LoaderContract.ALL_TRAILER_LOADER:
                 cursorLoader = new CursorLoader(activity,
                         DatabaseContract.TrailerEntry.CONTENT_URI.buildUpon().appendPath(sortBy).appendPath(movieId+"").build(),
                         null,

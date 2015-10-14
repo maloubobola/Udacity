@@ -30,26 +30,32 @@ public class MovieDatabaseProvider extends ContentProvider {
     private SQLiteOpenHelper openHelper;
     private static SQLiteQueryBuilder queryBuilder;
 
-    static final int MOVIE = 100;
+    static final int FIND_MOVIE = 100;
     static final int ALL_MOVIE = 101;
     static final int FAVORITE_MOVIE = 102;
-    static final int TRAILER = 200;
+    static final int MOVIE = 103;
+    static final int FIND_TRAILER = 200;
     static final int FAVORITE_TRAILER = 201;
-    static final int REVIEW = 300;
+    static final int TRAILER = 202;
+    static final int FIND_REVIEW = 300;
     static final int FAVORITE_REVIEW = 301;
+    static final int REVIEW = 302;
 
     private static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = DatabaseContract.CONTENT_AUTHORITY;
 
         // For each type of URI you want to add, create a corresponding code.
-        matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/*", ALL_MOVIE);
-        matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/#", MOVIE);
         matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/favorite", FAVORITE_MOVIE);
-        matcher.addURI(authority, DatabaseContract.PATH_TRAILER + "/*/*", TRAILER);
+        matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/#", FIND_MOVIE);
+        matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/*", ALL_MOVIE);
+        matcher.addURI(authority, DatabaseContract.PATH_MOVIE, MOVIE);
+        matcher.addURI(authority, DatabaseContract.PATH_TRAILER + "/*/*", FIND_TRAILER);
         matcher.addURI(authority, DatabaseContract.PATH_TRAILER + "/favorite", FAVORITE_TRAILER);
-        matcher.addURI(authority, DatabaseContract.PATH_REVIEW + "/*/*", REVIEW);
+        matcher.addURI(authority, DatabaseContract.PATH_TRAILER, TRAILER);
+        matcher.addURI(authority, DatabaseContract.PATH_REVIEW + "/*/*", FIND_REVIEW);
         matcher.addURI(authority, DatabaseContract.PATH_REVIEW + "/favorite", FAVORITE_REVIEW);
+        matcher.addURI(authority, DatabaseContract.PATH_REVIEW, REVIEW);
         return matcher;
     }
 
@@ -64,17 +70,17 @@ public class MovieDatabaseProvider extends ContentProvider {
         final int match = uriMatcher.match(uri);
 
         switch (match) {
-            case MOVIE:
+            case FIND_MOVIE:
                 return DatabaseContract.MovieEntry.CONTENT_TYPE;
             case ALL_MOVIE:
                 return DatabaseContract.MovieEntry.CONTENT_TYPE;
             case FAVORITE_MOVIE:
                 return DatabaseContract.MovieEntry.CONTENT_TYPE;
-            case REVIEW:
+            case FIND_REVIEW:
                 return DatabaseContract.ReviewEntry.CONTENT_TYPE;
             case FAVORITE_REVIEW:
                 return DatabaseContract.ReviewEntry.CONTENT_TYPE;
-            case TRAILER:
+            case FIND_TRAILER:
                 return DatabaseContract.ReviewEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown Uri" + uri);
@@ -85,6 +91,7 @@ public class MovieDatabaseProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
         final Cursor cursor;
+
         switch (uriMatcher.match(uri)) {
             case FAVORITE_MOVIE:
                 cursor = openHelper.getReadableDatabase().query(
@@ -97,7 +104,9 @@ public class MovieDatabaseProvider extends ContentProvider {
                         sortOrder);
                 break;
             case ALL_MOVIE: {
-                    cursor = new MatrixCursor(new String[]{
+                Log.e(TAG, uri.toString());
+
+                cursor = new MatrixCursor(new String[]{
                             DatabaseContract.MovieEntry._ID,
                             DatabaseContract.MovieEntry.COLUMN_TITLE,
                             DatabaseContract.MovieEntry.COLUMN_POSTER_PATH,
@@ -136,7 +145,7 @@ public class MovieDatabaseProvider extends ContentProvider {
                     }
                 }
                 break;
-            case MOVIE:
+            case FIND_MOVIE:
                 cursor = openHelper.getReadableDatabase().query(
                         DatabaseContract.MovieEntry.TABLE_NAME,
                         projection,
@@ -156,7 +165,7 @@ public class MovieDatabaseProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
-            case TRAILER: {
+            case FIND_TRAILER: {
                     cursor = new MatrixCursor(new String[]{
                             DatabaseContract.TrailerEntry._ID,
                             DatabaseContract.TrailerEntry.COLUMN_NAME,
@@ -191,7 +200,7 @@ public class MovieDatabaseProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
-            case REVIEW:
+            case FIND_REVIEW:
                 cursor = new MatrixCursor(new String[]{
                         DatabaseContract.ReviewEntry._ID,
                         DatabaseContract.ReviewEntry.COLUMN_AUTHOR,

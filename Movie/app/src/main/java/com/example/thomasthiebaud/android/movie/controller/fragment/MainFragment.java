@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.GridView;
 import com.example.thomasthiebaud.android.movie.controller.data.adapter.MovieAdapter;
 import com.example.thomasthiebaud.android.movie.controller.data.loader.MovieCursorLoaderCallback;
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
+import com.example.thomasthiebaud.android.movie.model.contract.LoaderContract;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 import com.example.thomasthiebaud.android.movie.R;
 
@@ -42,7 +44,8 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
 
     private void updateMovies() {
         String sortBy = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity));
-        getLoaderManager().restartLoader(MovieCursorLoaderCallback.ALL_MOVIE_LOADER, null, new MovieCursorLoaderCallback(getActivity()).setAdapter(movieAdapter).setSortOrder(sortBy));
+        Log.e(TAG, sortBy);
+        getLoaderManager().restartLoader(LoaderContract.ALL_MOVIE_LOADER, null, new MovieCursorLoaderCallback(getActivity()).setAdapter(movieAdapter).setSortOrder(sortBy));
 
         View v = getActivity().findViewById(R.id.movie_detail_container);
         if(v != null)
@@ -52,6 +55,12 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        updateMovies();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         updateMovies();
     }
 
