@@ -1,5 +1,6 @@
 package com.example.thomasthiebaud.android.movie.controller.data.adapter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
@@ -10,6 +11,9 @@ import android.widget.TextView;
 
 import com.example.thomasthiebaud.android.movie.R;
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by thomasthiebaud on 04/10/15.
@@ -33,5 +37,20 @@ public class ReviewAdapter extends CursorAdapter {
             textView = new TextView(context);
 
         textView.setText(cursor.getString(DatabaseContract.ReviewEntry.COLUMN_CONTENT_INDEX));
+    }
+
+    public List<ContentValues> toContentValuesList(String movieId) {
+        List<ContentValues> values = new ArrayList<>();
+        if(mCursor != null) {
+            while(mCursor.moveToNext()) {
+                ContentValues value = new ContentValues();
+                value.put(DatabaseContract.ReviewEntry._ID, mCursor.getString(DatabaseContract.ReviewEntry._ID_INDEX));
+                value.put(DatabaseContract.ReviewEntry.COLUMN_AUTHOR, mCursor.getString(DatabaseContract.ReviewEntry.COLUMN_AUTHOR_INDEX));
+                value.put(DatabaseContract.ReviewEntry.COLUMN_CONTENT, mCursor.getString(DatabaseContract.ReviewEntry.COLUMN_CONTENT_INDEX));
+                value.put(DatabaseContract.ReviewEntry.COLUMN_URL, mCursor.getString(DatabaseContract.ReviewEntry.COLUMN_URL_INDEX));
+                value.put(DatabaseContract.ReviewEntry.COLUMN_ID_MOVIE, movieId);
+            }
+        }
+        return values;
     }
 }

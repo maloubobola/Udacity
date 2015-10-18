@@ -12,29 +12,27 @@ import android.util.Log;
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.model.contract.LoaderContract;
 
-import java.util.Arrays;
-
 /**
  * Created by thomasthiebaud on 03/10/15.
  */
-public class MovieCursorLoaderCallback implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MainCursorLoaderCallback implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String TAG = MovieCursorLoaderCallback.class.getSimpleName();
+    private static final String TAG = MainCursorLoaderCallback.class.getSimpleName();
 
     private Activity activity;
     private CursorAdapter adapter;
     private String sortBy;
 
-    public MovieCursorLoaderCallback(Activity activity) {
+    public MainCursorLoaderCallback(Activity activity) {
         this.activity = activity;
     }
 
-    public MovieCursorLoaderCallback setAdapter(CursorAdapter adapter) {
+    public MainCursorLoaderCallback setAdapter(CursorAdapter adapter) {
         this.adapter = adapter;
         return this;
     }
 
-    public MovieCursorLoaderCallback setSortOrder(String sortBy) {
+    public MainCursorLoaderCallback setSortOrder(String sortBy) {
         this.sortBy = sortBy;
         return this;
     }
@@ -65,13 +63,8 @@ public class MovieCursorLoaderCallback implements LoaderManager.LoaderCallbacks<
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(adapter != null) {
-            //if(data.moveToFirst()) {
-                while (data.moveToNext()) {
-                    adapter.swapCursor(data);
-                }
-            //}
-        }
+        if(adapter != null && data != null)
+            adapter.swapCursor(data);
     }
 
     @Override

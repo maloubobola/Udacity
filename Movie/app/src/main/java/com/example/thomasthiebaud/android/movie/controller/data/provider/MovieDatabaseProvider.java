@@ -28,7 +28,6 @@ public class MovieDatabaseProvider extends ContentProvider {
     private final String TAG = MovieDatabaseProvider.class.getSimpleName();
     private static final UriMatcher uriMatcher = buildUriMatcher();
     private SQLiteOpenHelper openHelper;
-    private static SQLiteQueryBuilder queryBuilder;
 
     static final int FIND_MOVIE = 100;
     static final int ALL_MOVIE = 101;
@@ -104,8 +103,6 @@ public class MovieDatabaseProvider extends ContentProvider {
                         sortOrder);
                 break;
             case ALL_MOVIE: {
-                Log.e(TAG, uri.toString());
-
                 cursor = new MatrixCursor(new String[]{
                             DatabaseContract.MovieEntry._ID,
                             DatabaseContract.MovieEntry.COLUMN_TITLE,
@@ -121,7 +118,6 @@ public class MovieDatabaseProvider extends ContentProvider {
                     try {
                         results = json.getJSONArray(APIContract.JSON_RESULTS);
                         for (int i = 0; i < results.length(); i++) {
-
                             JSONObject jsonMovie = results.getJSONObject(i);
 
                             Uri.Builder builder = new Uri.Builder();
@@ -144,7 +140,7 @@ public class MovieDatabaseProvider extends ContentProvider {
                         e.printStackTrace();
                     }
                 }
-                break;
+            break;
             case FIND_MOVIE:
                 cursor = openHelper.getReadableDatabase().query(
                         DatabaseContract.MovieEntry.TABLE_NAME,
@@ -241,8 +237,7 @@ public class MovieDatabaseProvider extends ContentProvider {
         switch (uriMatcher.match(uri)) {
             case MOVIE:
                 try {
-                    long id = database.insert(DatabaseContract.MovieEntry.TABLE_NAME,null,values);
-                    Log.e(TAG,id+"");
+                    database.insert(DatabaseContract.MovieEntry.TABLE_NAME,null,values);
                 }catch (SQLiteConstraintException e) {
                     Log.e(TAG, "UNIQUE constraint not respected ", e);
                 }
@@ -271,6 +266,7 @@ public class MovieDatabaseProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
+        Log.e(TAG,uri.toString() + " " + rowsDeleted);
         if (rowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }

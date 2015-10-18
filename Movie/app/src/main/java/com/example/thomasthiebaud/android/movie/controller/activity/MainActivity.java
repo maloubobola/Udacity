@@ -1,6 +1,7 @@
 package com.example.thomasthiebaud.android.movie.controller.activity;
 
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,12 +15,15 @@ import com.example.thomasthiebaud.android.movie.controller.fragment.MainFragment
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 
 public class MainActivity extends AppCompatActivity implements MainFragment.MovieClickCallback {
+    private static final String TAG = MainActivity.class.getSimpleName();
     private boolean isTwoPane = false;
+    private String sortBy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        sortBy = PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity));
 
         if(findViewById(R.id.movie_detail_container) != null) {
             this.isTwoPane = true;
@@ -33,6 +37,20 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Movi
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        String sortBy = PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity));
+
+        if(sortBy != null && !this.sortBy.equals(sortBy)) {
+            MainFragment mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.movie_container);
+            if(mainFragment != null)
+                mainFragment.onSortByChanged();
+            this.sortBy = sortBy;
+        }
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

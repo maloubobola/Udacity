@@ -20,4 +20,5 @@
     <string name="pref_sort_favorite">favorite</string>
     <string name="no_reviews">No reviews</string>
     <string name="no_trailers">No trailers</string>
+    <string name="no_movies">No movies</string>
 </resources>

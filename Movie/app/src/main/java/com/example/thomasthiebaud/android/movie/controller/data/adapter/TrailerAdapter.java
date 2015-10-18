@@ -1,5 +1,6 @@
 package com.example.thomasthiebaud.android.movie.controller.data.adapter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
@@ -10,6 +11,10 @@ import android.widget.TextView;
 
 import com.example.thomasthiebaud.android.movie.R;
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
+import com.example.thomasthiebaud.android.movie.model.item.TrailerItem;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by thomasthiebaud on 04/10/15.
@@ -33,5 +38,20 @@ public class TrailerAdapter extends CursorAdapter {
             textView = new TextView(context);
 
         textView.setText(cursor.getString(DatabaseContract.TrailerEntry.COLUMN_NAME_INDEX));
+    }
+
+    public List<ContentValues> toContentValuesList(String movieId) {
+        List<ContentValues> values = new ArrayList<>();
+        if(mCursor != null) {
+            while(mCursor.moveToNext()) {
+                ContentValues value = new ContentValues();
+                value.put(DatabaseContract.TrailerEntry._ID, mCursor.getString(DatabaseContract.TrailerEntry._ID_INDEX));
+                value.put(DatabaseContract.TrailerEntry.COLUMN_KEY, mCursor.getString(DatabaseContract.TrailerEntry.COLUMN_KEY_INDEX));
+                value.put(DatabaseContract.TrailerEntry.COLUMN_NAME, mCursor.getString(DatabaseContract.TrailerEntry.COLUMN_NAME_INDEX));
+                value.put(DatabaseContract.TrailerEntry.COLUMN_ID_MOVIE, movieId);
+                values.add(value);
+            }
+        }
+        return values;
     }
 }

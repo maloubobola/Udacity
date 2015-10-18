@@ -17,4 +17,12 @@
         android:stretchMode="columnWidth"
         android:columnWidth="@dimen/column_width"
         android:listSelector="@null"/>
+
+    <TextView
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:id="@+id/empty_movies_label"
+        android:padding="@dimen/default_padding"
+        android:text="@string/no_movies"
+        android:gravity="center"/>
 </FrameLayout>

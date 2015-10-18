@@ -11,9 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ListView;
 
 import com.example.thomasthiebaud.android.movie.controller.data.adapter.MovieAdapter;
-import com.example.thomasthiebaud.android.movie.controller.data.loader.MovieCursorLoaderCallback;
+import com.example.thomasthiebaud.android.movie.controller.data.loader.MainCursorLoaderCallback;
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.model.contract.LoaderContract;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
@@ -39,13 +40,16 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
         gv.setAdapter(movieAdapter);
         gv.setOnItemClickListener(this);
 
+        ((GridView)view.findViewById(R.id.cover_grid)).setEmptyView(view.findViewById(R.id.empty_reviews_label));
+
+
         return view;
     }
 
     private void updateMovies() {
         String sortBy = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity));
-        Log.e(TAG, sortBy);
-        getLoaderManager().restartLoader(LoaderContract.ALL_MOVIE_LOADER, null, new MovieCursorLoaderCallback(getActivity()).setAdapter(movieAdapter).setSortOrder(sortBy));
+
+        getLoaderManager().initLoader(LoaderContract.ALL_MOVIE_LOADER, null, new MainCursorLoaderCallback(getActivity()).setAdapter(movieAdapter).setSortOrder(sortBy));
 
         View v = getActivity().findViewById(R.id.movie_detail_container);
         if(v != null)
@@ -55,12 +59,6 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        updateMovies();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
         updateMovies();
     }
 
@@ -82,6 +80,11 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
             if(v != null)
                 v.setVisibility(View.VISIBLE);
         }
+    }
+
+    public void onSortByChanged() {
+        String sortBy = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity));
+        getLoaderManager().restartLoader(LoaderContract.ALL_MOVIE_LOADER, null, new MainCursorLoaderCallback(getActivity()).setAdapter(movieAdapter).setSortOrder(sortBy));
     }
 
     //TODO MOve to separate file or into activity

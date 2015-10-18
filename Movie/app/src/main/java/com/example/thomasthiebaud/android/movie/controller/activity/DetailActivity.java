@@ -15,7 +15,6 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
 
         if(savedInstanceState == null) {
-
             Bundle argument = new Bundle();
             argument.putParcelable(MovieItem.class.getSimpleName(), getIntent().getParcelableExtra(MovieItem.class.getSimpleName()));
 
