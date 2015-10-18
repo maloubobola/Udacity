@@ -1,6 +1,7 @@
 package com.example.thomasthiebaud.android.movie.controller.data.loader;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -14,6 +15,8 @@ import android.view.View;
 import com.example.thomasthiebaud.android.movie.R;
 import com.example.thomasthiebaud.android.movie.controller.data.adapter.ReviewAdapter;
 import com.example.thomasthiebaud.android.movie.controller.data.adapter.TrailerAdapter;
+import com.example.thomasthiebaud.android.movie.controller.fragment.DetailFragment;
+import com.example.thomasthiebaud.android.movie.controller.fragment.MainFragment;
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.model.contract.LoaderContract;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
@@ -32,6 +35,7 @@ public class DetailCursorLoaderCallback implements LoaderManager.LoaderCallbacks
     private ReviewAdapter reviewAdapter;
     private TrailerAdapter trailerAdapter;
     private MovieItem movieItem;
+    private DetailFragment detailFragment;
 
     public DetailCursorLoaderCallback(Activity activity) {
         this.activity = activity;
@@ -52,7 +56,11 @@ public class DetailCursorLoaderCallback implements LoaderManager.LoaderCallbacks
         this.movieItem = movieItem;
         this.movieId = movieItem.getId() + "";
         return this;
+    }
 
+    public DetailCursorLoaderCallback setFragment(DetailFragment detailFragment) {
+        this.detailFragment = detailFragment;
+        return this;
     }
 
     @Override
@@ -139,6 +147,7 @@ public class DetailCursorLoaderCallback implements LoaderManager.LoaderCallbacks
                     if(view != null)
                         view.setVisibility(View.GONE);
                     activity.setTitle("Movie");
+                    detailFragment.setMenuVisibility(false);
                 }
                 else {
                     List<ContentValues> reviewValues = reviewAdapter.toContentValuesList(movieId);
@@ -157,6 +166,7 @@ public class DetailCursorLoaderCallback implements LoaderManager.LoaderCallbacks
                     );
                     ((FloatingActionButton) activity.findViewById(R.id.favorite_button)).setImageResource(R.drawable.ic_favorite_black);
                     isFavorite = true;
+                    detailFragment.setMenuVisibility(true);
                 }
             }
         });

@@ -6,7 +6,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -33,6 +38,16 @@ public class DetailFragment extends Fragment /*implements LoaderManager.LoaderCa
     private ReviewAdapter reviewAdapter;
     private TrailerAdapter trailerAdapter;
     private MovieItem item = null;
+
+    private MenuItem menuItem;
+
+    public DetailFragment() {
+        setHasOptionsMenu(true);
+    }
+
+    public void setMenuVisibility(boolean visible) {
+        menuItem.setVisible(visible);
+    }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -77,7 +92,7 @@ public class DetailFragment extends Fragment /*implements LoaderManager.LoaderCa
                 Cursor cursor = (Cursor)parent.getItemAtPosition(position);
                 if(cursor != null) {
                     String key = cursor.getString(DatabaseContract.TrailerEntry.COLUMN_KEY_INDEX);
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + key));
+                    Intent intent = new Intent(Intent.ACTION_CHOOSER, Uri.parse("http://www.youtube.com/watch?v=" + key));
                     startActivity(intent);
                 }
             }
@@ -85,6 +100,7 @@ public class DetailFragment extends Fragment /*implements LoaderManager.LoaderCa
         trailersList.setAdapter(trailerAdapter);
 
         DetailCursorLoaderCallback callback = new DetailCursorLoaderCallback(getActivity())
+                .setFragment(this)
                 .setItem(item)
                 .setReviewAdapter(reviewAdapter)
                 .setTrailerAdapter(trailerAdapter);
@@ -98,4 +114,21 @@ public class DetailFragment extends Fragment /*implements LoaderManager.LoaderCa
 
         return rootView;
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_detail, menu);
+        menuItem = menu.findItem(R.id.action_share);
+
+        ShareActionProvider mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "WAZAZAAAA");
+
+        mShareActionProvider.setShareIntent(shareIntent);
+
+    }
+
 }
