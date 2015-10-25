@@ -41,15 +41,15 @@ public class ReviewAdapter extends CursorAdapter {
 
     public List<ContentValues> toContentValuesList(String movieId) {
         List<ContentValues> values = new ArrayList<>();
-        if(mCursor != null) {
-            while(mCursor.moveToNext()) {
-                ContentValues value = new ContentValues();
-                value.put(DatabaseContract.ReviewEntry._ID, mCursor.getString(DatabaseContract.ReviewEntry._ID_INDEX));
-                value.put(DatabaseContract.ReviewEntry.COLUMN_AUTHOR, mCursor.getString(DatabaseContract.ReviewEntry.COLUMN_AUTHOR_INDEX));
-                value.put(DatabaseContract.ReviewEntry.COLUMN_CONTENT, mCursor.getString(DatabaseContract.ReviewEntry.COLUMN_CONTENT_INDEX));
-                value.put(DatabaseContract.ReviewEntry.COLUMN_URL, mCursor.getString(DatabaseContract.ReviewEntry.COLUMN_URL_INDEX));
-                value.put(DatabaseContract.ReviewEntry.COLUMN_ID_MOVIE, movieId);
-            }
+        for(int i=0; i<getCount(); i++) {
+            Cursor cursor = (Cursor) getItem(i);
+            ContentValues value = new ContentValues();
+            value.put(DatabaseContract.ReviewEntry._ID, cursor.getString(DatabaseContract.ReviewEntry._ID_INDEX));
+            value.put(DatabaseContract.ReviewEntry.COLUMN_AUTHOR, cursor.getString(DatabaseContract.ReviewEntry.COLUMN_AUTHOR_INDEX));
+            value.put(DatabaseContract.ReviewEntry.COLUMN_CONTENT, cursor.getString(DatabaseContract.ReviewEntry.COLUMN_CONTENT_INDEX));
+            value.put(DatabaseContract.ReviewEntry.COLUMN_URL, cursor.getString(DatabaseContract.ReviewEntry.COLUMN_URL_INDEX));
+            value.put(DatabaseContract.ReviewEntry.COLUMN_ID_MOVIE, movieId);
+            values.add(value);
         }
         return values;
     }

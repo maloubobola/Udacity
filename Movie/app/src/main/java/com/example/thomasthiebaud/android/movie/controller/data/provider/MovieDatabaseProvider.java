@@ -8,11 +8,11 @@ import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
 
 import com.example.thomasthiebaud.android.movie.controller.data.http.HttpService;
+import com.example.thomasthiebaud.android.movie.controller.data.loader.LoaderException;
 import com.example.thomasthiebaud.android.movie.model.contract.APIContract;
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.controller.data.database.helper.MovieDatabaseHelper;
@@ -20,6 +20,9 @@ import com.example.thomasthiebaud.android.movie.controller.data.database.helper.
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Created by thiebaudthomas on 22/09/15.
@@ -29,15 +32,15 @@ public class MovieDatabaseProvider extends ContentProvider {
     private static final UriMatcher uriMatcher = buildUriMatcher();
     private SQLiteOpenHelper openHelper;
 
-    static final int FIND_MOVIE = 100;
-    static final int ALL_MOVIE = 101;
+    static final int MOVIE_WITH_ID = 100;
+    static final int OTHER_MOVIE = 101;
     static final int FAVORITE_MOVIE = 102;
     static final int MOVIE = 103;
-    static final int FIND_TRAILER = 200;
-    static final int FAVORITE_TRAILER = 201;
+    static final int OTHER_TRAILER_WITH_ID = 200;
+    static final int FAVORITE_TRAILER_WITH_ID = 201;
     static final int TRAILER = 202;
-    static final int FIND_REVIEW = 300;
-    static final int FAVORITE_REVIEW = 301;
+    static final int OTHER_REVIEW_WITH_ID = 300;
+    static final int FAVORITE_REVIEW_WITH_ID = 301;
     static final int REVIEW = 302;
 
     private static UriMatcher buildUriMatcher() {
@@ -46,14 +49,14 @@ public class MovieDatabaseProvider extends ContentProvider {
 
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/favorite", FAVORITE_MOVIE);
-        matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/#", FIND_MOVIE);
-        matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/*", ALL_MOVIE);
+        matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/#", MOVIE_WITH_ID);
+        matcher.addURI(authority, DatabaseContract.PATH_MOVIE + "/*", OTHER_MOVIE);
         matcher.addURI(authority, DatabaseContract.PATH_MOVIE, MOVIE);
-        matcher.addURI(authority, DatabaseContract.PATH_TRAILER + "/*/*", FIND_TRAILER);
-        matcher.addURI(authority, DatabaseContract.PATH_TRAILER + "/favorite", FAVORITE_TRAILER);
+        matcher.addURI(authority, DatabaseContract.PATH_TRAILER + "/favorite/*", FAVORITE_TRAILER_WITH_ID);
+        matcher.addURI(authority, DatabaseContract.PATH_TRAILER + "/*/*", OTHER_TRAILER_WITH_ID);
         matcher.addURI(authority, DatabaseContract.PATH_TRAILER, TRAILER);
-        matcher.addURI(authority, DatabaseContract.PATH_REVIEW + "/*/*", FIND_REVIEW);
-        matcher.addURI(authority, DatabaseContract.PATH_REVIEW + "/favorite", FAVORITE_REVIEW);
+        matcher.addURI(authority, DatabaseContract.PATH_REVIEW + "/favorite/*", FAVORITE_REVIEW_WITH_ID);
+        matcher.addURI(authority, DatabaseContract.PATH_REVIEW + "/*/*", OTHER_REVIEW_WITH_ID);
         matcher.addURI(authority, DatabaseContract.PATH_REVIEW, REVIEW);
         return matcher;
     }
@@ -69,17 +72,17 @@ public class MovieDatabaseProvider extends ContentProvider {
         final int match = uriMatcher.match(uri);
 
         switch (match) {
-            case FIND_MOVIE:
+            case MOVIE_WITH_ID:
                 return DatabaseContract.MovieEntry.CONTENT_TYPE;
-            case ALL_MOVIE:
+            case OTHER_MOVIE:
                 return DatabaseContract.MovieEntry.CONTENT_TYPE;
             case FAVORITE_MOVIE:
                 return DatabaseContract.MovieEntry.CONTENT_TYPE;
-            case FIND_REVIEW:
+            case OTHER_REVIEW_WITH_ID:
                 return DatabaseContract.ReviewEntry.CONTENT_TYPE;
-            case FAVORITE_REVIEW:
+            case FAVORITE_REVIEW_WITH_ID:
                 return DatabaseContract.ReviewEntry.CONTENT_TYPE;
-            case FIND_TRAILER:
+            case OTHER_TRAILER_WITH_ID:
                 return DatabaseContract.ReviewEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown Uri" + uri);
@@ -87,7 +90,7 @@ public class MovieDatabaseProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) throws LoaderException {
 
         final Cursor cursor;
 
@@ -102,7 +105,7 @@ public class MovieDatabaseProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
-            case ALL_MOVIE: {
+            case OTHER_MOVIE: {
                 cursor = new MatrixCursor(new String[]{
                             DatabaseContract.MovieEntry._ID,
                             DatabaseContract.MovieEntry.COLUMN_TITLE,
@@ -112,9 +115,14 @@ public class MovieDatabaseProvider extends ContentProvider {
                             DatabaseContract.MovieEntry.COLUMN_RELEASE_DATE
                     });
 
-                    JSONObject json = new HttpService().getMovies(uri.getLastPathSegment() + APIContract.API_SORT_DESC_LABEL).execute();
+                JSONObject json;
+                try {
+                    json = new HttpService().getMovies(uri.getLastPathSegment() + APIContract.API_SORT_DESC_LABEL).execute();
+                } catch (IOException e) {
+                    throw new LoaderException(e.toString());
+                }
 
-                    JSONArray results;
+                JSONArray results;
                     try {
                         results = json.getJSONArray(APIContract.JSON_RESULTS);
                         for (int i = 0; i < results.length(); i++) {
@@ -141,7 +149,7 @@ public class MovieDatabaseProvider extends ContentProvider {
                     }
                 }
             break;
-            case FIND_MOVIE:
+            case MOVIE_WITH_ID:
                 cursor = openHelper.getReadableDatabase().query(
                         DatabaseContract.MovieEntry.TABLE_NAME,
                         projection,
@@ -151,7 +159,7 @@ public class MovieDatabaseProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
-            case FAVORITE_TRAILER:
+            case FAVORITE_TRAILER_WITH_ID:
                 cursor = openHelper.getReadableDatabase().query(
                         DatabaseContract.TrailerEntry.TABLE_NAME,
                         projection,
@@ -161,16 +169,21 @@ public class MovieDatabaseProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
-            case FIND_TRAILER: {
+            case OTHER_TRAILER_WITH_ID: {
                     cursor = new MatrixCursor(new String[]{
                             DatabaseContract.TrailerEntry._ID,
                             DatabaseContract.TrailerEntry.COLUMN_NAME,
                             DatabaseContract.TrailerEntry.COLUMN_KEY
                     });
 
-                    JSONObject json = new HttpService().getTrailers(uri.getLastPathSegment()).execute();
+                JSONObject json = null;
+                try {
+                    json = new HttpService().getTrailers(uri.getLastPathSegment()).execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-                    JSONArray results;
+                JSONArray results;
                     try {
                         results = json.getJSONArray(APIContract.JSON_RESULTS);
                         for (int i = 0; i < results.length(); i++) {
@@ -186,7 +199,7 @@ public class MovieDatabaseProvider extends ContentProvider {
                     }
                 }
                 break;
-            case FAVORITE_REVIEW:
+            case FAVORITE_REVIEW_WITH_ID:
                 cursor = openHelper.getReadableDatabase().query(
                         DatabaseContract.ReviewEntry.TABLE_NAME,
                         projection,
@@ -196,7 +209,7 @@ public class MovieDatabaseProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
-            case FIND_REVIEW:
+            case OTHER_REVIEW_WITH_ID:
                 cursor = new MatrixCursor(new String[]{
                         DatabaseContract.ReviewEntry._ID,
                         DatabaseContract.ReviewEntry.COLUMN_AUTHOR,
@@ -204,7 +217,12 @@ public class MovieDatabaseProvider extends ContentProvider {
                         DatabaseContract.ReviewEntry.COLUMN_URL
                 });
 
-                JSONObject json = new HttpService().getReview(uri.getLastPathSegment()).execute();
+                JSONObject json = null;
+                try {
+                    json = new HttpService().getReview(uri.getLastPathSegment()).execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 JSONArray results;
                 try {
@@ -288,6 +306,7 @@ public class MovieDatabaseProvider extends ContentProvider {
                 try {
                     for (ContentValues value : values) {
                         long id = db.insert(DatabaseContract.TrailerEntry.TABLE_NAME, null, value);
+
                         if (id != -1)
                             returnCount++;
                     }

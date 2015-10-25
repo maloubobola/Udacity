@@ -85,7 +85,7 @@
 
                 <View style="@style/Divider"/>
 
-                <ListView
+                <com.example.thomasthiebaud.android.movie.view.NestedListView
                     android:id="@+id/trailers_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -107,7 +107,7 @@
 
                 <View style="@style/Divider"/>
 
-                <ListView
+                <com.example.thomasthiebaud.android.movie.view.NestedListView
                     android:id="@+id/reviews_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

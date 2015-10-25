@@ -12,6 +12,7 @@ import android.view.View;
 import com.example.thomasthiebaud.android.movie.R;
 import com.example.thomasthiebaud.android.movie.controller.fragment.DetailFragment;
 import com.example.thomasthiebaud.android.movie.controller.fragment.MainFragment;
+import com.example.thomasthiebaud.android.movie.model.contract.BundleContract;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 
 public class MainActivity extends AppCompatActivity implements MainFragment.MovieClickCallback {
@@ -27,8 +28,15 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Movi
 
         if(findViewById(R.id.movie_detail_container) != null) {
             this.isTwoPane = true;
+            Bundle argument = new Bundle();
+            argument.putBoolean(BundleContract.IS_TWO_PANE, isTwoPane);
+
+            DetailFragment fragment = new DetailFragment();
+            fragment.setArguments(argument);
+
+
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.movie_detail_container, new DetailFragment())
+                    .replace(R.id.movie_detail_container, fragment)
                     .commit();
             findViewById(R.id.movie_detail_container).setVisibility(View.GONE);
         }
@@ -76,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Movi
         if(isTwoPane) {
             Bundle argument = new Bundle();
             argument.putParcelable(MovieItem.class.getSimpleName(), movie);
+            argument.putBoolean(BundleContract.IS_TWO_PANE,isTwoPane);
+            argument.putBoolean(BundleContract.SHARE_VISIBLE, true);
 
             DetailFragment fragment = new DetailFragment();
             fragment.setArguments(argument);

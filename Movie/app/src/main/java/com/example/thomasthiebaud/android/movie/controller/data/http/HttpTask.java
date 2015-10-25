@@ -1,5 +1,6 @@
 package com.example.thomasthiebaud.android.movie.controller.data.http;
 
+import android.accounts.NetworkErrorException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -14,6 +15,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -51,8 +53,11 @@ public class HttpTask {
         return this;
     }
 
-
-    public JSONObject execute() {
+    /**
+     * Must be execute outside the UI Thread.
+     * @return Response from server.
+     */
+    public JSONObject execute() throws IOException {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
@@ -96,9 +101,6 @@ public class HttpTask {
                 Log.e(TAG, "Error parsing json", e);
                 return null;
             }
-        } catch (IOException e) {
-            Log.e(TAG, "IO Exception", e);
-            return null;
         } finally{
             if (urlConnection != null) {
                 urlConnection.disconnect();

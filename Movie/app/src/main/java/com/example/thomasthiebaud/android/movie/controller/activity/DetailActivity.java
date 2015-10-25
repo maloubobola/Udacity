@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import com.example.thomasthiebaud.android.movie.R;
 import com.example.thomasthiebaud.android.movie.controller.fragment.DetailFragment;
+import com.example.thomasthiebaud.android.movie.model.contract.BundleContract;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 
 public class DetailActivity extends AppCompatActivity {
@@ -17,6 +18,7 @@ public class DetailActivity extends AppCompatActivity {
         if(savedInstanceState == null) {
             Bundle argument = new Bundle();
             argument.putParcelable(MovieItem.class.getSimpleName(), getIntent().getParcelableExtra(MovieItem.class.getSimpleName()));
+            argument.putBoolean(BundleContract.IS_TWO_PANE, false);
 
             DetailFragment fragment = new DetailFragment();
             fragment.setArguments(argument);

@@ -5,22 +5,26 @@ import android.app.FragmentManager;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.thomasthiebaud.android.movie.R;
 import com.example.thomasthiebaud.android.movie.controller.data.adapter.ReviewAdapter;
 import com.example.thomasthiebaud.android.movie.controller.data.adapter.TrailerAdapter;
 import com.example.thomasthiebaud.android.movie.controller.fragment.DetailFragment;
 import com.example.thomasthiebaud.android.movie.controller.fragment.MainFragment;
+import com.example.thomasthiebaud.android.movie.model.contract.BundleContract;
 import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.model.contract.LoaderContract;
 import com.example.thomasthiebaud.android.movie.model.item.MovieItem;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -37,30 +41,13 @@ public class DetailCursorLoaderCallback implements LoaderManager.LoaderCallbacks
     private MovieItem movieItem;
     private DetailFragment detailFragment;
 
-    public DetailCursorLoaderCallback(Activity activity) {
-        this.activity = activity;
-    }
-
-
-    public DetailCursorLoaderCallback setReviewAdapter(ReviewAdapter reviewAdapter) {
-        this.reviewAdapter = reviewAdapter;
-        return this;
-    }
-
-    public DetailCursorLoaderCallback setTrailerAdapter(TrailerAdapter trailerAdapter) {
-        this.trailerAdapter = trailerAdapter;
-        return this;
-    }
-
-    public DetailCursorLoaderCallback setItem(MovieItem movieItem) {
-        this.movieItem = movieItem;
-        this.movieId = movieItem.getId() + "";
-        return this;
-    }
-
-    public DetailCursorLoaderCallback setFragment(DetailFragment detailFragment) {
+    public DetailCursorLoaderCallback(DetailFragment detailFragment) {
         this.detailFragment = detailFragment;
-        return this;
+        this.activity = detailFragment.getActivity();
+        this.reviewAdapter = detailFragment.getReviewAdapter();
+        this.trailerAdapter = detailFragment.getTrailerAdapter();
+        this.movieItem = detailFragment.getItem();
+        this.movieId = movieItem.getId() + "";
     }
 
     @Override
@@ -77,7 +64,7 @@ public class DetailCursorLoaderCallback implements LoaderManager.LoaderCallbacks
                 break;
             case LoaderContract.ALL_REVIEW_LOADER:
                 cursorLoader = new CursorLoader(activity,
-                        DatabaseContract.ReviewEntry.CONTENT_URI.buildUpon().appendPath("popularity").appendPath(movieId+"").build(),
+                        DatabaseContract.ReviewEntry.CONTENT_URI.buildUpon().appendPath(args.getString(BundleContract.SORT_BY)).appendPath(movieId+"").build(),
                         null,
                         DatabaseContract.ReviewEntry.COLUMN_ID_MOVIE + "= ?",
                         new String[]{movieId},
@@ -85,7 +72,7 @@ public class DetailCursorLoaderCallback implements LoaderManager.LoaderCallbacks
                 break;
             case LoaderContract.ALL_TRAILER_LOADER:
                 cursorLoader = new CursorLoader(activity,
-                        DatabaseContract.TrailerEntry.CONTENT_URI.buildUpon().appendPath("popularity").appendPath(movieId+"").build(),
+                        DatabaseContract.TrailerEntry.CONTENT_URI.buildUpon().appendPath(args.getString(BundleContract.SORT_BY)).appendPath(movieId+"").build(),
                         null,
                         DatabaseContract.TrailerEntry.COLUMN_ID_MOVIE + "= ?",
                         new String[]{movieId},
@@ -117,9 +104,12 @@ public class DetailCursorLoaderCallback implements LoaderManager.LoaderCallbacks
                 break;
             case LoaderContract.ALL_TRAILER_LOADER:
                 if(data != null) {
-                    while (data.moveToNext()) {
+                    if(data.moveToFirst()) {
+                        detailFragment.createShareActionProvider(data.getString(DatabaseContract.TrailerEntry.COLUMN_KEY_INDEX));
                         trailerAdapter.swapCursor(data);
                     }
+                    while (data.moveToNext())
+                        trailerAdapter.swapCursor(data);
                 }
                 break;
         }
@@ -144,10 +134,10 @@ public class DetailCursorLoaderCallback implements LoaderManager.LoaderCallbacks
                     isFavorite = false;
 
                     View view = activity.findViewById(R.id.movie_detail_container);
-                    if(view != null)
+                    if(view != null && detailFragment.isTwoPane()) {
                         view.setVisibility(View.GONE);
-                    activity.setTitle("Movie");
-                    detailFragment.setMenuVisibility(false);
+                        activity.setTitle("Movie");
+                    }
                 }
                 else {
                     List<ContentValues> reviewValues = reviewAdapter.toContentValuesList(movieId);
@@ -166,7 +156,6 @@ public class DetailCursorLoaderCallback implements LoaderManager.LoaderCallbacks
                     );
                     ((FloatingActionButton) activity.findViewById(R.id.favorite_button)).setImageResource(R.drawable.ic_favorite_black);
                     isFavorite = true;
-                    detailFragment.setMenuVisibility(true);
                 }
             }
         });
