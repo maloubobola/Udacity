@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        tools:context="com.example.thomasthiebaud.android.movie.controller.fragment.DetailFragment">
+        tools:context="com.example.thomasthiebaud.android.movie.app.details.DetailFragment">
 
         <ImageView
             android:id="@+id/poster"
@@ -83,7 +83,7 @@
 
                 <View style="@style/Divider"/>
 
-                <com.example.thomasthiebaud.android.movie.view.NestedListView
+                <com.example.thomasthiebaud.android.movie.commons.view.NestedListView
                     android:id="@+id/trailers_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -105,7 +105,7 @@
 
                 <View style="@style/Divider"/>
 
-                <com.example.thomasthiebaud.android.movie.view.NestedListView
+                <com.example.thomasthiebaud.android.movie.commons.view.NestedListView
                     android:id="@+id/reviews_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

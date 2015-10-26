@@ -4,9 +4,7 @@ import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
-
-import java.io.Serializable;
+import com.example.thomasthiebaud.android.movie.contract.DatabaseContract;
 
 /**
  * Created by thiebaudthomas on 09/09/15.

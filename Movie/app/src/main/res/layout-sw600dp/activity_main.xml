@@ -7,11 +7,11 @@
     android:baselineAligned="false"
     android:divider="?android:attr/dividerHorizontal"
     android:orientation="horizontal"
-    tools:context="com.example.thomasthiebaud.android.movie.controller.activity.MainActivity">
+    tools:context="com.example.thomasthiebaud.android.movie.app.main.MainActivity">
 
     <fragment
         android:id="@+id/movie_container"
-        android:name="com.example.thomasthiebaud.android.movie.controller.fragment.MainFragment"
+        android:name="com.example.thomasthiebaud.android.movie.app.main.MainFragment"
         tools:layout="@layout/fragment_main"
         android:layout_width="0dp"
         android:layout_height="match_parent"

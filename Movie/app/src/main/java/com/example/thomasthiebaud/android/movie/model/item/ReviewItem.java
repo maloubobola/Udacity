@@ -2,7 +2,7 @@ package com.example.thomasthiebaud.android.movie.model.item;
 
 import android.content.ContentValues;
 
-import com.example.thomasthiebaud.android.movie.model.contract.DatabaseContract;
+import com.example.thomasthiebaud.android.movie.contract.DatabaseContract;
 
 /**
  * Created by thiebaudthomas on 21/09/15.

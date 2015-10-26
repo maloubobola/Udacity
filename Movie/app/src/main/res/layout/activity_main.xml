@@ -2,7 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/movie_container"
-    android:name="com.example.thomasthiebaud.android.movie.controller.fragment.MainFragment"
+    android:name="com.example.thomasthiebaud.android.movie.app.main.MainFragment"
     tools:layout="@layout/fragment_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent" />
