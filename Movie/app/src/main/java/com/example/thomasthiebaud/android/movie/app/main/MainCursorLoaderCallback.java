@@ -48,14 +48,6 @@ public class MainCursorLoaderCallback implements LoaderManager.LoaderCallbacks<C
                         null,
                         null);
                 break;
-            case LoaderContract.ONE_MOVIE_LOADER:
-                cursorLoader =  new CursorLoader(mainFragment.getActivity(),
-                        DatabaseContract.MovieEntry.CONTENT_URI.buildUpon().appendPath(sortBy).build(),
-                        null,
-                        null,
-                        null,
-                        null);
-                break;
         }
         return cursorLoader;
     }
@@ -67,13 +59,13 @@ public class MainCursorLoaderCallback implements LoaderManager.LoaderCallbacks<C
 
         if(l.getException() != null) {
             textView.setVisibility(View.VISIBLE);
-            textView.setText("Network unreachable.\n Only favorites movies are available.\n Change sort order in (Settings -> Sort).");
+            textView.setText(mainFragment.getString(R.string.no_network_main));
             adapter.swapCursor(null);
         }
         else if(adapter != null && data != null) {
             adapter.swapCursor(data);
             if(data.getCount() <= 0)
-                textView.setText("No movies");
+                textView.setText(mainFragment.getString(R.string.no_movies));
             else
                 textView.setVisibility(View.GONE);
         }

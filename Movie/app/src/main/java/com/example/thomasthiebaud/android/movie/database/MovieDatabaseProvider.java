@@ -182,11 +182,11 @@ public class MovieDatabaseProvider extends ContentProvider {
                             DatabaseContract.TrailerEntry.COLUMN_KEY
                     });
 
-                JSONObject json = null;
+                JSONObject json;
                 try {
                     json = new HttpTaskFactory().getTrailers(uri.getLastPathSegment()).execute();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    throw new NoNetworkException(e.getMessage());
                 }
 
                 JSONArray results;
@@ -227,7 +227,7 @@ public class MovieDatabaseProvider extends ContentProvider {
                 try {
                     json = new HttpTaskFactory().getReview(uri.getLastPathSegment()).execute();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    throw new NoNetworkException(e.getMessage());
                 }
 
                 JSONArray results;

@@ -19,7 +19,10 @@
     <string name="reviews_label">Reviews</string>
     <string name="pref_sort_favorite_label">Favorite</string>
     <string name="pref_sort_favorite">favorite</string>
+    <string name="movie_title">Movie</string>
     <string name="no_reviews">No reviews</string>
     <string name="no_trailers">No trailers</string>
     <string name="no_movies">No movies</string>
+    <string name="no_network_detail">No network. Impossible to get data.</string>
+    <string name="no_network_main">Network unreachable.\n Only favorites movies are available.\n Change sort order in (Settings -> Sort).</string>
 </resources>

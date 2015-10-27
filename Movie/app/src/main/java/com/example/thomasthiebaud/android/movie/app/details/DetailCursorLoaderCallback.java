@@ -9,8 +9,10 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.View;
+import android.widget.TextView;
 
 import com.example.thomasthiebaud.android.movie.R;
+import com.example.thomasthiebaud.android.movie.commons.loader.NoNetworkSafeCursorLoader;
 import com.example.thomasthiebaud.android.movie.model.adapter.ReviewAdapter;
 import com.example.thomasthiebaud.android.movie.model.adapter.TrailerAdapter;
 import com.example.thomasthiebaud.android.movie.contract.BundleContract;
@@ -48,7 +50,7 @@ public class DetailCursorLoaderCallback implements LoaderManager.LoaderCallbacks
         CursorLoader cursorLoader = null;
         switch (id) {
             case LoaderContract.ONE_MOVIE_LOADER:
-                cursorLoader = new CursorLoader(activity,
+                cursorLoader = new NoNetworkSafeCursorLoader(activity,
                         DatabaseContract.MovieEntry.CONTENT_URI.buildUpon().appendPath(movieId + "").build(),
                         null,
                         DatabaseContract.ReviewEntry._ID + "= ?",
@@ -56,7 +58,7 @@ public class DetailCursorLoaderCallback implements LoaderManager.LoaderCallbacks
                         null);
                 break;
             case LoaderContract.ALL_REVIEW_LOADER:
-                cursorLoader = new CursorLoader(activity,
+                cursorLoader = new NoNetworkSafeCursorLoader(activity,
                         DatabaseContract.ReviewEntry.CONTENT_URI.buildUpon().appendPath(args.getString(BundleContract.SORT_BY)).appendPath(movieId+"").build(),
                         null,
                         DatabaseContract.ReviewEntry.COLUMN_ID_MOVIE + "= ?",
@@ -64,7 +66,7 @@ public class DetailCursorLoaderCallback implements LoaderManager.LoaderCallbacks
                         null);
                 break;
             case LoaderContract.ALL_TRAILER_LOADER:
-                cursorLoader = new CursorLoader(activity,
+                cursorLoader = new NoNetworkSafeCursorLoader(activity,
                         DatabaseContract.TrailerEntry.CONTENT_URI.buildUpon().appendPath(args.getString(BundleContract.SORT_BY)).appendPath(movieId+"").build(),
                         null,
                         DatabaseContract.TrailerEntry.COLUMN_ID_MOVIE + "= ?",
@@ -77,6 +79,9 @@ public class DetailCursorLoaderCallback implements LoaderManager.LoaderCallbacks
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        NoNetworkSafeCursorLoader l = (NoNetworkSafeCursorLoader) loader;
+        String error = detailFragment.getString(R.string.no_network_detail);
+
         switch (loader.getId()) {
             case LoaderContract.ONE_MOVIE_LOADER:
                 if(data != null && data.moveToFirst()) {
@@ -89,14 +94,25 @@ public class DetailCursorLoaderCallback implements LoaderManager.LoaderCallbacks
                 }
                 break;
             case LoaderContract.ALL_REVIEW_LOADER:
-                if(data != null) {
+                if(l.getException() != null) {
+                    ((TextView)activity.findViewById(R.id.empty_reviews_label)).setText(error);
+                    activity.findViewById(R.id.favorite_button).setVisibility(View.GONE);
+                    return;
+                }
+                else if(data != null) {
                     while (data.moveToNext()) {
                         reviewAdapter.swapCursor(data);
                     }
                 }
                 break;
             case LoaderContract.ALL_TRAILER_LOADER:
-                if(data != null) {
+                if(l.getException() != null) {
+                    ((TextView)activity.findViewById(R.id.empty_trailers_label)).setText(error);
+                    activity.findViewById(R.id.favorite_button).setVisibility(View.GONE);
+                    detailFragment.createShareActionProvider(null);
+                    return;
+                }
+                else if(data != null) {
                     if(data.moveToFirst()) {
                         detailFragment.createShareActionProvider(data.getString(DatabaseContract.TrailerEntry.COLUMN_KEY_INDEX));
                         trailerAdapter.swapCursor(data);
@@ -129,7 +145,7 @@ public class DetailCursorLoaderCallback implements LoaderManager.LoaderCallbacks
                     View view = activity.findViewById(R.id.movie_detail_container);
                     if(view != null && detailFragment.isTwoPane()) {
                         view.setVisibility(View.GONE);
-                        activity.setTitle("Movie");
+                        activity.setTitle(detailFragment.getString(R.string.movie_title));
                     }
                 }
                 else {

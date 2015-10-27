@@ -34,9 +34,6 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        String ext = Environment.getExternalStorageDirectory().getAbsolutePath();
-        Log.e(TAG,ext);
-
         GridView gv = (GridView) rootView.findViewById(R.id.cover_grid);
         movieAdapter = new MovieAdapter(getContext(),null,0);
         gv.setAdapter(movieAdapter);
@@ -81,6 +78,10 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
     public void onSortByChanged() {
         String sortBy = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity));
         getLoaderManager().restartLoader(LoaderContract.ALL_MOVIE_LOADER, null, mainCursorLoaderCallback.setSortOrder(sortBy));
+
+        View view = getActivity().findViewById(R.id.movie_detail_container);
+        if(view != null)
+            view.setVisibility(View.GONE);
     }
 
     //TODO MOve to separate file or into activity
