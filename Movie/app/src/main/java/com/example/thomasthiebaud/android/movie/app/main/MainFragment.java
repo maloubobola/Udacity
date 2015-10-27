@@ -32,19 +32,18 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         String ext = Environment.getExternalStorageDirectory().getAbsolutePath();
         Log.e(TAG,ext);
 
-        GridView gv = (GridView) view.findViewById(R.id.cover_grid);
+        GridView gv = (GridView) rootView.findViewById(R.id.cover_grid);
         movieAdapter = new MovieAdapter(getContext(),null,0);
         gv.setAdapter(movieAdapter);
         gv.setOnItemClickListener(this);
 
         mainCursorLoaderCallback = new MainCursorLoaderCallback(this);
-        rootView = view;
-        return view;
+        return rootView;
     }
 
     @Override
@@ -52,7 +51,7 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
         super.onActivityCreated(savedInstanceState);
         String sortBy = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity));
         mainCursorLoaderCallback.setSortOrder(sortBy);
-        getLoaderManager().restartLoader(LoaderContract.ALL_MOVIE_LOADER, null, mainCursorLoaderCallback);
+        getLoaderManager().initLoader(LoaderContract.ALL_MOVIE_LOADER, null, mainCursorLoaderCallback);
 
         View v = getActivity().findViewById(R.id.movie_detail_container);
         if(v != null)

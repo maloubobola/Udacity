@@ -8,14 +8,10 @@ import android.support.v4.content.CursorLoader;
 /**
  * Created by thiebaudthomas on 21/10/15.
  */
-public class CustomCursorLoader extends CursorLoader {
-    private Throwable throwable;
+public class NoNetworkSafeCursorLoader extends CursorLoader {
+    private NoNetworkException exception;
 
-    public CustomCursorLoader(Context context) {
-        super(context);
-    }
-
-    public CustomCursorLoader(Context context, Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public NoNetworkSafeCursorLoader(Context context, Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         super(context, uri, projection, selection, selectionArgs, sortOrder);
     }
 
@@ -23,13 +19,13 @@ public class CustomCursorLoader extends CursorLoader {
     public Cursor loadInBackground() {
         try {
             return super.loadInBackground();
-        } catch(Throwable t) {
-            this.throwable = t;
+        } catch(NoNetworkException exception) {
+            this.exception = exception;
         }
         return null;
     }
 
-    public Throwable getThrowable() {
-        return throwable;
+    public NoNetworkException getException() {
+        return exception;
     }
 }

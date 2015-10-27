@@ -11,8 +11,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.util.Log;
 
-import com.example.thomasthiebaud.android.movie.http.HttpFactory;
-import com.example.thomasthiebaud.android.movie.commons.loader.LoaderException;
+import com.example.thomasthiebaud.android.movie.http.HttpTaskFactory;
+import com.example.thomasthiebaud.android.movie.commons.loader.NoNetworkException;
 import com.example.thomasthiebaud.android.movie.contract.APIContract;
 import com.example.thomasthiebaud.android.movie.contract.DatabaseContract;
 
@@ -30,16 +30,16 @@ public class MovieDatabaseProvider extends ContentProvider {
     private static final UriMatcher uriMatcher = buildUriMatcher();
     private SQLiteOpenHelper openHelper;
 
-    static final int MOVIE_WITH_ID = 100;
-    static final int OTHER_MOVIE = 101;
-    static final int FAVORITE_MOVIE = 102;
-    static final int MOVIE = 103;
-    static final int OTHER_TRAILER_WITH_ID = 200;
-    static final int FAVORITE_TRAILER_WITH_ID = 201;
-    static final int TRAILER = 202;
-    static final int OTHER_REVIEW_WITH_ID = 300;
-    static final int FAVORITE_REVIEW_WITH_ID = 301;
-    static final int REVIEW = 302;
+    private static final int MOVIE_WITH_ID = 100;
+    private static final int OTHER_MOVIE = 101;
+    private static final int FAVORITE_MOVIE = 102;
+    private static final int MOVIE = 103;
+    private static final int OTHER_TRAILER_WITH_ID = 200;
+    private static final int FAVORITE_TRAILER_WITH_ID = 201;
+    private static final int TRAILER = 202;
+    private static final int OTHER_REVIEW_WITH_ID = 300;
+    private static final int FAVORITE_REVIEW_WITH_ID = 301;
+    private static final int REVIEW = 302;
 
     private static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -76,19 +76,27 @@ public class MovieDatabaseProvider extends ContentProvider {
                 return DatabaseContract.MovieEntry.CONTENT_TYPE;
             case FAVORITE_MOVIE:
                 return DatabaseContract.MovieEntry.CONTENT_TYPE;
+            case MOVIE:
+                return DatabaseContract.MovieEntry.CONTENT_ITEM_TYPE;
             case OTHER_REVIEW_WITH_ID:
                 return DatabaseContract.ReviewEntry.CONTENT_TYPE;
             case FAVORITE_REVIEW_WITH_ID:
                 return DatabaseContract.ReviewEntry.CONTENT_TYPE;
+            case REVIEW:
+                return DatabaseContract.ReviewEntry.CONTENT_ITEM_TYPE;
             case OTHER_TRAILER_WITH_ID:
-                return DatabaseContract.ReviewEntry.CONTENT_TYPE;
+                return DatabaseContract.TrailerEntry.CONTENT_TYPE;
+            case FAVORITE_TRAILER_WITH_ID:
+                return DatabaseContract.TrailerEntry.CONTENT_TYPE;
+            case TRAILER:
+                return DatabaseContract.TrailerEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown Uri" + uri);
         }
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) throws LoaderException {
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) throws NoNetworkException {
 
         final Cursor cursor;
 
@@ -115,9 +123,9 @@ public class MovieDatabaseProvider extends ContentProvider {
 
                 JSONObject json;
                 try {
-                    json = new HttpFactory().getMovies(uri.getLastPathSegment() + APIContract.API_SORT_DESC_LABEL).execute();
+                    json = new HttpTaskFactory().getMovies(uri.getLastPathSegment() + APIContract.API_SORT_DESC_LABEL).execute();
                 } catch (IOException e) {
-                    throw new LoaderException(e.toString());
+                    throw new NoNetworkException(e.toString());
                 }
 
                 JSONArray results;
@@ -176,7 +184,7 @@ public class MovieDatabaseProvider extends ContentProvider {
 
                 JSONObject json = null;
                 try {
-                    json = new HttpFactory().getTrailers(uri.getLastPathSegment()).execute();
+                    json = new HttpTaskFactory().getTrailers(uri.getLastPathSegment()).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -217,7 +225,7 @@ public class MovieDatabaseProvider extends ContentProvider {
 
                 JSONObject json = null;
                 try {
-                    json = new HttpFactory().getReview(uri.getLastPathSegment()).execute();
+                    json = new HttpTaskFactory().getReview(uri.getLastPathSegment()).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

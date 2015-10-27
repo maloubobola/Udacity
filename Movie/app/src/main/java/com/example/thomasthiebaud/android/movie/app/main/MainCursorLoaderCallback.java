@@ -10,8 +10,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.thomasthiebaud.android.movie.R;
-import com.example.thomasthiebaud.android.movie.commons.loader.CustomCursorLoader;
-import com.example.thomasthiebaud.android.movie.commons.loader.LoaderException;
+import com.example.thomasthiebaud.android.movie.commons.loader.NoNetworkSafeCursorLoader;
+import com.example.thomasthiebaud.android.movie.commons.loader.NoNetworkException;
 import com.example.thomasthiebaud.android.movie.contract.DatabaseContract;
 import com.example.thomasthiebaud.android.movie.contract.LoaderContract;
 
@@ -41,7 +41,7 @@ public class MainCursorLoaderCallback implements LoaderManager.LoaderCallbacks<C
         CursorLoader cursorLoader = null;
         switch (id) {
             case LoaderContract.ALL_MOVIE_LOADER:
-                cursorLoader =  new CustomCursorLoader(mainFragment.getActivity(),
+                cursorLoader =  new NoNetworkSafeCursorLoader(mainFragment.getActivity(),
                         DatabaseContract.MovieEntry.CONTENT_URI.buildUpon().appendPath(sortBy).build(),
                         null,
                         null,
@@ -61,13 +61,13 @@ public class MainCursorLoaderCallback implements LoaderManager.LoaderCallbacks<C
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) throws LoaderException {
-        CustomCursorLoader l = (CustomCursorLoader) loader;
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) throws NoNetworkException {
+        NoNetworkSafeCursorLoader l = (NoNetworkSafeCursorLoader) loader;
         TextView textView = (TextView) mainFragment.getRootView().findViewById(R.id.empty_movies_label);
 
-        if(l.getThrowable() != null) {
+        if(l.getException() != null) {
             textView.setVisibility(View.VISIBLE);
-            textView.setText("Network unreachable.\n Only favorites are available.\n Go to (Settings -> favorite).");
+            textView.setText("Network unreachable.\n Only favorites movies are available.\n Change sort order in (Settings -> Sort).");
             adapter.swapCursor(null);
         }
         else if(adapter != null && data != null) {

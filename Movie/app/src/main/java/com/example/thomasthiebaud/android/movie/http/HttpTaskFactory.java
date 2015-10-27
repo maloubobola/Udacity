@@ -5,7 +5,7 @@ import com.example.thomasthiebaud.android.movie.contract.APIContract;
 /**
  * Created by thiebaudthomas on 18/09/15.
  */
-public class HttpFactory {
+public class HttpTaskFactory {
     public HttpTask getMovies(String sortBy) {
         return HttpTask
                 .authority(APIContract.API_AUTHORITY)
