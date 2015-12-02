@@ -97,8 +97,7 @@
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            >
+            android:layout_alignParentRight="true">
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -108,8 +107,7 @@
                 android:src="@drawable/ic_action_discard"
                 style="?android:attr/buttonBarButtonStyle"
                 android:id="@+id/delete_button"
-                android:visibility="invisible"
-                />
+                android:visibility="invisible"/>
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -121,11 +119,7 @@
                 android:visibility="invisible"
                 android:src="@drawable/ic_action_accept"
                 style="?android:attr/buttonBarButtonStyle"
-                android:layout_gravity="bottom"
-                />
-
-
+                android:layout_gravity="bottom" />
         </LinearLayout>
-
     </RelativeLayout>
 </FrameLayout>
