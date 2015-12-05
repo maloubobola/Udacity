@@ -1,4 +1,4 @@
-package it.jaschke.alexandria.api;
+package it.jaschke.alexandria.model.adapter;
 
 
 import android.content.Context;
@@ -11,15 +11,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import it.jaschke.alexandria.R;
-import it.jaschke.alexandria.data.AlexandriaContract;
-import it.jaschke.alexandria.services.DownloadImage;
+import it.jaschke.alexandria.contract.APIContract;
+import it.jaschke.alexandria.services.DownloadImageTask;
 
 /**
  * Created by saj on 11/01/15.
  */
-public class BookListAdapter extends CursorAdapter {
-
-
+public class BookAdapter extends CursorAdapter {
     public static class ViewHolder {
         public final ImageView bookCover;
         public final TextView bookTitle;
@@ -32,7 +30,7 @@ public class BookListAdapter extends CursorAdapter {
         }
     }
 
-    public BookListAdapter(Context context, Cursor c, int flags) {
+    public BookAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
 
@@ -41,13 +39,13 @@ public class BookListAdapter extends CursorAdapter {
 
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        String imgUrl = cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
-        new DownloadImage(viewHolder.bookCover).execute(imgUrl);
+        String imgUrl = cursor.getString(cursor.getColumnIndex(APIContract.BookEntry.IMAGE_URL));
+        new DownloadImageTask(viewHolder.bookCover).execute(imgUrl);
 
-        String bookTitle = cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
+        String bookTitle = cursor.getString(cursor.getColumnIndex(APIContract.BookEntry.TITLE));
         viewHolder.bookTitle.setText(bookTitle);
 
-        String bookSubTitle = cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
+        String bookSubTitle = cursor.getString(cursor.getColumnIndex(APIContract.BookEntry.SUBTITLE));
         viewHolder.bookSubTitle.setText(bookSubTitle);
     }
 

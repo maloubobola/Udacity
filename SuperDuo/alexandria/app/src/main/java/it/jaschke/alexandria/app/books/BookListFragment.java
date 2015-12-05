@@ -1,4 +1,4 @@
-package it.jaschke.alexandria;
+package it.jaschke.alexandria.app.books;
 
 import android.app.Activity;
 import android.database.Cursor;
@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,21 +14,22 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import it.jaschke.alexandria.api.BookListAdapter;
-import it.jaschke.alexandria.api.Callback;
-import it.jaschke.alexandria.data.AlexandriaContract;
+import it.jaschke.alexandria.R;
+import it.jaschke.alexandria.model.adapter.BookAdapter;
+import it.jaschke.alexandria.commons.Callback;
+import it.jaschke.alexandria.contract.APIContract;
 
 
-public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class BookListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private BookListAdapter bookListAdapter;
+    private BookAdapter bookAdapter;
     private ListView bookList;
     private int position = ListView.INVALID_POSITION;
     private EditText searchText;
 
     private final int LOADER_ID = 10;
 
-    public ListOfBooks() {
+    public BookListFragment() {
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         Cursor cursor = getActivity().getContentResolver().query(
-                AlexandriaContract.BookEntry.CONTENT_URI,
+                APIContract.BookEntry.CONTENT_URI,
                 null, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
                 null, // values for "where" clause
@@ -49,29 +49,29 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
         );
 
 
-        bookListAdapter = new BookListAdapter(getActivity(), cursor, 0);
+        bookAdapter = new BookAdapter(getActivity(), cursor, 0);
         View rootView = inflater.inflate(R.layout.fragment_list_of_books, container, false);
         searchText = (EditText) rootView.findViewById(R.id.searchText);
         rootView.findViewById(R.id.searchButton).setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ListOfBooks.this.restartLoader();
+                        BookListFragment.this.restartLoader();
                     }
                 }
         );
 
         bookList = (ListView) rootView.findViewById(R.id.listOfBooks);
-        bookList.setAdapter(bookListAdapter);
+        bookList.setAdapter(bookAdapter);
 
         bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Cursor cursor = bookListAdapter.getCursor();
+                Cursor cursor = bookAdapter.getCursor();
                 if (cursor != null && cursor.moveToPosition(position)) {
                     ((Callback)getActivity())
-                            .onItemSelected(cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry._ID)));
+                            .onItemSelected(cursor.getString(cursor.getColumnIndex(APIContract.BookEntry._ID)));
                 }
             }
         });
@@ -86,14 +86,14 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        final String selection = AlexandriaContract.BookEntry.TITLE +" LIKE ? OR " + AlexandriaContract.BookEntry.SUBTITLE + " LIKE ? ";
+        final String selection = APIContract.BookEntry.TITLE +" LIKE ? OR " + APIContract.BookEntry.SUBTITLE + " LIKE ? ";
         String searchString =searchText.getText().toString();
 
         if(searchString.length()>0){
             searchString = "%"+searchString+"%";
             return new CursorLoader(
                     getActivity(),
-                    AlexandriaContract.BookEntry.CONTENT_URI,
+                    APIContract.BookEntry.CONTENT_URI,
                     null,
                     selection,
                     new String[]{searchString,searchString},
@@ -103,7 +103,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
         return new CursorLoader(
                 getActivity(),
-                AlexandriaContract.BookEntry.CONTENT_URI,
+                APIContract.BookEntry.CONTENT_URI,
                 null,
                 null,
                 null,
@@ -113,7 +113,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        bookListAdapter.swapCursor(data);
+        bookAdapter.swapCursor(data);
         if (position != ListView.INVALID_POSITION) {
             bookList.smoothScrollToPosition(position);
         }
@@ -121,7 +121,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        bookListAdapter.swapCursor(null);
+        bookAdapter.swapCursor(null);
     }
 
     @Override

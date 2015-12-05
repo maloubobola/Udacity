@@ -8,7 +8,7 @@ import android.test.AndroidTestCase;
 import java.util.Map;
 import java.util.Set;
 
-import it.jaschke.alexandria.data.AlexandriaContract;
+import it.jaschke.alexandria.contract.APIContract;
 import it.jaschke.alexandria.data.DbHelper;
 
 /**
@@ -40,20 +40,20 @@ public class TestDb extends AndroidTestCase {
 
         ContentValues values = getBookValues();
 
-        long retEan = db.insert(AlexandriaContract.BookEntry.TABLE_NAME, null, values);
+        long retEan = db.insert(APIContract.BookEntry.TABLE_NAME, null, values);
         assertEquals(ean, retEan);
 
         String[] columns = {
-                AlexandriaContract.BookEntry._ID,
-                AlexandriaContract.BookEntry.TITLE,
-                AlexandriaContract.BookEntry.IMAGE_URL,
-                AlexandriaContract.BookEntry.SUBTITLE,
-                AlexandriaContract.BookEntry.DESC
+                APIContract.BookEntry._ID,
+                APIContract.BookEntry.TITLE,
+                APIContract.BookEntry.IMAGE_URL,
+                APIContract.BookEntry.SUBTITLE,
+                APIContract.BookEntry.DESC
         };
 
         // A cursor is your primary interface to the query results.
         Cursor cursor = db.query(
-                AlexandriaContract.BookEntry.TABLE_NAME,  // Table to Query
+                APIContract.BookEntry.TABLE_NAME,  // Table to Query
                 columns,
                 null, // Columns for the "where" clause
                 null, // Values for the "where" clause
@@ -67,15 +67,15 @@ public class TestDb extends AndroidTestCase {
         values = getAuthorValues();
 
 
-        retEan = db.insert(AlexandriaContract.AuthorEntry.TABLE_NAME, null, values);
+        retEan = db.insert(APIContract.AuthorEntry.TABLE_NAME, null, values);
 
         columns = new String[]{
-                AlexandriaContract.AuthorEntry._ID,
-                AlexandriaContract.AuthorEntry.AUTHOR
+                APIContract.AuthorEntry._ID,
+                APIContract.AuthorEntry.AUTHOR
         };
 
         cursor = db.query(
-                AlexandriaContract.AuthorEntry.TABLE_NAME,  // Table to Query
+                APIContract.AuthorEntry.TABLE_NAME,  // Table to Query
                 columns,
                 null, // Columns for the "where" clause
                 null, // Values for the "where" clause
@@ -88,15 +88,15 @@ public class TestDb extends AndroidTestCase {
         // test category table
 
         values = getCategoryValues();
-        retEan = db.insert(AlexandriaContract.CategoryEntry.TABLE_NAME, null, values);
+        retEan = db.insert(APIContract.CategoryEntry.TABLE_NAME, null, values);
 
         columns = new String[]{
-                AlexandriaContract.CategoryEntry._ID,
-                AlexandriaContract.CategoryEntry.CATEGORY
+                APIContract.CategoryEntry._ID,
+                APIContract.CategoryEntry.CATEGORY
         };
 
         cursor = db.query(
-                AlexandriaContract.CategoryEntry.TABLE_NAME,  // Table to Query
+                APIContract.CategoryEntry.TABLE_NAME,  // Table to Query
                 columns,
                 null, // Columns for the "where" clause
                 null, // Values for the "where" clause
@@ -129,11 +129,11 @@ public class TestDb extends AndroidTestCase {
     public static ContentValues getBookValues() {
 
         final ContentValues values = new ContentValues();
-        values.put(AlexandriaContract.BookEntry._ID, ean);
-        values.put(AlexandriaContract.BookEntry.TITLE, title);
-        values.put(AlexandriaContract.BookEntry.IMAGE_URL, imgUrl);
-        values.put(AlexandriaContract.BookEntry.SUBTITLE, subtitle);
-        values.put(AlexandriaContract.BookEntry.DESC, desc);
+        values.put(APIContract.BookEntry._ID, ean);
+        values.put(APIContract.BookEntry.TITLE, title);
+        values.put(APIContract.BookEntry.IMAGE_URL, imgUrl);
+        values.put(APIContract.BookEntry.SUBTITLE, subtitle);
+        values.put(APIContract.BookEntry.DESC, desc);
 
         return values;
     }
@@ -141,8 +141,8 @@ public class TestDb extends AndroidTestCase {
     public static ContentValues getAuthorValues() {
 
         final ContentValues values= new ContentValues();
-        values.put(AlexandriaContract.AuthorEntry._ID, ean);
-        values.put(AlexandriaContract.AuthorEntry.AUTHOR, author);
+        values.put(APIContract.AuthorEntry._ID, ean);
+        values.put(APIContract.AuthorEntry.AUTHOR, author);
 
         return values;
     }
@@ -150,8 +150,8 @@ public class TestDb extends AndroidTestCase {
     public static ContentValues getCategoryValues() {
 
         final ContentValues values= new ContentValues();
-        values.put(AlexandriaContract.CategoryEntry._ID, ean);
-        values.put(AlexandriaContract.CategoryEntry.CATEGORY, category);
+        values.put(APIContract.CategoryEntry._ID, ean);
+        values.put(APIContract.CategoryEntry.CATEGORY, category);
 
         return values;
     }
@@ -159,22 +159,22 @@ public class TestDb extends AndroidTestCase {
     public static ContentValues getFullDetailValues() {
 
         final ContentValues values= new ContentValues();
-        values.put(AlexandriaContract.BookEntry.TITLE, title);
-        values.put(AlexandriaContract.BookEntry.IMAGE_URL, imgUrl);
-        values.put(AlexandriaContract.BookEntry.SUBTITLE, subtitle);
-        values.put(AlexandriaContract.BookEntry.DESC, desc);
-        values.put(AlexandriaContract.AuthorEntry.AUTHOR, author);
-        values.put(AlexandriaContract.CategoryEntry.CATEGORY, category);
+        values.put(APIContract.BookEntry.TITLE, title);
+        values.put(APIContract.BookEntry.IMAGE_URL, imgUrl);
+        values.put(APIContract.BookEntry.SUBTITLE, subtitle);
+        values.put(APIContract.BookEntry.DESC, desc);
+        values.put(APIContract.AuthorEntry.AUTHOR, author);
+        values.put(APIContract.CategoryEntry.CATEGORY, category);
         return values;
     }
 
     public static ContentValues getFullListValues() {
 
         final ContentValues values= new ContentValues();
-        values.put(AlexandriaContract.BookEntry.TITLE, title);
-        values.put(AlexandriaContract.BookEntry.IMAGE_URL, imgUrl);
-        values.put(AlexandriaContract.AuthorEntry.AUTHOR, author);
-        values.put(AlexandriaContract.CategoryEntry.CATEGORY, category);
+        values.put(APIContract.BookEntry.TITLE, title);
+        values.put(APIContract.BookEntry.IMAGE_URL, imgUrl);
+        values.put(APIContract.AuthorEntry.AUTHOR, author);
+        values.put(APIContract.CategoryEntry.CATEGORY, category);
         return values;
     }
 }

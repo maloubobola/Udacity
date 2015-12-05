@@ -8,7 +8,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.util.Log;
+
+import it.jaschke.alexandria.contract.APIContract;
 
 /**
  * Created by saj on 24/12/14.
@@ -36,27 +37,27 @@ public class BookProvider extends ContentProvider {
     static{
         bookFull = new SQLiteQueryBuilder();
         bookFull.setTables(
-                AlexandriaContract.BookEntry.TABLE_NAME + " LEFT OUTER JOIN " +
-                AlexandriaContract.AuthorEntry.TABLE_NAME + " USING (" +AlexandriaContract.BookEntry._ID + ")" +
-                " LEFT OUTER JOIN " +  AlexandriaContract.CategoryEntry.TABLE_NAME + " USING (" +AlexandriaContract.BookEntry._ID + ")");
+                APIContract.BookEntry.TABLE_NAME + " LEFT OUTER JOIN " +
+                APIContract.AuthorEntry.TABLE_NAME + " USING (" + APIContract.BookEntry._ID + ")" +
+                " LEFT OUTER JOIN " +  APIContract.CategoryEntry.TABLE_NAME + " USING (" + APIContract.BookEntry._ID + ")");
     }
 
 
     private static UriMatcher buildUriMatcher() {
 
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
-        final String authority = AlexandriaContract.CONTENT_AUTHORITY;
+        final String authority = APIContract.CONTENT_AUTHORITY;
 
-        matcher.addURI(authority, AlexandriaContract.PATH_BOOKS+"/#", BOOK_ID);
-        matcher.addURI(authority, AlexandriaContract.PATH_AUTHORS+"/#", AUTHOR_ID);
-        matcher.addURI(authority, AlexandriaContract.PATH_CATEGORIES+"/#", CATEGORY_ID);
+        matcher.addURI(authority, APIContract.PATH_BOOKS+"/#", BOOK_ID);
+        matcher.addURI(authority, APIContract.PATH_AUTHORS+"/#", AUTHOR_ID);
+        matcher.addURI(authority, APIContract.PATH_CATEGORIES+"/#", CATEGORY_ID);
 
-        matcher.addURI(authority, AlexandriaContract.PATH_BOOKS, BOOK);
-        matcher.addURI(authority, AlexandriaContract.PATH_AUTHORS, AUTHOR);
-        matcher.addURI(authority, AlexandriaContract.PATH_CATEGORIES, CATEGORY);
+        matcher.addURI(authority, APIContract.PATH_BOOKS, BOOK);
+        matcher.addURI(authority, APIContract.PATH_AUTHORS, AUTHOR);
+        matcher.addURI(authority, APIContract.PATH_CATEGORIES, CATEGORY);
 
-        matcher.addURI(authority, AlexandriaContract.PATH_FULLBOOK +"/#", BOOK_FULLDETAIL);
-        matcher.addURI(authority, AlexandriaContract.PATH_FULLBOOK, BOOK_FULL);
+        matcher.addURI(authority, APIContract.PATH_FULLBOOK +"/#", BOOK_FULLDETAIL);
+        matcher.addURI(authority, APIContract.PATH_FULLBOOK, BOOK_FULL);
 
         return matcher;
     }
@@ -74,7 +75,7 @@ public class BookProvider extends ContentProvider {
         switch (uriMatcher.match(uri)) {
             case BOOK:
                 retCursor=dbHelper.getReadableDatabase().query(
-                        AlexandriaContract.BookEntry.TABLE_NAME,
+                        APIContract.BookEntry.TABLE_NAME,
                         projection,
                         selection,
                         selection==null? null : selectionArgs,
@@ -85,7 +86,7 @@ public class BookProvider extends ContentProvider {
                 break;
             case AUTHOR:
                 retCursor=dbHelper.getReadableDatabase().query(
-                        AlexandriaContract.AuthorEntry.TABLE_NAME,
+                        APIContract.AuthorEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -96,7 +97,7 @@ public class BookProvider extends ContentProvider {
                 break;
             case CATEGORY:
                 retCursor=dbHelper.getReadableDatabase().query(
-                        AlexandriaContract.CategoryEntry.TABLE_NAME,
+                        APIContract.CategoryEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -107,9 +108,9 @@ public class BookProvider extends ContentProvider {
                 break;
             case BOOK_ID:
                 retCursor=dbHelper.getReadableDatabase().query(
-                        AlexandriaContract.BookEntry.TABLE_NAME,
+                        APIContract.BookEntry.TABLE_NAME,
                         projection,
-                        AlexandriaContract.BookEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        APIContract.BookEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs,
                         null,
                         null,
@@ -118,9 +119,9 @@ public class BookProvider extends ContentProvider {
                 break;
             case AUTHOR_ID:
                 retCursor=dbHelper.getReadableDatabase().query(
-                        AlexandriaContract.AuthorEntry.TABLE_NAME,
+                        APIContract.AuthorEntry.TABLE_NAME,
                         projection,
-                        AlexandriaContract.AuthorEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        APIContract.AuthorEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs,
                         null,
                         null,
@@ -129,9 +130,9 @@ public class BookProvider extends ContentProvider {
                 break;
             case CATEGORY_ID:
                 retCursor=dbHelper.getReadableDatabase().query(
-                        AlexandriaContract.CategoryEntry.TABLE_NAME,
+                        APIContract.CategoryEntry.TABLE_NAME,
                         projection,
-                        AlexandriaContract.CategoryEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        APIContract.CategoryEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs,
                         null,
                         null,
@@ -140,33 +141,33 @@ public class BookProvider extends ContentProvider {
                 break;
             case BOOK_FULLDETAIL:
                 String[] bfd_projection ={
-                    AlexandriaContract.BookEntry.TABLE_NAME + "." + AlexandriaContract.BookEntry.TITLE,
-                    AlexandriaContract.BookEntry.TABLE_NAME + "." + AlexandriaContract.BookEntry.SUBTITLE,
-                    AlexandriaContract.BookEntry.TABLE_NAME + "." + AlexandriaContract.BookEntry.IMAGE_URL,
-                    AlexandriaContract.BookEntry.TABLE_NAME + "." + AlexandriaContract.BookEntry.DESC,
-                    "group_concat(DISTINCT " + AlexandriaContract.AuthorEntry.TABLE_NAME+ "."+ AlexandriaContract.AuthorEntry.AUTHOR +") as " + AlexandriaContract.AuthorEntry.AUTHOR,
-                    "group_concat(DISTINCT " + AlexandriaContract.CategoryEntry.TABLE_NAME+ "."+ AlexandriaContract.CategoryEntry.CATEGORY +") as " + AlexandriaContract.CategoryEntry.CATEGORY
+                    APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry.TITLE,
+                    APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry.SUBTITLE,
+                    APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry.IMAGE_URL,
+                    APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry.DESC,
+                    "group_concat(DISTINCT " + APIContract.AuthorEntry.TABLE_NAME+ "."+ APIContract.AuthorEntry.AUTHOR +") as " + APIContract.AuthorEntry.AUTHOR,
+                    "group_concat(DISTINCT " + APIContract.CategoryEntry.TABLE_NAME+ "."+ APIContract.CategoryEntry.CATEGORY +") as " + APIContract.CategoryEntry.CATEGORY
                 };
                 retCursor = bookFull.query(dbHelper.getReadableDatabase(),
                         bfd_projection,
-                        AlexandriaContract.BookEntry.TABLE_NAME + "." + AlexandriaContract.BookEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs,
-                        AlexandriaContract.BookEntry.TABLE_NAME + "." + AlexandriaContract.BookEntry._ID,
+                        APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry._ID,
                         null,
                         sortOrder);
                 break;
             case BOOK_FULL:
                 String[] bf_projection ={
-                        AlexandriaContract.BookEntry.TABLE_NAME + "." + AlexandriaContract.BookEntry.TITLE,
-                        AlexandriaContract.BookEntry.TABLE_NAME + "." + AlexandriaContract.BookEntry.IMAGE_URL,
-                        "group_concat(DISTINCT " + AlexandriaContract.AuthorEntry.TABLE_NAME+ "."+ AlexandriaContract.AuthorEntry.AUTHOR + ") as " + AlexandriaContract.AuthorEntry.AUTHOR,
-                        "group_concat(DISTINCT " + AlexandriaContract.CategoryEntry.TABLE_NAME+ "."+ AlexandriaContract.CategoryEntry.CATEGORY +") as " + AlexandriaContract.CategoryEntry.CATEGORY
+                        APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry.TITLE,
+                        APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry.IMAGE_URL,
+                        "group_concat(DISTINCT " + APIContract.AuthorEntry.TABLE_NAME+ "."+ APIContract.AuthorEntry.AUTHOR + ") as " + APIContract.AuthorEntry.AUTHOR,
+                        "group_concat(DISTINCT " + APIContract.CategoryEntry.TABLE_NAME+ "."+ APIContract.CategoryEntry.CATEGORY +") as " + APIContract.CategoryEntry.CATEGORY
                 };
                 retCursor = bookFull.query(dbHelper.getReadableDatabase(),
                         bf_projection,
                         null,
                         selectionArgs,
-                        AlexandriaContract.BookEntry.TABLE_NAME + "." + AlexandriaContract.BookEntry._ID,
+                        APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry._ID,
                         null,
                         sortOrder);
                 break;
@@ -187,19 +188,19 @@ public class BookProvider extends ContentProvider {
 
         switch (match) {
             case BOOK_FULLDETAIL:
-                return AlexandriaContract.BookEntry.CONTENT_ITEM_TYPE;
+                return APIContract.BookEntry.CONTENT_ITEM_TYPE;
             case BOOK_ID:
-                return AlexandriaContract.BookEntry.CONTENT_ITEM_TYPE;
+                return APIContract.BookEntry.CONTENT_ITEM_TYPE;
             case AUTHOR_ID:
-                return AlexandriaContract.AuthorEntry.CONTENT_ITEM_TYPE;
+                return APIContract.AuthorEntry.CONTENT_ITEM_TYPE;
             case CATEGORY_ID:
-                return AlexandriaContract.CategoryEntry.CONTENT_ITEM_TYPE;
+                return APIContract.CategoryEntry.CONTENT_ITEM_TYPE;
             case BOOK:
-                return AlexandriaContract.BookEntry.CONTENT_TYPE;
+                return APIContract.BookEntry.CONTENT_TYPE;
             case AUTHOR:
-                return AlexandriaContract.AuthorEntry.CONTENT_TYPE;
+                return APIContract.AuthorEntry.CONTENT_TYPE;
             case CATEGORY:
-                return AlexandriaContract.CategoryEntry.CONTENT_TYPE;
+                return APIContract.CategoryEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -212,27 +213,27 @@ public class BookProvider extends ContentProvider {
         Uri returnUri;
         switch (match) {
             case BOOK: {
-                long _id = db.insert(AlexandriaContract.BookEntry.TABLE_NAME, null, values);
+                long _id = db.insert(APIContract.BookEntry.TABLE_NAME, null, values);
                 if ( _id > 0 ){
-                    returnUri = AlexandriaContract.BookEntry.buildBookUri(_id);
+                    returnUri = APIContract.BookEntry.buildBookUri(_id);
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
-                getContext().getContentResolver().notifyChange(AlexandriaContract.BookEntry.buildFullBookUri(_id), null);
+                getContext().getContentResolver().notifyChange(APIContract.BookEntry.buildFullBookUri(_id), null);
                 break;
             }
             case AUTHOR:{
-                long _id = db.insert(AlexandriaContract.AuthorEntry.TABLE_NAME, null, values);
+                long _id = db.insert(APIContract.AuthorEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
-                    returnUri = AlexandriaContract.AuthorEntry.buildAuthorUri(values.getAsLong("_id"));
+                    returnUri = APIContract.AuthorEntry.buildAuthorUri(values.getAsLong("_id"));
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
             case CATEGORY: {
-                long _id = db.insert(AlexandriaContract.CategoryEntry.TABLE_NAME, null, values);
+                long _id = db.insert(APIContract.CategoryEntry.TABLE_NAME, null, values);
                 if (_id > 0)
-                    returnUri = AlexandriaContract.CategoryEntry.buildCategoryUri(values.getAsLong("_id"));
+                    returnUri = APIContract.CategoryEntry.buildCategoryUri(values.getAsLong("_id"));
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
@@ -251,20 +252,20 @@ public class BookProvider extends ContentProvider {
         switch (match) {
             case BOOK:
                 rowsDeleted = db.delete(
-                        AlexandriaContract.BookEntry.TABLE_NAME, selection, selectionArgs);
+                        APIContract.BookEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case AUTHOR:
                 rowsDeleted = db.delete(
-                        AlexandriaContract.AuthorEntry.TABLE_NAME, selection, selectionArgs);
+                        APIContract.AuthorEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case CATEGORY:
                 rowsDeleted = db.delete(
-                        AlexandriaContract.CategoryEntry.TABLE_NAME, selection, selectionArgs);
+                        APIContract.CategoryEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case BOOK_ID:
                 rowsDeleted = db.delete(
-                        AlexandriaContract.BookEntry.TABLE_NAME,
-                        AlexandriaContract.BookEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        APIContract.BookEntry.TABLE_NAME,
+                        APIContract.BookEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs);
                 break;
             default:
@@ -284,15 +285,15 @@ public class BookProvider extends ContentProvider {
         int rowsUpdated;
         switch (match) {
             case BOOK:
-                rowsUpdated = db.update(AlexandriaContract.BookEntry.TABLE_NAME, values, selection,
+                rowsUpdated = db.update(APIContract.BookEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
             case AUTHOR:
-                rowsUpdated = db.update(AlexandriaContract.AuthorEntry.TABLE_NAME, values, selection,
+                rowsUpdated = db.update(APIContract.AuthorEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
             case CATEGORY:
-                rowsUpdated = db.update(AlexandriaContract.CategoryEntry.TABLE_NAME, values, selection,
+                rowsUpdated = db.update(APIContract.CategoryEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
 

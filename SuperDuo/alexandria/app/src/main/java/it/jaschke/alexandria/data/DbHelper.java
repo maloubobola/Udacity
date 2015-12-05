@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import it.jaschke.alexandria.contract.APIContract;
+
 /**
  * Created by saj on 22/12/14.
  */
@@ -20,25 +22,25 @@ public class DbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        final String SQL_CREATE_BOOK_TABLE = "CREATE TABLE " + AlexandriaContract.BookEntry.TABLE_NAME + " ("+
-                AlexandriaContract.BookEntry._ID + " INTEGER PRIMARY KEY," +
-                AlexandriaContract.BookEntry.TITLE + " TEXT NOT NULL," +
-                AlexandriaContract.BookEntry.SUBTITLE + " TEXT ," +
-                AlexandriaContract.BookEntry.DESC + " TEXT ," +
-                AlexandriaContract.BookEntry.IMAGE_URL + " TEXT, " +
-                "UNIQUE ("+ AlexandriaContract.BookEntry._ID +") ON CONFLICT IGNORE)";
+        final String SQL_CREATE_BOOK_TABLE = "CREATE TABLE " + APIContract.BookEntry.TABLE_NAME + " ("+
+                APIContract.BookEntry._ID + " INTEGER PRIMARY KEY," +
+                APIContract.BookEntry.TITLE + " TEXT NOT NULL," +
+                APIContract.BookEntry.SUBTITLE + " TEXT ," +
+                APIContract.BookEntry.DESC + " TEXT ," +
+                APIContract.BookEntry.IMAGE_URL + " TEXT, " +
+                "UNIQUE ("+ APIContract.BookEntry._ID +") ON CONFLICT IGNORE)";
 
-        final String SQL_CREATE_AUTHOR_TABLE = "CREATE TABLE " + AlexandriaContract.AuthorEntry.TABLE_NAME + " ("+
-                AlexandriaContract.AuthorEntry._ID + " INTEGER," +
-                AlexandriaContract.AuthorEntry.AUTHOR + " TEXT," +
-                " FOREIGN KEY (" + AlexandriaContract.AuthorEntry._ID + ") REFERENCES " +
-                AlexandriaContract.BookEntry.TABLE_NAME + " (" + AlexandriaContract.BookEntry._ID + "))";
+        final String SQL_CREATE_AUTHOR_TABLE = "CREATE TABLE " + APIContract.AuthorEntry.TABLE_NAME + " ("+
+                APIContract.AuthorEntry._ID + " INTEGER," +
+                APIContract.AuthorEntry.AUTHOR + " TEXT," +
+                " FOREIGN KEY (" + APIContract.AuthorEntry._ID + ") REFERENCES " +
+                APIContract.BookEntry.TABLE_NAME + " (" + APIContract.BookEntry._ID + "))";
 
-        final String SQL_CREATE_CATEGORY_TABLE = "CREATE TABLE " + AlexandriaContract.CategoryEntry.TABLE_NAME + " ("+
-                AlexandriaContract.CategoryEntry._ID + " INTEGER," +
-                AlexandriaContract.CategoryEntry.CATEGORY + " TEXT," +
-                " FOREIGN KEY (" + AlexandriaContract.CategoryEntry._ID + ") REFERENCES " +
-                AlexandriaContract.BookEntry.TABLE_NAME + " (" + AlexandriaContract.BookEntry._ID + "))";
+        final String SQL_CREATE_CATEGORY_TABLE = "CREATE TABLE " + APIContract.CategoryEntry.TABLE_NAME + " ("+
+                APIContract.CategoryEntry._ID + " INTEGER," +
+                APIContract.CategoryEntry.CATEGORY + " TEXT," +
+                " FOREIGN KEY (" + APIContract.CategoryEntry._ID + ") REFERENCES " +
+                APIContract.BookEntry.TABLE_NAME + " (" + APIContract.BookEntry._ID + "))";
 
 
         Log.d("sql-statments",SQL_CREATE_BOOK_TABLE);
