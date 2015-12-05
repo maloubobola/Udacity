@@ -40,4 +40,6 @@ dependencies {
     compile 'com.journeyapps:zxing-android-embedded:3.0.3@aar'
     compile 'com.google.zxing:core:3.2.1'
     compile 'com.android.support:support-annotations:23.1.0'
+
+    compile 'com.github.bluejamesbond:textjustify-android:2.1.1'
 }

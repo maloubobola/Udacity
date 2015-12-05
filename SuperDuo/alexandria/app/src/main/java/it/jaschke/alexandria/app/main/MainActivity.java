@@ -151,7 +151,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 .replace(id, fragment)
                 .addToBackStack("Book Detail")
                 .commit();
-
     }
 
     private class MessageReceiver extends BroadcastReceiver {

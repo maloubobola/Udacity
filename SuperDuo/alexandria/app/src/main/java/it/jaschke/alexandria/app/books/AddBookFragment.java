@@ -1,12 +1,8 @@
 package it.jaschke.alexandria.app.books;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -21,7 +17,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -38,16 +33,8 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
     private final int LOADER_ID = 1;
     private View rootView;
     private final String EAN_CONTENT="eanContent";
-    private static final String SCAN_FORMAT = "scanFormat";
-    private static final String SCAN_CONTENTS = "scanContents";
 
-    private String mScanFormat = "Format:";
-    private String mScanContents = "Contents:";
-
-    static final String ACTION_SCAN = "com.google.zxing.client.android.SCAN";
-
-    public AddBookFragment(){
-    }
+    public AddBookFragment() {}
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -59,7 +46,6 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         rootView = inflater.inflate(R.layout.fragment_add_book, container, false);
         ean = (EditText) rootView.findViewById(R.id.ean);
 
@@ -78,10 +64,10 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
             public void afterTextChanged(Editable s) {
                 String ean =s.toString();
                 //catch isbn10 numbers
-                if(ean.length()==10 && !ean.startsWith("978")){
-                    ean="978"+ean;
+                if(ean.length() == 10 && !ean.startsWith("978")){
+                    ean = "978" + ean;
                 }
-                if(ean.length()<13){
+                if(ean.length() < 13){
                     clearFields();
                     return;
                 }
@@ -114,7 +100,7 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
             }
         });
 
-        if(savedInstanceState!=null){
+        if(savedInstanceState != null){
             ean.setText(savedInstanceState.getString(EAN_CONTENT));
             ean.setHint("");
         }
@@ -141,12 +127,12 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if(ean.getText().length()==0){
+        if(ean.getText().length() == 0){
             return null;
         }
         String eanStr= ean.getText().toString();
-        if(eanStr.length()==10 && !eanStr.startsWith("978")){
-            eanStr="978"+eanStr;
+        if(eanStr.length() == 10 && !eanStr.startsWith("978")){
+            eanStr = "978" + eanStr;
         }
         return new CursorLoader(
                 getActivity(),

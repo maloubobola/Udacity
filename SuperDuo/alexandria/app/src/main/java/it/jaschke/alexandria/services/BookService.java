@@ -99,7 +99,6 @@ public class BookService extends IntentService {
      * parameters.
      */
     private void fetchBook(String ean) {
-
         if(ean.length()!=13){
             return;
         }
@@ -126,7 +125,6 @@ public class BookService extends IntentService {
         try {
             final String FORECAST_BASE_URL = "https://www.googleapis.com/books/v1/volumes?";
             final String QUERY_PARAM = "q";
-
             final String ISBN_PARAM = "isbn:" + ean;
 
             Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
@@ -169,7 +167,6 @@ public class BookService extends IntentService {
                     Log.e(LOG_TAG, "Error closing stream", e);
                 }
             }
-
         }
 
         final String ITEMS = "items";
