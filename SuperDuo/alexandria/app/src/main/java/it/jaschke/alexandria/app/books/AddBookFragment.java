@@ -134,7 +134,6 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
             String scanContent = scanningResult.getContents();
             EditText ean = (EditText) getActivity().findViewById(R.id.ean);
             ean.setText(scanContent);
-            Toast.makeText(getActivity(),scanContent, Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(getActivity(),"No scan data received!", Toast.LENGTH_SHORT).show();
         }
@@ -157,28 +156,6 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
                 null,
                 null
         );
-    }
-
-    private static AlertDialog showDialog(final Activity act, CharSequence title, CharSequence message, CharSequence buttonYes, CharSequence buttonNo) {
-        AlertDialog.Builder downloadDialog = new AlertDialog.Builder(act);
-        downloadDialog.setTitle(title);
-        downloadDialog.setMessage(message);
-        downloadDialog.setPositiveButton(buttonYes, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialogInterface, int i) {
-                Uri uri = Uri.parse("market://search?q=pname:" + "com.google.zxing.client.android");
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                try {
-                    act.startActivity(intent);
-                } catch (ActivityNotFoundException anfe) {
-
-                }
-            }
-        });
-        downloadDialog.setNegativeButton(buttonNo, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialogInterface, int i) {
-            }
-        });
-        return downloadDialog.show();
     }
 
     @Override

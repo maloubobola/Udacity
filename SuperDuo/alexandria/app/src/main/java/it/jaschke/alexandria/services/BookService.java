@@ -2,11 +2,14 @@ package it.jaschke.alexandria.services;
 
 import android.app.IntentService;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,6 +24,7 @@ import java.net.URL;
 
 import it.jaschke.alexandria.app.main.MainActivity;
 import it.jaschke.alexandria.R;
+import it.jaschke.alexandria.commons.Network;
 import it.jaschke.alexandria.contract.APIContract;
 
 
@@ -38,12 +42,36 @@ public class BookService extends IntentService {
 
     public static final String EAN = "it.jaschke.alexandria.services.extra.EAN";
 
+    private Handler mHandler;
+
     public BookService() {
         super("Alexandria");
+        mHandler = new Handler();
+    }
+
+    private class DisplayToast implements Runnable {
+        private final Context mContext;
+        String mText;
+
+        public DisplayToast(Context mContext, String text){
+            this.mContext = mContext;
+            mText = text;
+        }
+
+        public void run(){
+            Toast.makeText(mContext, mText, Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        if(!Network.isAvailable(getApplicationContext())) {
+            //mHandler.post(new DisplayToast(this, "No network"));
+            Intent messageIntent = new Intent(MainActivity.MESSAGE_EVENT);
+            messageIntent.putExtra(MainActivity.MESSAGE_KEY, "No network");
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(messageIntent);
+            return;
+        }
         if (intent != null) {
             final String action = intent.getAction();
             if (FETCH_BOOK.equals(action)) {
