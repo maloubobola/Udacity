@@ -17,7 +17,7 @@ import android.widget.ListView;
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.model.adapter.BookAdapter;
 import it.jaschke.alexandria.commons.Callback;
-import it.jaschke.alexandria.contract.APIContract;
+import it.jaschke.alexandria.contract.DatabaseContract;
 
 
 public class BookListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -41,7 +41,7 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         Cursor cursor = getActivity().getContentResolver().query(
-                APIContract.BookEntry.CONTENT_URI,
+                DatabaseContract.BookEntry.CONTENT_URI,
                 null, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
                 null, // values for "where" clause
@@ -71,7 +71,7 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
                 Cursor cursor = bookAdapter.getCursor();
                 if (cursor != null && cursor.moveToPosition(position)) {
                     ((Callback)getActivity())
-                            .onItemSelected(cursor.getString(cursor.getColumnIndex(APIContract.BookEntry._ID)));
+                            .onItemSelected(cursor.getString(cursor.getColumnIndex(DatabaseContract.BookEntry._ID)));
                 }
             }
         });
@@ -86,14 +86,14 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        final String selection = APIContract.BookEntry.TITLE +" LIKE ? OR " + APIContract.BookEntry.SUBTITLE + " LIKE ? ";
+        final String selection = DatabaseContract.BookEntry.TITLE +" LIKE ? OR " + DatabaseContract.BookEntry.SUBTITLE + " LIKE ? ";
         String searchString =searchText.getText().toString();
 
         if(searchString.length()>0){
             searchString = "%"+searchString+"%";
             return new CursorLoader(
                     getActivity(),
-                    APIContract.BookEntry.CONTENT_URI,
+                    DatabaseContract.BookEntry.CONTENT_URI,
                     null,
                     selection,
                     new String[]{searchString,searchString},
@@ -103,7 +103,7 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
 
         return new CursorLoader(
                 getActivity(),
-                APIContract.BookEntry.CONTENT_URI,
+                DatabaseContract.BookEntry.CONTENT_URI,
                 null,
                 null,
                 null,

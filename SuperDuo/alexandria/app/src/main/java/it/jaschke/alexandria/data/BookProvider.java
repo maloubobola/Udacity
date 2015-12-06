@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
-import it.jaschke.alexandria.contract.APIContract;
+import it.jaschke.alexandria.contract.DatabaseContract;
 
 /**
  * Created by saj on 24/12/14.
@@ -37,27 +37,27 @@ public class BookProvider extends ContentProvider {
     static{
         bookFull = new SQLiteQueryBuilder();
         bookFull.setTables(
-                APIContract.BookEntry.TABLE_NAME + " LEFT OUTER JOIN " +
-                APIContract.AuthorEntry.TABLE_NAME + " USING (" + APIContract.BookEntry._ID + ")" +
-                " LEFT OUTER JOIN " +  APIContract.CategoryEntry.TABLE_NAME + " USING (" + APIContract.BookEntry._ID + ")");
+                DatabaseContract.BookEntry.TABLE_NAME + " LEFT OUTER JOIN " +
+                DatabaseContract.AuthorEntry.TABLE_NAME + " USING (" + DatabaseContract.BookEntry._ID + ")" +
+                " LEFT OUTER JOIN " +  DatabaseContract.CategoryEntry.TABLE_NAME + " USING (" + DatabaseContract.BookEntry._ID + ")");
     }
 
 
     private static UriMatcher buildUriMatcher() {
 
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
-        final String authority = APIContract.CONTENT_AUTHORITY;
+        final String authority = DatabaseContract.CONTENT_AUTHORITY;
 
-        matcher.addURI(authority, APIContract.PATH_BOOKS+"/#", BOOK_ID);
-        matcher.addURI(authority, APIContract.PATH_AUTHORS+"/#", AUTHOR_ID);
-        matcher.addURI(authority, APIContract.PATH_CATEGORIES+"/#", CATEGORY_ID);
+        matcher.addURI(authority, DatabaseContract.PATH_BOOKS+"/#", BOOK_ID);
+        matcher.addURI(authority, DatabaseContract.PATH_AUTHORS+"/#", AUTHOR_ID);
+        matcher.addURI(authority, DatabaseContract.PATH_CATEGORIES+"/#", CATEGORY_ID);
 
-        matcher.addURI(authority, APIContract.PATH_BOOKS, BOOK);
-        matcher.addURI(authority, APIContract.PATH_AUTHORS, AUTHOR);
-        matcher.addURI(authority, APIContract.PATH_CATEGORIES, CATEGORY);
+        matcher.addURI(authority, DatabaseContract.PATH_BOOKS, BOOK);
+        matcher.addURI(authority, DatabaseContract.PATH_AUTHORS, AUTHOR);
+        matcher.addURI(authority, DatabaseContract.PATH_CATEGORIES, CATEGORY);
 
-        matcher.addURI(authority, APIContract.PATH_FULLBOOK +"/#", BOOK_FULLDETAIL);
-        matcher.addURI(authority, APIContract.PATH_FULLBOOK, BOOK_FULL);
+        matcher.addURI(authority, DatabaseContract.PATH_FULLBOOK +"/#", BOOK_FULLDETAIL);
+        matcher.addURI(authority, DatabaseContract.PATH_FULLBOOK, BOOK_FULL);
 
         return matcher;
     }
@@ -75,7 +75,7 @@ public class BookProvider extends ContentProvider {
         switch (uriMatcher.match(uri)) {
             case BOOK:
                 retCursor=dbHelper.getReadableDatabase().query(
-                        APIContract.BookEntry.TABLE_NAME,
+                        DatabaseContract.BookEntry.TABLE_NAME,
                         projection,
                         selection,
                         selection==null? null : selectionArgs,
@@ -86,7 +86,7 @@ public class BookProvider extends ContentProvider {
                 break;
             case AUTHOR:
                 retCursor=dbHelper.getReadableDatabase().query(
-                        APIContract.AuthorEntry.TABLE_NAME,
+                        DatabaseContract.AuthorEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -97,7 +97,7 @@ public class BookProvider extends ContentProvider {
                 break;
             case CATEGORY:
                 retCursor=dbHelper.getReadableDatabase().query(
-                        APIContract.CategoryEntry.TABLE_NAME,
+                        DatabaseContract.CategoryEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -108,9 +108,9 @@ public class BookProvider extends ContentProvider {
                 break;
             case BOOK_ID:
                 retCursor=dbHelper.getReadableDatabase().query(
-                        APIContract.BookEntry.TABLE_NAME,
+                        DatabaseContract.BookEntry.TABLE_NAME,
                         projection,
-                        APIContract.BookEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        DatabaseContract.BookEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs,
                         null,
                         null,
@@ -119,9 +119,9 @@ public class BookProvider extends ContentProvider {
                 break;
             case AUTHOR_ID:
                 retCursor=dbHelper.getReadableDatabase().query(
-                        APIContract.AuthorEntry.TABLE_NAME,
+                        DatabaseContract.AuthorEntry.TABLE_NAME,
                         projection,
-                        APIContract.AuthorEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        DatabaseContract.AuthorEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs,
                         null,
                         null,
@@ -130,9 +130,9 @@ public class BookProvider extends ContentProvider {
                 break;
             case CATEGORY_ID:
                 retCursor=dbHelper.getReadableDatabase().query(
-                        APIContract.CategoryEntry.TABLE_NAME,
+                        DatabaseContract.CategoryEntry.TABLE_NAME,
                         projection,
-                        APIContract.CategoryEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        DatabaseContract.CategoryEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs,
                         null,
                         null,
@@ -141,33 +141,33 @@ public class BookProvider extends ContentProvider {
                 break;
             case BOOK_FULLDETAIL:
                 String[] bfd_projection ={
-                    APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry.TITLE,
-                    APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry.SUBTITLE,
-                    APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry.IMAGE_URL,
-                    APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry.DESC,
-                    "group_concat(DISTINCT " + APIContract.AuthorEntry.TABLE_NAME+ "."+ APIContract.AuthorEntry.AUTHOR +") as " + APIContract.AuthorEntry.AUTHOR,
-                    "group_concat(DISTINCT " + APIContract.CategoryEntry.TABLE_NAME+ "."+ APIContract.CategoryEntry.CATEGORY +") as " + APIContract.CategoryEntry.CATEGORY
+                    DatabaseContract.BookEntry.TABLE_NAME + "." + DatabaseContract.BookEntry.TITLE,
+                    DatabaseContract.BookEntry.TABLE_NAME + "." + DatabaseContract.BookEntry.SUBTITLE,
+                    DatabaseContract.BookEntry.TABLE_NAME + "." + DatabaseContract.BookEntry.IMAGE_URL,
+                    DatabaseContract.BookEntry.TABLE_NAME + "." + DatabaseContract.BookEntry.DESC,
+                    "group_concat(DISTINCT " + DatabaseContract.AuthorEntry.TABLE_NAME+ "."+ DatabaseContract.AuthorEntry.AUTHOR +") as " + DatabaseContract.AuthorEntry.AUTHOR,
+                    "group_concat(DISTINCT " + DatabaseContract.CategoryEntry.TABLE_NAME+ "."+ DatabaseContract.CategoryEntry.CATEGORY +") as " + DatabaseContract.CategoryEntry.CATEGORY
                 };
                 retCursor = bookFull.query(dbHelper.getReadableDatabase(),
                         bfd_projection,
-                        APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        DatabaseContract.BookEntry.TABLE_NAME + "." + DatabaseContract.BookEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs,
-                        APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry._ID,
+                        DatabaseContract.BookEntry.TABLE_NAME + "." + DatabaseContract.BookEntry._ID,
                         null,
                         sortOrder);
                 break;
             case BOOK_FULL:
                 String[] bf_projection ={
-                        APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry.TITLE,
-                        APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry.IMAGE_URL,
-                        "group_concat(DISTINCT " + APIContract.AuthorEntry.TABLE_NAME+ "."+ APIContract.AuthorEntry.AUTHOR + ") as " + APIContract.AuthorEntry.AUTHOR,
-                        "group_concat(DISTINCT " + APIContract.CategoryEntry.TABLE_NAME+ "."+ APIContract.CategoryEntry.CATEGORY +") as " + APIContract.CategoryEntry.CATEGORY
+                        DatabaseContract.BookEntry.TABLE_NAME + "." + DatabaseContract.BookEntry.TITLE,
+                        DatabaseContract.BookEntry.TABLE_NAME + "." + DatabaseContract.BookEntry.IMAGE_URL,
+                        "group_concat(DISTINCT " + DatabaseContract.AuthorEntry.TABLE_NAME+ "."+ DatabaseContract.AuthorEntry.AUTHOR + ") as " + DatabaseContract.AuthorEntry.AUTHOR,
+                        "group_concat(DISTINCT " + DatabaseContract.CategoryEntry.TABLE_NAME+ "."+ DatabaseContract.CategoryEntry.CATEGORY +") as " + DatabaseContract.CategoryEntry.CATEGORY
                 };
                 retCursor = bookFull.query(dbHelper.getReadableDatabase(),
                         bf_projection,
                         null,
                         selectionArgs,
-                        APIContract.BookEntry.TABLE_NAME + "." + APIContract.BookEntry._ID,
+                        DatabaseContract.BookEntry.TABLE_NAME + "." + DatabaseContract.BookEntry._ID,
                         null,
                         sortOrder);
                 break;
@@ -188,19 +188,19 @@ public class BookProvider extends ContentProvider {
 
         switch (match) {
             case BOOK_FULLDETAIL:
-                return APIContract.BookEntry.CONTENT_ITEM_TYPE;
+                return DatabaseContract.BookEntry.CONTENT_ITEM_TYPE;
             case BOOK_ID:
-                return APIContract.BookEntry.CONTENT_ITEM_TYPE;
+                return DatabaseContract.BookEntry.CONTENT_ITEM_TYPE;
             case AUTHOR_ID:
-                return APIContract.AuthorEntry.CONTENT_ITEM_TYPE;
+                return DatabaseContract.AuthorEntry.CONTENT_ITEM_TYPE;
             case CATEGORY_ID:
-                return APIContract.CategoryEntry.CONTENT_ITEM_TYPE;
+                return DatabaseContract.CategoryEntry.CONTENT_ITEM_TYPE;
             case BOOK:
-                return APIContract.BookEntry.CONTENT_TYPE;
+                return DatabaseContract.BookEntry.CONTENT_TYPE;
             case AUTHOR:
-                return APIContract.AuthorEntry.CONTENT_TYPE;
+                return DatabaseContract.AuthorEntry.CONTENT_TYPE;
             case CATEGORY:
-                return APIContract.CategoryEntry.CONTENT_TYPE;
+                return DatabaseContract.CategoryEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -213,27 +213,27 @@ public class BookProvider extends ContentProvider {
         Uri returnUri;
         switch (match) {
             case BOOK: {
-                long _id = db.insert(APIContract.BookEntry.TABLE_NAME, null, values);
+                long _id = db.insert(DatabaseContract.BookEntry.TABLE_NAME, null, values);
                 if ( _id > 0 ){
-                    returnUri = APIContract.BookEntry.buildBookUri(_id);
+                    returnUri = DatabaseContract.BookEntry.buildBookUri(_id);
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
-                getContext().getContentResolver().notifyChange(APIContract.BookEntry.buildFullBookUri(_id), null);
+                getContext().getContentResolver().notifyChange(DatabaseContract.BookEntry.buildFullBookUri(_id), null);
                 break;
             }
             case AUTHOR:{
-                long _id = db.insert(APIContract.AuthorEntry.TABLE_NAME, null, values);
+                long _id = db.insert(DatabaseContract.AuthorEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
-                    returnUri = APIContract.AuthorEntry.buildAuthorUri(values.getAsLong("_id"));
+                    returnUri = DatabaseContract.AuthorEntry.buildAuthorUri(values.getAsLong("_id"));
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
             case CATEGORY: {
-                long _id = db.insert(APIContract.CategoryEntry.TABLE_NAME, null, values);
+                long _id = db.insert(DatabaseContract.CategoryEntry.TABLE_NAME, null, values);
                 if (_id > 0)
-                    returnUri = APIContract.CategoryEntry.buildCategoryUri(values.getAsLong("_id"));
+                    returnUri = DatabaseContract.CategoryEntry.buildCategoryUri(values.getAsLong("_id"));
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
@@ -252,20 +252,20 @@ public class BookProvider extends ContentProvider {
         switch (match) {
             case BOOK:
                 rowsDeleted = db.delete(
-                        APIContract.BookEntry.TABLE_NAME, selection, selectionArgs);
+                        DatabaseContract.BookEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case AUTHOR:
                 rowsDeleted = db.delete(
-                        APIContract.AuthorEntry.TABLE_NAME, selection, selectionArgs);
+                        DatabaseContract.AuthorEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case CATEGORY:
                 rowsDeleted = db.delete(
-                        APIContract.CategoryEntry.TABLE_NAME, selection, selectionArgs);
+                        DatabaseContract.CategoryEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case BOOK_ID:
                 rowsDeleted = db.delete(
-                        APIContract.BookEntry.TABLE_NAME,
-                        APIContract.BookEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        DatabaseContract.BookEntry.TABLE_NAME,
+                        DatabaseContract.BookEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs);
                 break;
             default:
@@ -285,15 +285,15 @@ public class BookProvider extends ContentProvider {
         int rowsUpdated;
         switch (match) {
             case BOOK:
-                rowsUpdated = db.update(APIContract.BookEntry.TABLE_NAME, values, selection,
+                rowsUpdated = db.update(DatabaseContract.BookEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
             case AUTHOR:
-                rowsUpdated = db.update(APIContract.AuthorEntry.TABLE_NAME, values, selection,
+                rowsUpdated = db.update(DatabaseContract.AuthorEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
             case CATEGORY:
-                rowsUpdated = db.update(APIContract.CategoryEntry.TABLE_NAME, values, selection,
+                rowsUpdated = db.update(DatabaseContract.CategoryEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
 

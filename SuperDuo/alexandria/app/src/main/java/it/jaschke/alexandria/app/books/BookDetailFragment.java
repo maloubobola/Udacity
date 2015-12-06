@@ -21,6 +21,7 @@ import android.widget.TextView;
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.app.main.MainActivity;
 import it.jaschke.alexandria.contract.APIContract;
+import it.jaschke.alexandria.contract.DatabaseContract;
 import it.jaschke.alexandria.services.BookService;
 import it.jaschke.alexandria.services.DownloadImageTask;
 
@@ -58,8 +59,8 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
             @Override
             public void onClick(View view) {
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean);
-                bookIntent.setAction(BookService.DELETE_BOOK);
+                bookIntent.putExtra(APIContract.EAN, ean);
+                bookIntent.setAction(APIContract.DELETE_BOOK);
                 getActivity().startService(bookIntent);
                 getActivity().getSupportFragmentManager().popBackStack();
             }
@@ -80,7 +81,7 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
     public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(
                 getActivity(),
-                APIContract.BookEntry.buildFullBookUri(Long.parseLong(ean)),
+                DatabaseContract.BookEntry.buildFullBookUri(Long.parseLong(ean)),
                 null,
                 null,
                 null,
@@ -94,7 +95,7 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
             return;
         }
 
-        bookTitle = data.getString(data.getColumnIndex(APIContract.BookEntry.TITLE));
+        bookTitle = data.getString(data.getColumnIndex(DatabaseContract.BookEntry.TITLE));
         ((TextView) rootView.findViewById(R.id.fullBookTitle)).setText(bookTitle);
 
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
@@ -103,23 +104,23 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
         shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text)+bookTitle);
         shareActionProvider.setShareIntent(shareIntent);
 
-        String bookSubTitle = data.getString(data.getColumnIndex(APIContract.BookEntry.SUBTITLE));
+        String bookSubTitle = data.getString(data.getColumnIndex(DatabaseContract.BookEntry.SUBTITLE));
         ((TextView) rootView.findViewById(R.id.fullBookSubTitle)).setText(bookSubTitle);
 
-        String desc = data.getString(data.getColumnIndex(APIContract.BookEntry.DESC));
+        String desc = data.getString(data.getColumnIndex(DatabaseContract.BookEntry.DESC));
         ((TextView) rootView.findViewById(R.id.fullBookDesc)).setText(desc);
 
-        String authors = data.getString(data.getColumnIndex(APIContract.AuthorEntry.AUTHOR));
+        String authors = data.getString(data.getColumnIndex(DatabaseContract.AuthorEntry.AUTHOR));
         String[] authorsArr = authors.split(",");
         ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
         ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
-        String imgUrl = data.getString(data.getColumnIndex(APIContract.BookEntry.IMAGE_URL));
+        String imgUrl = data.getString(data.getColumnIndex(DatabaseContract.BookEntry.IMAGE_URL));
         if(Patterns.WEB_URL.matcher(imgUrl).matches()){
             new DownloadImageTask((ImageView) rootView.findViewById(R.id.fullBookCover)).execute(imgUrl);
             rootView.findViewById(R.id.fullBookCover).setVisibility(View.VISIBLE);
         }
 
-        String categories = data.getString(data.getColumnIndex(APIContract.CategoryEntry.CATEGORY));
+        String categories = data.getString(data.getColumnIndex(DatabaseContract.CategoryEntry.CATEGORY));
         ((TextView) rootView.findViewById(R.id.categories)).setText(categories);
 
         if(rootView.findViewById(R.id.right_container)!=null){

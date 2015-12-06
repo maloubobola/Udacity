@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import it.jaschke.alexandria.R;
-import it.jaschke.alexandria.contract.APIContract;
+import it.jaschke.alexandria.contract.DatabaseContract;
 import it.jaschke.alexandria.services.DownloadImageTask;
 
 /**
@@ -39,13 +39,13 @@ public class BookAdapter extends CursorAdapter {
 
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        String imgUrl = cursor.getString(cursor.getColumnIndex(APIContract.BookEntry.IMAGE_URL));
+        String imgUrl = cursor.getString(cursor.getColumnIndex(DatabaseContract.BookEntry.IMAGE_URL));
         new DownloadImageTask(viewHolder.bookCover).execute(imgUrl);
 
-        String bookTitle = cursor.getString(cursor.getColumnIndex(APIContract.BookEntry.TITLE));
+        String bookTitle = cursor.getString(cursor.getColumnIndex(DatabaseContract.BookEntry.TITLE));
         viewHolder.bookTitle.setText(bookTitle);
 
-        String bookSubTitle = cursor.getString(cursor.getColumnIndex(APIContract.BookEntry.SUBTITLE));
+        String bookSubTitle = cursor.getString(cursor.getColumnIndex(DatabaseContract.BookEntry.SUBTITLE));
         viewHolder.bookSubTitle.setText(bookSubTitle);
     }
 

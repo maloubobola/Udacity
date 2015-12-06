@@ -108,8 +108,7 @@
                 style="?android:attr/buttonBarButtonStyle"
                 android:id="@+id/delete_button"
                 android:drawableLeft="@drawable/ic_action_discard"
-                android:visibility="invisible"
-                />
+                android:visibility="invisible" />
 
             <Button
                 android:layout_width="wrap_content"
@@ -120,10 +119,8 @@
                 android:id="@+id/save_button"
                 android:drawableLeft="@drawable/ic_action_accept"
                 style="?android:attr/buttonBarButtonStyle"
-                android:layout_gravity="bottom"
-                />
+                android:layout_gravity="bottom" />
 
         </LinearLayout>
-
     </RelativeLayout>
 </FrameLayout>

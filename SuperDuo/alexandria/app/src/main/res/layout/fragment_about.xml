@@ -5,20 +5,10 @@
     android:layout_height="match_parent"
     tools:context="it.jaschke.alexandria.app.main.AboutFragment">
 
-    <com.bluejamesbond.text.DocumentView xmlns:ext="http://schemas.android.com/apk/res-auto"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        ext:documentView_antialias="true"
-        ext:documentView_cacheConfig="auto_quality"
-        ext:documentView_lineHeightMultiplier="2.0"
-        ext:documentView_maxLines="20"
-        ext:documentView_insetPaddingBottom="@dimen/default_padding"
-        ext:documentView_insetPaddingLeft="@dimen/default_padding"
-        ext:documentView_insetPaddingRight="@dimen/default_padding"
-        ext:documentView_insetPaddingTop="@dimen/default_padding"
-        ext:documentView_text="@string/about_text"
-        ext:documentView_textAlignment="justified"
-        ext:documentView_textFormat="formatted"
-        ext:documentView_textSize="12sp"/>
+        android:layout_margin="@dimen/default_padding"
+        android:text="@string/about_text"/>
 </FrameLayout>

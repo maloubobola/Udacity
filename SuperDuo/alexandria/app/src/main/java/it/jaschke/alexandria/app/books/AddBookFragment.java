@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Patterns;
@@ -23,6 +24,7 @@ import com.google.zxing.integration.android.IntentResult;
 
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.contract.APIContract;
+import it.jaschke.alexandria.contract.DatabaseContract;
 import it.jaschke.alexandria.services.BookService;
 import it.jaschke.alexandria.services.DownloadImageTask;
 
@@ -73,8 +75,8 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
                 }
                 //Once we have an ISBN, start a book intent
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean);
-                bookIntent.setAction(BookService.FETCH_BOOK);
+                bookIntent.putExtra(APIContract.EAN, ean);
+                bookIntent.setAction(APIContract.FETCH_BOOK);
                 getActivity().startService(bookIntent);
                 AddBookFragment.this.restartLoader();
             }
@@ -93,8 +95,8 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
             @Override
             public void onClick(View view) {
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean.getText().toString());
-                bookIntent.setAction(BookService.DELETE_BOOK);
+                bookIntent.putExtra(APIContract.EAN, ean.getText().toString());
+                bookIntent.setAction(APIContract.DELETE_BOOK);
                 getActivity().startService(bookIntent);
                 ean.setText("");
             }
@@ -126,7 +128,7 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
     @Override
-    public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if(ean.getText().length() == 0){
             return null;
         }
@@ -136,7 +138,7 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
         }
         return new CursorLoader(
                 getActivity(),
-                APIContract.BookEntry.buildFullBookUri(Long.parseLong(eanStr)),
+                DatabaseContract.BookEntry.buildFullBookUri(Long.parseLong(eanStr)),
                 null,
                 null,
                 null,
@@ -144,33 +146,43 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
         );
     }
 
+    /**
+     * Handle the error when most of the fields are null (test with the isbn 9782754803199 which only contains a title).
+     * A book must a least contained a title, subtitle, author and category. Image is optional.
+     * If one of the field is missing, display a "Corrupt data error"
+     * This also avoid to get a NullPointerException when the "authors" is null and add more consistency to the data.
+     */
     @Override
-    public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (!data.moveToFirst()) {
             return;
         }
 
-        String bookTitle = data.getString(data.getColumnIndex(APIContract.BookEntry.TITLE));
-        ((TextView) rootView.findViewById(R.id.bookTitle)).setText(bookTitle);
+        String bookTitle = data.getString(data.getColumnIndex(DatabaseContract.BookEntry.TITLE));
+        String bookSubTitle = data.getString(data.getColumnIndex(DatabaseContract.BookEntry.SUBTITLE));
+        String authors = data.getString(data.getColumnIndex(DatabaseContract.AuthorEntry.AUTHOR));
+        String imgUrl = data.getString(data.getColumnIndex(DatabaseContract.BookEntry.IMAGE_URL));
+        String categories = data.getString(data.getColumnIndex(DatabaseContract.CategoryEntry.CATEGORY));
 
-        String bookSubTitle = data.getString(data.getColumnIndex(APIContract.BookEntry.SUBTITLE));
-        ((TextView) rootView.findViewById(R.id.bookSubTitle)).setText(bookSubTitle);
+        if(bookTitle == null || bookSubTitle == null || categories == null || authors == null) {
+            Toast.makeText(getContext(),getResources().getString(R.string.corrupt_data_error),Toast.LENGTH_LONG).show();
+        } else {
+            String[] authorsArr = authors.split(",");
+            ((TextView) rootView.findViewById(R.id.bookTitle)).setText(bookTitle);
+            ((TextView) rootView.findViewById(R.id.bookSubTitle)).setText(bookSubTitle);
+            ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
+            ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
 
-        String authors = data.getString(data.getColumnIndex(APIContract.AuthorEntry.AUTHOR));
-        String[] authorsArr = authors.split(",");
-        ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
-        ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
-        String imgUrl = data.getString(data.getColumnIndex(APIContract.BookEntry.IMAGE_URL));
-        if(Patterns.WEB_URL.matcher(imgUrl).matches()){
-            new DownloadImageTask((ImageView) rootView.findViewById(R.id.bookCover)).execute(imgUrl);
-            rootView.findViewById(R.id.bookCover).setVisibility(View.VISIBLE);
+            if(Patterns.WEB_URL.matcher(imgUrl).matches()){
+                new DownloadImageTask((ImageView) rootView.findViewById(R.id.bookCover)).execute(imgUrl);
+                rootView.findViewById(R.id.bookCover).setVisibility(View.VISIBLE);
+            }
+
+            ((TextView) rootView.findViewById(R.id.categories)).setText(categories);
+
+            rootView.findViewById(R.id.save_button).setVisibility(View.VISIBLE);
+            rootView.findViewById(R.id.delete_button).setVisibility(View.VISIBLE);
         }
-
-        String categories = data.getString(data.getColumnIndex(APIContract.CategoryEntry.CATEGORY));
-        ((TextView) rootView.findViewById(R.id.categories)).setText(categories);
-
-        rootView.findViewById(R.id.save_button).setVisibility(View.VISIBLE);
-        rootView.findViewById(R.id.delete_button).setVisibility(View.VISIBLE);
     }
 
     @Override
