@@ -1,10 +1,11 @@
-package barqsoft.footballscores;
+package barqsoft.footballscores.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import barqsoft.footballscores.DatabaseContract.scores_table;
+import barqsoft.footballscores.contract.DatabaseContract;
+import barqsoft.footballscores.contract.DatabaseContract.scores_table;
 
 /**
  * Created by yehya khaled on 2/25/2015.

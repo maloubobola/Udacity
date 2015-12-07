@@ -22,38 +22,34 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.Vector;
 
-import barqsoft.footballscores.DatabaseContract;
+import barqsoft.footballscores.contract.DatabaseContract;
 import barqsoft.footballscores.R;
 
 /**
  * Created by yehya khaled on 3/2/2015.
  */
-public class myFetchService extends IntentService
-{
-    public static final String LOG_TAG = "myFetchService";
-    public myFetchService()
+public class FetchService extends IntentService {
+    public static final String LOG_TAG = "FetchService";
+    public FetchService()
     {
-        super("myFetchService");
+        super("FetchService");
     }
 
     @Override
-    protected void onHandleIntent(Intent intent)
-    {
+    protected void onHandleIntent(Intent intent) {
         getData("n2");
         getData("p2");
 
         return;
     }
 
-    private void getData (String timeFrame)
-    {
+    private void getData (String timeFrame) {
         //Creating fetch URL
         final String BASE_URL = "http://api.football-data.org/alpha/fixtures"; //Base URL
         final String QUERY_TIME_FRAME = "timeFrame"; //Time Frame parameter to determine days
         //final String QUERY_MATCH_DAY = "matchday";
 
-        Uri fetch_build = Uri.parse(BASE_URL).buildUpon().
-                appendQueryParameter(QUERY_TIME_FRAME, timeFrame).build();
+        Uri fetch_build = Uri.parse(BASE_URL).buildUpon().appendQueryParameter(QUERY_TIME_FRAME, timeFrame).build();
         //Log.v(LOG_TAG, "The url we are looking at is: "+fetch_build.toString()); //log spam
         HttpURLConnection m_connection = null;
         BufferedReader reader = null;
@@ -93,17 +89,14 @@ public class myFetchService extends IntentService
             Log.e(LOG_TAG,"Exception here" + e.getMessage());
         }
         finally {
-            if(m_connection != null)
-            {
+            if(m_connection != null) {
                 m_connection.disconnect();
             }
-            if (reader != null)
-            {
+            if (reader != null) {
                 try {
                     reader.close();
                 }
-                catch (IOException e)
-                {
+                catch (IOException e) {
                     Log.e(LOG_TAG,"Error Closing Stream");
                 }
             }
@@ -119,20 +112,17 @@ public class myFetchService extends IntentService
                     return;
                 }
 
-
                 processJSONdata(JSON_data, getApplicationContext(), true);
             } else {
                 //Could not Connect
                 Log.d(LOG_TAG, "Could not connect to server.");
             }
         }
-        catch(Exception e)
-        {
+        catch(Exception e) {
             Log.e(LOG_TAG,e.getMessage());
         }
     }
-    private void processJSONdata (String JSONdata,Context mContext, boolean isReal)
-    {
+    private void processJSONdata (String JSONdata,Context mContext, boolean isReal) {
         //JSON data
         // This set of league codes is for the 2015/2016 season. In fall of 2016, they will need to
         // be updated. Feel free to use the codes
@@ -181,12 +171,10 @@ public class myFetchService extends IntentService
 
             //ContentValues to be inserted
             Vector<ContentValues> values = new Vector <ContentValues> (matches.length());
-            for(int i = 0;i < matches.length();i++)
-            {
+            for(int i = 0;i < matches.length();i++) {
 
                 JSONObject match_data = matches.getJSONObject(i);
-                League = match_data.getJSONObject(LINKS).getJSONObject(SOCCER_SEASON).
-                        getString("href");
+                League = match_data.getJSONObject(LINKS).getJSONObject(SOCCER_SEASON).getString("href");
                 League = League.replace(SEASON_LINK,"");
                 //This if statement controls which leagues we're interested in the data from.
                 //add leagues here in order to have them be added to the DB.
@@ -196,8 +184,7 @@ public class myFetchService extends IntentService
                         League.equals(SERIE_A)             ||
                         League.equals(BUNDESLIGA1)         ||
                         League.equals(BUNDESLIGA2)         ||
-                        League.equals(PRIMERA_DIVISION)     )
-                {
+                        League.equals(PRIMERA_DIVISION)     ) {
                     match_id = match_data.getJSONObject(LINKS).getJSONObject(SELF).
                             getString("href");
                     match_id = match_id.replace(MATCH_LINK, "");
@@ -267,11 +254,9 @@ public class myFetchService extends IntentService
 
             //Log.v(LOG_TAG,"Succesfully Inserted : " + String.valueOf(inserted_data));
         }
-        catch (JSONException e)
-        {
+        catch (JSONException e) {
             Log.e(LOG_TAG,e.getMessage());
         }
-
     }
 }
 

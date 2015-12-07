@@ -1,14 +1,15 @@
-package barqsoft.footballscores;
+package barqsoft.footballscores.model.holder;
 
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import barqsoft.footballscores.R;
+
 /**
  * Created by yehya khaled on 2/26/2015.
  */
-public class ViewHolder
-{
+public class ViewHolder {
     public TextView home_name;
     public TextView away_name;
     public TextView score;
@@ -16,8 +17,8 @@ public class ViewHolder
     public ImageView home_crest;
     public ImageView away_crest;
     public double match_id;
-    public ViewHolder(View view)
-    {
+
+    public ViewHolder(View view) {
         home_name = (TextView) view.findViewById(R.id.home_name);
         away_name = (TextView) view.findViewById(R.id.away_name);
         score     = (TextView) view.findViewById(R.id.score_textview);
