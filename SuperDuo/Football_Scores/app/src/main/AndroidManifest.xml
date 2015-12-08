@@ -32,17 +32,19 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".app.main.MainActivity" />
         </activity>
-        <service android:name=".service.FetchService" />
-
         <receiver
             android:name=".app.score.LastScoreWidget"
             android:label="@string/last_score_widget" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="barqsoft.footballscores.ACTION_DATA_UPDATED" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/widget_last_score" />
         </receiver>
+
+        <service android:name=".service.FetchService" />
+        <service android:name=".service.LastScoreWidgetService" />
     </application>
 
 </manifest>
