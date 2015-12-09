@@ -83,28 +83,25 @@ public class ScoresProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor retCursor;
-        //Log.v(FetchScoreTask.TAG,uri.getPathSegments().toString());
         int match = match_uri(uri);
-        //Log.v(FetchScoreTask.TAG,SCORES_BY_LEAGUE);
-        //Log.v(FetchScoreTask.TAG,selectionArgs[0]);
-        //Log.v(FetchScoreTask.TAG,String.valueOf(match));
         switch (match) {
-            case MATCHES: retCursor = mOpenHelper.getReadableDatabase().query(
+            case MATCHES:
+                retCursor = mOpenHelper.getReadableDatabase().query(
                     DatabaseContract.SCORES_TABLE,
                     projection,null,null,null,null,sortOrder);
                 break;
             case MATCHES_WITH_DATE:
-                    //Log.v(FetchScoreTask.TAG,selectionArgs[1]);
-                    //Log.v(FetchScoreTask.TAG,selectionArgs[2]);
                     retCursor = mOpenHelper.getReadableDatabase().query(
                         DatabaseContract.SCORES_TABLE,
                         projection,SCORES_BY_DATE,selectionArgs,null,null,sortOrder);
                 break;
-            case MATCHES_WITH_ID: retCursor = mOpenHelper.getReadableDatabase().query(
+            case MATCHES_WITH_ID:
+                retCursor = mOpenHelper.getReadableDatabase().query(
                     DatabaseContract.SCORES_TABLE,
                     projection,SCORES_BY_ID,selectionArgs,null,null,sortOrder);
                 break;
-            case MATCHES_WITH_LEAGUE: retCursor = mOpenHelper.getReadableDatabase().query(
+            case MATCHES_WITH_LEAGUE:
+                retCursor = mOpenHelper.getReadableDatabase().query(
                     DatabaseContract.SCORES_TABLE,
                     projection,SCORES_BY_LEAGUE,selectionArgs,null,null,sortOrder);
                 break;
@@ -117,28 +114,20 @@ public class ScoresProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-
         return null;
     }
 
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        //db.delete(DatabaseContract.SCORES_TABLE,null,null);
-        //Log.v(FetchScoreTask.TAG,String.valueOf(muriMatcher.match(uri)));
-        switch (match_uri(uri))
-        {
+        switch (match_uri(uri)) {
             case MATCHES:
                 db.beginTransaction();
                 int returncount = 0;
-                try
-                {
-                    for(ContentValues value : values)
-                    {
-                        long _id = db.insertWithOnConflict(DatabaseContract.SCORES_TABLE, null, value,
-                                SQLiteDatabase.CONFLICT_REPLACE);
-                        if (_id != -1)
-                        {
+                try {
+                    for(ContentValues value : values) {
+                        long _id = db.insertWithOnConflict(DatabaseContract.SCORES_TABLE, null, value, SQLiteDatabase.CONFLICT_REPLACE);
+                        if (_id != -1) {
                             returncount++;
                         }
                     }

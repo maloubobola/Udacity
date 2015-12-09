@@ -66,32 +66,18 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(getActivity(), DatabaseContract.ScoresTable.buildScoreWithDate(),
-                null,null,fragmentdate,null);
+        return new CursorLoader(getActivity(), DatabaseContract.ScoresTable.buildScoreWithDate(), null, null, fragmentdate, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        //Log.v(FetchScoreTask.TAG,"loader finished");
-        //cursor.moveToFirst();
-        /*
-        while (!cursor.isAfterLast())
-        {
-            Log.v(FetchScoreTask.TAG,cursor.getString(1));
-            cursor.moveToNext();
-        }
-        */
-
         int i = 0;
         cursor.moveToFirst();
-        while (!cursor.isAfterLast())
-        {
+        while (!cursor.isAfterLast()) {
             i++;
             cursor.moveToNext();
         }
-        //Log.v(FetchScoreTask.TAG,"Loader query: " + String.valueOf(i));
         mAdapter.swapCursor(cursor);
-        //mAdapter.notifyDataSetChanged();
     }
 
     @Override

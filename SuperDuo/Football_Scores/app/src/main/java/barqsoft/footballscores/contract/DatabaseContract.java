@@ -11,7 +11,6 @@ public class DatabaseContract {
     public static final String SCORES_TABLE = "ScoresTable";
 
     public static final class ScoresTable implements BaseColumns {
-        //Table data
         public static final String LEAGUE_COL = "league";
         public static final String DATE_COL = "date";
         public static final String TIME_COL = "time";
@@ -22,10 +21,16 @@ public class DatabaseContract {
         public static final String MATCH_ID = "match_id";
         public static final String MATCH_DAY = "match_day";
 
-        //public static Uri SCORES_CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH)
-                //.build();
+        public static final int INDEX_DATE = 1;
+        public static final int INDEX_TIME = 2;
+        public static final int INDEX_HOME = 3;
+        public static final int INDEX_AWAY = 4;
+        public static final int INDEX_LEAGUE = 5;
+        public static final int INDEX_HOME_GOALS = 6;
+        public static final int INDEX_AWAY_GOALS = 7;
+        public static final int INDEX_MATCH_ID = 8;
+        public static final int INDEX_MATCH_DAY = 9;
 
-        //Types
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH;
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH;
 

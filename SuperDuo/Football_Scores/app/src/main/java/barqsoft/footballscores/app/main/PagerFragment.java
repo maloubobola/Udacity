@@ -62,7 +62,7 @@ public class PagerFragment extends Fragment {
         // Returns the page title for the top indicator
         @Override
         public CharSequence getPageTitle(int position) {
-            return getDayName(getActivity(),System.currentTimeMillis()+((position-2)*86400000));
+            return getDayName(getActivity(),System.currentTimeMillis() + ((position-2) * 86400000));
         }
 
         public String getDayName(Context context, long dateInMillis) {
