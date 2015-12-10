@@ -21,6 +21,7 @@ public class DatabaseContract {
         public static final String MATCH_ID = "match_id";
         public static final String MATCH_DAY = "match_day";
 
+        public static final int INDEX_ID = 0;
         public static final int INDEX_DATE = 1;
         public static final int INDEX_TIME = 2;
         public static final int INDEX_HOME = 3;
@@ -30,6 +31,8 @@ public class DatabaseContract {
         public static final int INDEX_AWAY_GOALS = 7;
         public static final int INDEX_MATCH_ID = 8;
         public static final int INDEX_MATCH_DAY = 9;
+
+        public static final String FOOTBALL_SCORES_HASHTAG = "#Football_Scores";
 
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH;
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH;

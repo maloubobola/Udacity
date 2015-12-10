@@ -5,4 +5,6 @@
     android:initialLayout="@layout/widget_last_score"
     android:minHeight="@dimen/widget_last_score_default_height"
     android:minWidth="@dimen/widget_last_score_default_width"
-    android:updatePeriodMillis="0" />
+    android:updatePeriodMillis="0"
+    android:resizeMode="horizontal|vertical"
+    />
