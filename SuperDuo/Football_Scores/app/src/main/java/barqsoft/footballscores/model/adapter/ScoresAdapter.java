@@ -4,11 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.util.Calendar;
 
 import barqsoft.footballscores.R;
 import barqsoft.footballscores.commons.Utils;
@@ -38,9 +41,16 @@ public class ScoresAdapter extends CursorAdapter {
         final ViewHolder mHolder = (ViewHolder) view.getTag();
         mHolder.home_name.setText(cursor.getString(DatabaseContract.ScoresTable.INDEX_HOME));
         mHolder.away_name.setText(cursor.getString(DatabaseContract.ScoresTable.INDEX_AWAY));
-        mHolder.date.setText(cursor.getString(DatabaseContract.ScoresTable.INDEX_TIME));
+
+        long timeStamp = cursor.getLong(DatabaseContract.ScoresTable.INDEX_DATE);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timeStamp);
+
+        mHolder.date.setText(calendar.get(Calendar.HOUR) + ":" + calendar.get(Calendar.MINUTE));
+
         mHolder.score.setText(Utils.getScores(cursor.getInt(DatabaseContract.ScoresTable.INDEX_HOME_GOALS), cursor.getInt(DatabaseContract.ScoresTable.INDEX_AWAY_GOALS)));
-        mHolder.match_id = cursor.getDouble(DatabaseContract.ScoresTable.INDEX_ID);
+        mHolder.match_id = cursor.getDouble(DatabaseContract.ScoresTable.INDEX_MATCH_ID);
         mHolder.home_crest.setImageResource(Utils.getTeamCrestByTeamName(cursor.getString(DatabaseContract.ScoresTable.INDEX_HOME)));
         mHolder.away_crest.setImageResource(Utils.getTeamCrestByTeamName(cursor.getString(DatabaseContract.ScoresTable.INDEX_AWAY)));
         LayoutInflater vi = (LayoutInflater) context.getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);

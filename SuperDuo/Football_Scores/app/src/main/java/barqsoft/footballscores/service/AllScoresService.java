@@ -1,26 +1,20 @@
 package barqsoft.footballscores.service;
 
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
-import android.widget.TextView;
+
+import java.util.Calendar;
+import java.util.Date;
 
 import barqsoft.footballscores.R;
 import barqsoft.footballscores.commons.Utils;
 import barqsoft.footballscores.contract.DatabaseContract;
-import barqsoft.footballscores.model.holder.ViewHolder;
 
 /**
  * Created by thomasthiebaud on 10/12/15.
@@ -83,7 +77,12 @@ public class AllScoresService extends RemoteViewsService {
 
                 views.setTextViewText(R.id.home_name, data.getString(DatabaseContract.ScoresTable.INDEX_HOME));
                 views.setTextViewText(R.id.away_name, data.getString(DatabaseContract.ScoresTable.INDEX_AWAY));
-                views.setTextViewText(R.id.data_textview, data.getString(DatabaseContract.ScoresTable.INDEX_TIME));
+
+                long timeStamp = data.getLong(DatabaseContract.ScoresTable.INDEX_DATE);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(timeStamp);
+
+                views.setTextViewText(R.id.data_textview, calendar.get(Calendar.HOUR) + ":" + calendar.get(Calendar.MINUTE));
                 views.setTextViewText(R.id.score_textview, Utils.getScores(data.getInt(DatabaseContract.ScoresTable.INDEX_HOME_GOALS), data.getInt(DatabaseContract.ScoresTable.INDEX_AWAY_GOALS)));
       //          views.match_id = data.getDouble(DatabaseContract.ScoresTable.INDEX_ID);
                 views.setImageViewResource(R.id.home_crest, Utils.getTeamCrestByTeamName(data.getString(DatabaseContract.ScoresTable.INDEX_HOME)));

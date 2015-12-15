@@ -22,7 +22,7 @@ public class ScoresProvider extends ContentProvider {
     private UriMatcher muriMatcher = buildUriMatcher();
     private static final SQLiteQueryBuilder ScoreQuery = new SQLiteQueryBuilder();
     private static final String SCORES_BY_LEAGUE = DatabaseContract.ScoresTable.LEAGUE_COL + " = ?";
-    private static final String SCORES_BY_DATE = DatabaseContract.ScoresTable.DATE_COL + " LIKE ?";
+    private static final String SCORES_BY_DATE = DatabaseContract.ScoresTable.DATE_COL + " BETWEEN ? AND ?";
     private static final String SCORES_BY_ID = DatabaseContract.ScoresTable.MATCH_ID + " = ?";
 
     static UriMatcher buildUriMatcher() {
@@ -93,7 +93,7 @@ public class ScoresProvider extends ContentProvider {
             case MATCHES_WITH_DATE:
                     retCursor = mOpenHelper.getReadableDatabase().query(
                         DatabaseContract.SCORES_TABLE,
-                        projection,SCORES_BY_DATE,selectionArgs,null,null,sortOrder);
+                        projection,SCORES_BY_DATE, selectionArgs, null, null, sortOrder);
                 break;
             case MATCHES_WITH_ID:
                 retCursor = mOpenHelper.getReadableDatabase().query(
@@ -127,9 +127,8 @@ public class ScoresProvider extends ContentProvider {
                 try {
                     for(ContentValues value : values) {
                         long _id = db.insertWithOnConflict(DatabaseContract.SCORES_TABLE, null, value, SQLiteDatabase.CONFLICT_REPLACE);
-                        if (_id != -1) {
+                        if (_id != -1)
                             returncount++;
-                        }
                     }
                     db.setTransactionSuccessful();
                 } finally {

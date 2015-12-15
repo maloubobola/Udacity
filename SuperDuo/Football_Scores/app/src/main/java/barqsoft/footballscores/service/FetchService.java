@@ -17,8 +17,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Vector;
 
@@ -107,14 +110,16 @@ public class FetchService extends IntentService {
         try {
             if (jsonData != null) {
                 //This bit is to check if the data contains any matches. If not, we call processJson on the dummy data
+                /*
                 JSONArray matches = new JSONObject(jsonData).getJSONArray("fixtures");
+
                 if (matches.length() == 0) {
                     //if there is no data, call the function on dummy data
                     //this is expected behavior during the off season.
                     processJSONdata(getString(R.string.dummy_data), getApplicationContext(), false);
                     return;
                 }
-
+                */
                 processJSONdata(jsonData, getApplicationContext(), true);
             } else {
                 Log.d(TAG, "Could not connect to server.");
@@ -129,7 +134,6 @@ public class FetchService extends IntentService {
         //Match data
         String League = null;
         String mDate = null;
-        String mTime = null;
         String Home = null;
         String Away = null;
         String Home_goals = null;
@@ -151,43 +155,16 @@ public class FetchService extends IntentService {
                 //add leagues here in order to have them be added to the DB.
                 // If you are finding no data in the app, check that this contains all the leagues.
                 // If it doesn't, that can cause an empty DB, bypassing the dummy data routine.
-                if(     League.equals(APIContract.PREMIER_LEAGUE)      ||
-                        League.equals(APIContract.SERIE_A)             ||
-                        League.equals(APIContract.BUNDESLIGA1)         ||
-                        League.equals(APIContract.BUNDESLIGA2)         ||
-                        League.equals(APIContract.PRIMERA_DIVISION)     ) {
+                if( League.equals(APIContract.PREMIER_LEAGUE) || League.equals(APIContract.SERIE_A) || League.equals(APIContract.BUNDESLIGA1) || League.equals(APIContract.BUNDESLIGA2) || League.equals(APIContract.PRIMERA_DIVISION)     ) {
                     match_id = match_data.getJSONObject(APIContract.LINKS).getJSONObject(APIContract.SELF).getString("href");
                     match_id = match_id.replace(APIContract.MATCH_URL, "");
-                    if(!isReal){
-                        //This if statement changes the match ID of the dummy data so that it all goes into the database
-                        match_id=match_id+Integer.toString(i);
-                    }
 
                     mDate = match_data.getString(APIContract.MATCH_DATE);
-                    mTime = mDate.substring(mDate.indexOf("T") + 1, mDate.indexOf("Z"));
-                    mDate = mDate.substring(0,mDate.indexOf("T"));
-                    SimpleDateFormat match_date = new SimpleDateFormat("yyyy-MM-ddHH:mm:ss");
-                    match_date.setTimeZone(TimeZone.getTimeZone("UTC"));
-                    try {
-                        Date parseddate = match_date.parse(mDate+mTime);
-                        SimpleDateFormat new_date = new SimpleDateFormat("yyyy-MM-dd:HH:mm");
-                        new_date.setTimeZone(TimeZone.getDefault());
-                        mDate = new_date.format(parseddate);
-                        mTime = mDate.substring(mDate.indexOf(":") + 1);
-                        mDate = mDate.substring(0,mDate.indexOf(":"));
+                    SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                    isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-                        if(!isReal){
-                            //This if statement changes the dummy data's date to match our current date range.
-                            Date fragmentDate = new Date(System.currentTimeMillis() + ((i-2) * 86400000));
-                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                            mDate = format.format(fragmentDate);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Log.d(TAG, "error here!");
-                        Log.e(TAG,e.getMessage());
-                    }
+                    Date parsedDate = isoFormat.parse(mDate);
+
                     Home = match_data.getString(APIContract.HOME_TEAM);
                     Away = match_data.getString(APIContract.AWAY_TEAM);
                     Home_goals = match_data.getJSONObject(APIContract.RESULT).getString(APIContract.HOME_GOALS);
@@ -196,8 +173,7 @@ public class FetchService extends IntentService {
 
                     ContentValues match_values = new ContentValues();
                     match_values.put(DatabaseContract.ScoresTable.MATCH_ID,match_id);
-                    match_values.put(DatabaseContract.ScoresTable.DATE_COL,mDate);
-                    match_values.put(DatabaseContract.ScoresTable.TIME_COL,mTime);
+                    match_values.put(DatabaseContract.ScoresTable.DATE_COL, parsedDate.getTime());
                     match_values.put(DatabaseContract.ScoresTable.HOME_COL,Home);
                     match_values.put(DatabaseContract.ScoresTable.AWAY_COL,Away);
                     match_values.put(DatabaseContract.ScoresTable.HOME_GOALS_COL,Home_goals);
@@ -215,6 +191,8 @@ public class FetchService extends IntentService {
         }
         catch (JSONException e) {
             Log.e(TAG,e.getMessage());
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
     }
 }

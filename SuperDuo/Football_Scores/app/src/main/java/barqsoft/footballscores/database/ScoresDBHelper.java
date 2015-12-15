@@ -13,7 +13,7 @@ import barqsoft.footballscores.contract.DatabaseContract.ScoresTable;
 public class ScoresDBHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "Scores.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     public ScoresDBHelper(Context context)
     {
@@ -24,8 +24,7 @@ public class ScoresDBHelper extends SQLiteOpenHelper
     public void onCreate(SQLiteDatabase db) {
         final String CreateScoresTable = "CREATE TABLE " + DatabaseContract.SCORES_TABLE + " ("
                 + DatabaseContract.ScoresTable._ID + " INTEGER PRIMARY KEY,"
-                + ScoresTable.DATE_COL + " TEXT NOT NULL,"
-                + DatabaseContract.ScoresTable.TIME_COL + " INTEGER NOT NULL,"
+                + ScoresTable.DATE_COL + " INTEGER NOT NULL,"
                 + DatabaseContract.ScoresTable.HOME_COL + " TEXT NOT NULL,"
                 + DatabaseContract.ScoresTable.AWAY_COL + " TEXT NOT NULL,"
                 + DatabaseContract.ScoresTable.LEAGUE_COL + " INTEGER NOT NULL,"
@@ -39,9 +38,7 @@ public class ScoresDBHelper extends SQLiteOpenHelper
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
-    {
-        //Remove old values when upgrading.
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + DatabaseContract.SCORES_TABLE);
     }
 }

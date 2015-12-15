@@ -13,7 +13,6 @@ public class DatabaseContract {
     public static final class ScoresTable implements BaseColumns {
         public static final String LEAGUE_COL = "league";
         public static final String DATE_COL = "date";
-        public static final String TIME_COL = "time";
         public static final String HOME_COL = "home";
         public static final String AWAY_COL = "away";
         public static final String HOME_GOALS_COL = "home_goals";
@@ -23,14 +22,13 @@ public class DatabaseContract {
 
         public static final int INDEX_ID = 0;
         public static final int INDEX_DATE = 1;
-        public static final int INDEX_TIME = 2;
-        public static final int INDEX_HOME = 3;
-        public static final int INDEX_AWAY = 4;
-        public static final int INDEX_LEAGUE = 5;
-        public static final int INDEX_HOME_GOALS = 6;
-        public static final int INDEX_AWAY_GOALS = 7;
-        public static final int INDEX_MATCH_ID = 8;
-        public static final int INDEX_MATCH_DAY = 9;
+        public static final int INDEX_HOME = 2;
+        public static final int INDEX_AWAY = 3;
+        public static final int INDEX_LEAGUE = 4;
+        public static final int INDEX_HOME_GOALS = 5;
+        public static final int INDEX_AWAY_GOALS = 6;
+        public static final int INDEX_MATCH_ID = 7;
+        public static final int INDEX_MATCH_DAY = 8;
 
         public static final String FOOTBALL_SCORES_HASHTAG = "#Football_Scores";
 

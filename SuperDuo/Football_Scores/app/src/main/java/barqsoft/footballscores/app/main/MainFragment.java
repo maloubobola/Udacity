@@ -27,6 +27,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public ScoresAdapter mAdapter;
     public static final int SCORES_LOADER = 0;
     private String[] fragmentdate = new String[1];
+    private long date = 0;
     private int last_selected_item = -1;
 
     public MainFragment() {
@@ -37,8 +38,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         getActivity().startService(service_start);
     }
 
-    public void setFragmentDate(String date) {
-        fragmentdate[0] = date;
+    public void setFragmentDate(long date) {
+        this.date = date;
     }
 
     @Override
@@ -66,7 +67,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(getActivity(), DatabaseContract.ScoresTable.buildScoreWithDate(), null, null, fragmentdate, null);
+        return new CursorLoader(getActivity(), DatabaseContract.ScoresTable.buildScoreWithDate(), null, null, new String[]{date + "", (date + (24L * 60 * 60 * 1000)) + ""}, null);
     }
 
     @Override

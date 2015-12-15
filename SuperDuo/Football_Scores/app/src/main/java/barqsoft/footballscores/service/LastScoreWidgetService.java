@@ -10,12 +10,16 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.widget.RemoteViews;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import barqsoft.footballscores.R;
 import barqsoft.footballscores.app.main.MainActivity;
@@ -66,11 +70,18 @@ public class LastScoreWidgetService extends IntentService {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, LastScoreWidget.class));
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        //dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Calendar cal = Calendar.getInstance();
+
+        String currentDate = dateFormat.format(cal.getTime());
+
+
         Cursor data = context.getContentResolver().query(
                 DatabaseContract.BASE_CONTENT_URI,
                 null,
-                null,
-                null,
+                DatabaseContract.ScoresTable.DATE_COL + " <= ?",
+                new String[]{currentDate},
                 DatabaseContract.ScoresTable.DATE_COL + " DESC"
         );
 
@@ -81,8 +92,6 @@ public class LastScoreWidgetService extends IntentService {
             data.close();
             return;
         }
-
-        Log.e(TAG, Arrays.toString(data.getColumnNames()));
 
         String home_name = data.getString(DatabaseContract.ScoresTable.INDEX_HOME);
         String away_name = data.getString(DatabaseContract.ScoresTable.INDEX_AWAY);
