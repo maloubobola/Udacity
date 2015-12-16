@@ -1,11 +1,16 @@
 package it.jaschke.alexandria.app.books;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.text.Editable;
@@ -30,7 +35,8 @@ import it.jaschke.alexandria.services.DownloadImageTask;
 
 
 public class AddBookFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
-    private static final String TAG = "INTENT_TO_SCAN_ACTIVITY";
+    private static final String TAG = AddBookFragment.class.getSimpleName();
+    private static final int CAMERA_PERMISSION_REQUEST = 42;
     private EditText ean;
     private final int LOADER_ID = 1;
     private View rootView;
@@ -210,8 +216,27 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.scan_button:
-                IntentIntegrator.forSupportFragment(this).initiateScan();
+                // check Android 6 permission
+                if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    IntentIntegrator.forSupportFragment(this).initiateScan();
+                } else {
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
+                }
                 break;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case CAMERA_PERMISSION_REQUEST: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    IntentIntegrator.forSupportFragment(this).initiateScan();
+                } else {
+                    Toast.makeText(getActivity(),"Access to camera denied. Please enter manually your book.", Toast.LENGTH_SHORT).show();
+
+                }
+            }
         }
     }
 }
