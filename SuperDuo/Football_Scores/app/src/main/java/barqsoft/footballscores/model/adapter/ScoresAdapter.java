@@ -63,11 +63,11 @@ public class ScoresAdapter extends CursorAdapter {
             TextView league = (TextView) v.findViewById(R.id.league_textview);
             league.setText(Utils.getLeague(cursor.getInt(DatabaseContract.ScoresTable.INDEX_LEAGUE)));
             Button share_button = (Button) v.findViewById(R.id.share_button);
+
             share_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    context.startActivity(createShareForecastIntent(mHolder.home_name.getText()+" "
-                    +mHolder.score.getText()+" "+mHolder.away_name.getText() + " "));
+                    context.startActivity(createShareForecastIntent(mHolder.home_name.getText() + " " + mHolder.score.getText() +" " + mHolder.away_name.getText()));
                 }
             });
         }

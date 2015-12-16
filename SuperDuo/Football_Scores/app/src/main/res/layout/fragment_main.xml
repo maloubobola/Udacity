@@ -11,6 +11,6 @@
         android:id = "@+id/scores_list"
         android:layout_margin="@dimen/small_padding"
         android:divider="@android:color/transparent"
-        android:dividerHeight="@dimen/small_padding"/>
+        android:dividerHeight="@dimen/divider_height"/>
 
 </FrameLayout>

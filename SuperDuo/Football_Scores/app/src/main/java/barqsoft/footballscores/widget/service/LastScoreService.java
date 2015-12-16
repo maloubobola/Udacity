@@ -1,4 +1,4 @@
-package barqsoft.footballscores.service;
+package barqsoft.footballscores.widget.service;
 
 import android.annotation.TargetApi;
 import android.app.IntentService;
@@ -10,30 +10,26 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.widget.RemoteViews;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.TimeZone;
 
 import barqsoft.footballscores.R;
 import barqsoft.footballscores.app.main.MainActivity;
-import barqsoft.footballscores.app.score.LastScoreWidget;
+import barqsoft.footballscores.widget.provider.LastScoreProvider;
 import barqsoft.footballscores.contract.DatabaseContract;
 
 /**
  * Created by thomasthiebaud on 08/12/15.
  */
-public class LastScoreWidgetService extends IntentService {
-    private static final String TAG = LastScoreWidgetService.class.getSimpleName();
+public class LastScoreService extends IntentService {
+    private static final String TAG = LastScoreService.class.getSimpleName();
 
-    public LastScoreWidgetService() {
-        super(LastScoreWidgetService.class.getSimpleName());
+    public LastScoreService() {
+        super(LastScoreService.class.getSimpleName());
     }
 
     private int getWidgetWidth(AppWidgetManager appWidgetManager, int appWidgetId) {
@@ -68,7 +64,7 @@ public class LastScoreWidgetService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Context context = getApplicationContext();
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, LastScoreWidget.class));
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, LastScoreProvider.class));
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         //dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));

@@ -1,10 +1,9 @@
-package barqsoft.footballscores.app.score;
+package barqsoft.footballscores.widget.provider;
 
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -14,14 +13,13 @@ import android.widget.RemoteViews;
 
 import barqsoft.footballscores.R;
 import barqsoft.footballscores.app.main.MainActivity;
-import barqsoft.footballscores.service.AllScoresService;
+import barqsoft.footballscores.widget.service.AllScoresService;
 import barqsoft.footballscores.service.FetchService;
-import barqsoft.footballscores.service.LastScoreWidgetService;
 
 /**
  * Created by thomasthiebaud on 10/12/15.
  */
-public class AllScoresWidget extends AppWidgetProvider {
+public class AllScoresProvider extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // Perform this loop procedure for each App Widget that belongs to this provider
@@ -57,7 +55,7 @@ public class AllScoresWidget extends AppWidgetProvider {
     public void onReceive(@NonNull Context context, @NonNull Intent intent) {
         super.onReceive(context, intent);
         if (FetchService.ACTION_DATA_UPDATED.equals(intent.getAction())) {
-            context.startService(new Intent(context, AllScoresWidget.class));
+            context.startService(new Intent(context, AllScoresProvider.class));
         }
     }
 

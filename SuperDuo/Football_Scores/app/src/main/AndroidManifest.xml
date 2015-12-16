@@ -2,14 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="barqsoft.footballscores" >
 
-    <uses-permission
-        android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:supportsRtl="true">
+
         <activity
             android:name=".app.main.MainActivity"
             android:label="@string/app_name" >
@@ -33,7 +35,7 @@
                 android:value=".app.main.MainActivity" />
         </activity>
         <receiver
-            android:name=".app.score.LastScoreWidget"
+            android:name=".widget.provider.LastScoreProvider"
             android:label="@string/last_score_widget" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -44,7 +46,7 @@
                 android:resource="@xml/widget_last_score" />
         </receiver>
         <receiver
-            android:name=".app.score.AllScoresWidget"
+            android:name=".widget.provider.AllScoresProvider"
             android:label="@string/all_scores_widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -55,9 +57,9 @@
         </receiver>
 
         <service android:name=".service.FetchService" />
-        <service android:name=".service.LastScoreWidgetService" />
+        <service android:name=".widget.service.LastScoreService" />
         <service
-            android:name=".service.AllScoresService"
+            android:name=".widget.service.AllScoresService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>

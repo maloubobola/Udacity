@@ -1,4 +1,4 @@
-package barqsoft.footballscores.service;
+package barqsoft.footballscores.widget.service;
 
 import android.annotation.TargetApi;
 import android.content.Intent;
@@ -74,7 +74,6 @@ public class AllScoresService extends RemoteViewsService {
 
                 RemoteViews views = new RemoteViews(getPackageName(), R.layout.widget_score_item);
 
-
                 views.setTextViewText(R.id.home_name, data.getString(DatabaseContract.ScoresTable.INDEX_HOME));
                 views.setTextViewText(R.id.away_name, data.getString(DatabaseContract.ScoresTable.INDEX_AWAY));
 
@@ -92,6 +91,7 @@ public class AllScoresService extends RemoteViewsService {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
                     setRemoteContentDescription(views, "description");
                 }
+
 /*
                 final Intent fillInIntent = new Intent();
                 String locationSetting = Utility.getPreferredLocation(DetailWidgetRemoteViewsService.this);
