@@ -83,7 +83,7 @@ public class AllScoresService extends RemoteViewsService {
 
                 views.setTextViewText(R.id.data_textview, calendar.get(Calendar.HOUR) + ":" + calendar.get(Calendar.MINUTE));
                 views.setTextViewText(R.id.score_textview, Utils.getScores(data.getInt(DatabaseContract.ScoresTable.INDEX_HOME_GOALS), data.getInt(DatabaseContract.ScoresTable.INDEX_AWAY_GOALS)));
-      //          views.match_id = data.getDouble(DatabaseContract.ScoresTable.INDEX_ID);
+                //views.match_id = data.getDouble(DatabaseContract.ScoresTable.INDEX_ID);
                 views.setImageViewResource(R.id.home_crest, Utils.getTeamCrestByTeamName(data.getString(DatabaseContract.ScoresTable.INDEX_HOME)));
                 views.setImageViewResource(R.id.away_crest, Utils.getTeamCrestByTeamName(data.getString(DatabaseContract.ScoresTable.INDEX_AWAY)));
 
@@ -92,13 +92,11 @@ public class AllScoresService extends RemoteViewsService {
                     setRemoteContentDescription(views, "description");
                 }
 
-/*
+
                 final Intent fillInIntent = new Intent();
-                String locationSetting = Utility.getPreferredLocation(DetailWidgetRemoteViewsService.this);
-                Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(locationSetting, dateInMillis);
-                fillInIntent.setData(weatherUri);
+                fillInIntent.setData(DatabaseContract.ScoresTable.buildScoreWithDate());
                 views.setOnClickFillInIntent(R.id.widget_list_item, fillInIntent);
- */
+
                 return views;
             }
 

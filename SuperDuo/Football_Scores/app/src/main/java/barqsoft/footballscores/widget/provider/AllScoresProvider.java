@@ -41,10 +41,11 @@ public class AllScoresProvider extends AppWidgetProvider {
             boolean useDetailActivity = context.getResources().getBoolean(R.bool.use_detail_activity);
             Intent clickIntentTemplate = useDetailActivity ? new Intent(context, DetailActivity.class) : new Intent(context, MainActivity.class);
             */
+
             Intent clickIntentTemplate = new Intent(context, MainActivity.class);
             PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context).addNextIntentWithParentStack(clickIntentTemplate).getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
             views.setPendingIntentTemplate(R.id.scores_list, clickPendingIntentTemplate);
-            views.setEmptyView(R.id.scores_list, R.id.widget_empty);
+            views.setEmptyView(R.id.scores_list, R.id.empty_widget);
 
             // Tell the AppWidgetManager to perform an update on the current app widget
             appWidgetManager.updateAppWidget(appWidgetId, views);

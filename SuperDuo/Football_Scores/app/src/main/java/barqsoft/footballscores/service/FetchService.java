@@ -120,6 +120,7 @@ public class FetchService extends IntentService {
                     return;
                 }
                 */
+                Log.e(TAG,jsonData);
                 processJSONdata(jsonData, getApplicationContext(), true);
             } else {
                 Log.d(TAG, "Could not connect to server.");

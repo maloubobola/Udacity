@@ -43,7 +43,6 @@ public class PagerFragment extends Fragment {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.HOUR, 0);
 
-
         for (int i = 0;i < NUM_PAGES;i++) {
             Calendar fragmentCalendar = Calendar.getInstance();
             fragmentCalendar.setTime(calendar.getTime());
@@ -100,7 +99,8 @@ public class PagerFragment extends Fragment {
                 time.setToNow();
                 // Otherwise, the format is just the day of the week (e.g "Wednesday".
                 SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE");
-                return dayFormat.format(dateInMillis);
+                String day = dayFormat.format(dateInMillis);
+                return day.substring(0, 1).toUpperCase() + day.substring(1);
             }
         }
     }
