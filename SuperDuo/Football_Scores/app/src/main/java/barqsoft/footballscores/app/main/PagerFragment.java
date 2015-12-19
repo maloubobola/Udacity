@@ -17,47 +17,39 @@ import java.util.Calendar;
 import java.util.Date;
 
 import barqsoft.footballscores.R;
-import barqsoft.footballscores.app.main.MainActivity;
-import barqsoft.footballscores.app.main.MainFragment;
+import barqsoft.footballscores.commons.Day;
 
 /**
  * Created by yehya khaled on 2/27/2015.
  */
-public class PagerFragment extends Fragment {
-    public static final int NUM_PAGES = 5;
-    public ViewPager mPagerHandler;
-    private myPageAdapter mPagerAdapter;
+public final class PagerFragment extends Fragment {
+    private static final int NUM_PAGES = 5;
+    public ViewPager pagerHandler;
+    private PagerAdapter pagerAdapter;
     private MainFragment[] viewFragments = new MainFragment[NUM_PAGES];
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.pager_fragment, container, false);
-        mPagerHandler = (ViewPager) rootView.findViewById(R.id.pager);
-        mPagerAdapter = new myPageAdapter(getChildFragmentManager());
+        pagerHandler = (ViewPager) rootView.findViewById(R.id.pager);
+        pagerAdapter = new PagerAdapter(getChildFragmentManager());
 
-        Date currentDate = new Date(System.currentTimeMillis());
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(currentDate);
-        calendar.set(Calendar.MILLISECOND, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.HOUR, 0);
-
-        for (int i = 0;i < NUM_PAGES;i++) {
+        for (int i = 0; i<NUM_PAGES; i++) {
             Calendar fragmentCalendar = Calendar.getInstance();
-            fragmentCalendar.setTime(calendar.getTime());
+            fragmentCalendar.setTimeInMillis(System.currentTimeMillis());
             fragmentCalendar.add(Calendar.DATE, i - 2);
 
             viewFragments[i] = new MainFragment();
-            viewFragments[i].setFragmentDate(fragmentCalendar.getTimeInMillis());
+            viewFragments[i].setStartOfDay(Day.getStart(fragmentCalendar.getTime()));
+            viewFragments[i].setEndOfDay(Day.getEnd(fragmentCalendar.getTime()));
         }
 
-        mPagerHandler.setAdapter(mPagerAdapter);
-        mPagerHandler.setCurrentItem(MainActivity.current_fragment);
+        pagerHandler.setAdapter(pagerAdapter);
+        pagerHandler.setCurrentItem(MainActivity.currentFragment);
         return rootView;
     }
 
-    private class myPageAdapter extends FragmentStatePagerAdapter {
+    private class PagerAdapter extends FragmentStatePagerAdapter {
         @Override
         public Fragment getItem(int i) {
             return viewFragments[i];
@@ -68,7 +60,7 @@ public class PagerFragment extends Fragment {
             return NUM_PAGES;
         }
 
-        public myPageAdapter(FragmentManager fm) {
+        public PagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -78,7 +70,7 @@ public class PagerFragment extends Fragment {
             return getDayName(getActivity(),System.currentTimeMillis() + ((position-2) * 86400000));
         }
 
-        public String getDayName(Context context, long dateInMillis) {
+        private String getDayName(Context context, long dateInMillis) {
             // If the date is today, return the localized version of "Today" instead of the actual
             // day name.
 
@@ -88,10 +80,10 @@ public class PagerFragment extends Fragment {
             int currentJulianDay = Time.getJulianDay(System.currentTimeMillis(), t.gmtoff);
             if (julianDay == currentJulianDay) {
                 return context.getString(R.string.today);
-            } else if ( julianDay == currentJulianDay +1 ) {
+            } else if (julianDay == currentJulianDay + 1) {
                 return context.getString(R.string.tomorrow);
             }
-            else if ( julianDay == currentJulianDay -1) {
+            else if (julianDay == currentJulianDay - 1) {
                 return context.getString(R.string.yesterday);
             }
             else {

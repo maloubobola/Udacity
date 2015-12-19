@@ -20,7 +20,7 @@ public class ScoresProvider extends ContentProvider {
     private static final int MATCHES_WITH_ID = 102;
     private static final int MATCHES_WITH_DATE = 103;
     private UriMatcher muriMatcher = buildUriMatcher();
-    private static final SQLiteQueryBuilder ScoreQuery = new SQLiteQueryBuilder();
+
     private static final String SCORES_BY_LEAGUE = DatabaseContract.ScoresTable.LEAGUE_COL + " = ?";
     private static final String SCORES_BY_DATE = DatabaseContract.ScoresTable.DATE_COL + " BETWEEN ? AND ?";
     private static final String SCORES_BY_ID = DatabaseContract.ScoresTable.MATCH_ID + " = ?";
@@ -87,23 +87,46 @@ public class ScoresProvider extends ContentProvider {
         switch (match) {
             case MATCHES:
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                    DatabaseContract.SCORES_TABLE,
-                    projection,null,null,null,null,sortOrder);
+                        DatabaseContract.SCORES_TABLE,
+                        projection,
+                        null,
+                        null,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case MATCHES_WITH_DATE:
-                    retCursor = mOpenHelper.getReadableDatabase().query(
+                retCursor = mOpenHelper.getReadableDatabase().query(
                         DatabaseContract.SCORES_TABLE,
-                        projection,SCORES_BY_DATE, selectionArgs, null, null, sortOrder);
+                        projection,SCORES_BY_DATE,
+                        selectionArgs,
+                        null,
+                        null,
+                        DatabaseContract.ScoresTable.DATE_COL + " DESC"
+                );
                 break;
             case MATCHES_WITH_ID:
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                    DatabaseContract.SCORES_TABLE,
-                    projection,SCORES_BY_ID,selectionArgs,null,null,sortOrder);
+                        DatabaseContract.SCORES_TABLE,
+                        projection,
+                        SCORES_BY_ID,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case MATCHES_WITH_LEAGUE:
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                    DatabaseContract.SCORES_TABLE,
-                    projection,SCORES_BY_LEAGUE,selectionArgs,null,null,sortOrder);
+                        DatabaseContract.SCORES_TABLE,
+                        projection,
+                        SCORES_BY_LEAGUE,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown Uri" + uri);

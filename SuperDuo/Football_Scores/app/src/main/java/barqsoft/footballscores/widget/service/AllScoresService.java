@@ -5,15 +5,22 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Bundle;
+import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 import barqsoft.footballscores.R;
+import barqsoft.footballscores.app.main.MainActivity;
+import barqsoft.footballscores.commons.Day;
 import barqsoft.footballscores.commons.Utils;
+import barqsoft.footballscores.contract.BundleContract;
 import barqsoft.footballscores.contract.DatabaseContract;
 
 /**
@@ -21,6 +28,8 @@ import barqsoft.footballscores.contract.DatabaseContract;
  */
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class AllScoresService extends RemoteViewsService {
+    private static final String TAG = AllScoresService.class.getSimpleName();
+
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
         return new RemoteViewsFactory() {
@@ -43,13 +52,12 @@ public class AllScoresService extends RemoteViewsService {
                 final long identityToken = Binder.clearCallingIdentity();
 
                 data = getContentResolver().query(
-                        DatabaseContract.BASE_CONTENT_URI,
+                        DatabaseContract.ScoresTable.buildScoreWithDate(),
                         null,
                         null,
-                        null,
+                        new String[]{Day.getCurrentStart() + "", Day.getCurrentEnd() + ""},
                         DatabaseContract.ScoresTable.DATE_COL + " DESC"
                 );
-
                 Binder.restoreCallingIdentity(identityToken);
             }
 
@@ -81,9 +89,9 @@ public class AllScoresService extends RemoteViewsService {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(timeStamp);
 
-                views.setTextViewText(R.id.data_textview, calendar.get(Calendar.HOUR) + ":" + calendar.get(Calendar.MINUTE));
+                views.setTextViewText(R.id.data_textview, calendar.get(Calendar.HOUR_OF_DAY) + ":" + String.format("%02d", calendar.get(Calendar.MINUTE)));
                 views.setTextViewText(R.id.score_textview, Utils.getScores(data.getInt(DatabaseContract.ScoresTable.INDEX_HOME_GOALS), data.getInt(DatabaseContract.ScoresTable.INDEX_AWAY_GOALS)));
-                //views.match_id = data.getDouble(DatabaseContract.ScoresTable.INDEX_ID);
+                //views.matchId = data.getDouble(DatabaseContract.ScoresTable.INDEX_ID);
                 views.setImageViewResource(R.id.home_crest, Utils.getTeamCrestByTeamName(data.getString(DatabaseContract.ScoresTable.INDEX_HOME)));
                 views.setImageViewResource(R.id.away_crest, Utils.getTeamCrestByTeamName(data.getString(DatabaseContract.ScoresTable.INDEX_AWAY)));
 
@@ -93,8 +101,12 @@ public class AllScoresService extends RemoteViewsService {
                 }
 
 
-                final Intent fillInIntent = new Intent();
-                fillInIntent.setData(DatabaseContract.ScoresTable.buildScoreWithDate());
+                Bundle bundle = new Bundle();
+                bundle.putInt(BundleContract.MATCH_ID, data.getInt(DatabaseContract.ScoresTable.INDEX_MATCH_ID));
+                bundle.putInt(BundleContract.MATCH_POSITION, position);
+
+                Intent fillInIntent = new Intent();
+                fillInIntent.putExtras(bundle);
                 views.setOnClickFillInIntent(R.id.widget_list_item, fillInIntent);
 
                 return views;

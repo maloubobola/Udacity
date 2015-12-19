@@ -16,6 +16,7 @@ import android.widget.RemoteViews;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import barqsoft.footballscores.R;
 import barqsoft.footballscores.app.main.MainActivity;
@@ -67,11 +68,10 @@ public class LastScoreService extends IntentService {
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, LastScoreProvider.class));
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        //dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Calendar cal = Calendar.getInstance();
 
         String currentDate = dateFormat.format(cal.getTime());
-
 
         Cursor data = context.getContentResolver().query(
                 DatabaseContract.BASE_CONTENT_URI,

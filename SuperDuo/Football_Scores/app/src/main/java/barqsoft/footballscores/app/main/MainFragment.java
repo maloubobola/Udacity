@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import android.widget.ListView;
 
 import barqsoft.footballscores.contract.DatabaseContract;
 import barqsoft.footballscores.R;
+import barqsoft.footballscores.contract.LoaderContract;
 import barqsoft.footballscores.model.adapter.ScoresAdapter;
 import barqsoft.footballscores.model.holder.ViewHolder;
 import barqsoft.footballscores.service.FetchService;
@@ -22,43 +24,33 @@ import barqsoft.footballscores.service.FetchService;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
-{
-    public ScoresAdapter mAdapter;
-    public static final int SCORES_LOADER = 0;
-    private String[] fragmentdate = new String[1];
-    private long date = 0;
-    private int last_selected_item = -1;
+public final class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static final String TAG = MainFragment.class.getSimpleName();
+    private ScoresAdapter scoresAdapter;
+    private long startOfDay = 0;
+    private long endOfDay = 0;
 
-    public MainFragment() {
-    }
+    private ListView scoreList = null;
 
-    private void update_scores() {
-        Intent service_start = new Intent(getActivity(), FetchService.class);
-        getActivity().startService(service_start);
-    }
-
-    public void setFragmentDate(long date) {
-        this.date = date;
-    }
+    public MainFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
-        update_scores();
+        this.updateScores();
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        final ListView score_list = (ListView) rootView.findViewById(R.id.scores_list);
-        mAdapter = new ScoresAdapter(getActivity(),null,0);
-        score_list.setAdapter(mAdapter);
-        getLoaderManager().initLoader(SCORES_LOADER,null,this);
-        mAdapter.detail_match_id = MainActivity.selected_match_id;
+        scoreList = (ListView) rootView.findViewById(R.id.scores_list);
+        scoresAdapter = new ScoresAdapter(getActivity(),null,0);
+        scoreList.setAdapter(scoresAdapter);
+        getLoaderManager().initLoader(LoaderContract.SCORES_LOADER, null, this);
+        scoresAdapter.setDetailMatchId(MainActivity.selectedMatchId);
 
-        score_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        scoreList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ViewHolder selected = (ViewHolder) view.getTag();
-                mAdapter.detail_match_id = selected.match_id;
-                MainActivity.selected_match_id = (int) selected.match_id;
-                mAdapter.notifyDataSetChanged();
+                scoresAdapter.setDetailMatchId(selected.matchId);
+                MainActivity.selectedMatchId = (int) selected.matchId;
+                scoresAdapter.notifyDataSetChanged();
             }
         });
         return rootView;
@@ -66,7 +58,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(getActivity(), DatabaseContract.ScoresTable.buildScoreWithDate(), null, null, new String[]{date + "", (date + (24L * 60 * 60 * 1000)) + ""}, null);
+        return new CursorLoader(getActivity(), DatabaseContract.ScoresTable.buildScoreWithDate(), null, null, new String[]{startOfDay + "", endOfDay + ""}, null);
     }
 
     @Override
@@ -77,11 +69,25 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             i++;
             cursor.moveToNext();
         }
-        mAdapter.swapCursor(cursor);
+        scoresAdapter.swapCursor(cursor);
+        scoreList.smoothScrollToPosition(MainActivity.matchPosition);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
-        mAdapter.swapCursor(null);
+        scoresAdapter.swapCursor(null);
+    }
+
+    private void updateScores() {
+        Intent service_start = new Intent(getActivity(), FetchService.class);
+        getActivity().startService(service_start);
+    }
+
+    public void setStartOfDay(long startOfDay) {
+        this.startOfDay = startOfDay;
+    }
+
+    public void setEndOfDay(long endOfDay) {
+        this.endOfDay = endOfDay;
     }
 }
