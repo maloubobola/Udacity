@@ -76,7 +76,7 @@ public class BookService extends IntentService {
      * Handle action fetchBook in the provided background thread with the provided
      * parameters.
      *
-     * When the url was wrong (eg https://www.googleapis.coms/v1 for example), a null response was returned and the app crashed.
+     * If a null response was returned (server down for example), the app crashed.
      * Now this case is handle and a "internal server error" is raised.
      */
     private void fetchBook(String ean) {
