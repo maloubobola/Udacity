@@ -13,13 +13,13 @@ import android.widget.RemoteViews;
 
 import barqsoft.footballscores.R;
 import barqsoft.footballscores.app.main.MainActivity;
-import barqsoft.footballscores.widget.service.AllScoresService;
+import barqsoft.footballscores.widget.service.TodayScoresService;
 import barqsoft.footballscores.service.FetchService;
 
 /**
  * Created by thomasthiebaud on 10/12/15.
  */
-public class AllScoresProvider extends AppWidgetProvider {
+public class TodayScoresProvider extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // Perform this loop procedure for each App Widget that belongs to this provider
@@ -37,17 +37,12 @@ public class AllScoresProvider extends AppWidgetProvider {
             } else {
                 setRemoteAdapterV11(context, views);
             }
-            /*
-            boolean useDetailActivity = context.getResources().getBoolean(R.bool.use_detail_activity);
-            Intent clickIntentTemplate = useDetailActivity ? new Intent(context, DetailActivity.class) : new Intent(context, MainActivity.class);
-            */
 
             Intent clickIntentTemplate = new Intent(context, MainActivity.class);
             PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context).addNextIntentWithParentStack(clickIntentTemplate).getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
             views.setPendingIntentTemplate(R.id.scores_list, clickPendingIntentTemplate);
             views.setEmptyView(R.id.scores_list, R.id.empty_widget);
 
-            // Tell the AppWidgetManager to perform an update on the current app widget
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }
     }
@@ -56,7 +51,7 @@ public class AllScoresProvider extends AppWidgetProvider {
     public void onReceive(@NonNull Context context, @NonNull Intent intent) {
         super.onReceive(context, intent);
         if (FetchService.ACTION_DATA_UPDATED.equals(intent.getAction())) {
-            context.startService(new Intent(context, AllScoresProvider.class));
+            context.startService(new Intent(context, TodayScoresProvider.class));
         }
     }
 
@@ -66,7 +61,7 @@ public class AllScoresProvider extends AppWidgetProvider {
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     private void setRemoteAdapter(Context context, @NonNull final RemoteViews views) {
-        views.setRemoteAdapter(R.id.scores_list, new Intent(context, AllScoresService.class));
+        views.setRemoteAdapter(R.id.scores_list, new Intent(context, TodayScoresService.class));
     }
 
     /**
@@ -75,6 +70,6 @@ public class AllScoresProvider extends AppWidgetProvider {
      */
     @SuppressWarnings("deprecation")
     private void setRemoteAdapterV11(Context context, @NonNull final RemoteViews views) {
-        views.setRemoteAdapter(0, R.id.scores_list, new Intent(context, AllScoresService.class));
+        views.setRemoteAdapter(0, R.id.scores_list, new Intent(context, TodayScoresService.class));
     }
 }

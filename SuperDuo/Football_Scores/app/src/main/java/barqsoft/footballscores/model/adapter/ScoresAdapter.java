@@ -38,19 +38,37 @@ public final class ScoresAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, final Context context, Cursor cursor) {
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
-        viewHolder.homeName.setText(cursor.getString(DatabaseContract.ScoresTable.INDEX_HOME));
-        viewHolder.awayName.setText(cursor.getString(DatabaseContract.ScoresTable.INDEX_AWAY));
+        String homeName = cursor.getString(DatabaseContract.ScoresTable.INDEX_HOME);
+        viewHolder.homeName.setText(homeName);
+        viewHolder.homeName.setContentDescription(context.getString(R.string.home_description, homeName));
+
+        String awayName = cursor.getString(DatabaseContract.ScoresTable.INDEX_AWAY);
+        viewHolder.awayName.setText(awayName);
+        viewHolder.awayName.setContentDescription(context.getString(R.string.away_description, awayName));
 
         long timeStamp = cursor.getLong(DatabaseContract.ScoresTable.INDEX_DATE);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timeStamp);
 
-        viewHolder.date.setText(calendar.get(Calendar.HOUR_OF_DAY) + ":" + String.format("%02d", calendar.get(Calendar.MINUTE)));
-        viewHolder.score.setText(Utils.getScores(cursor.getInt(DatabaseContract.ScoresTable.INDEX_HOME_GOALS), cursor.getInt(DatabaseContract.ScoresTable.INDEX_AWAY_GOALS)));
+        String date = calendar.get(Calendar.HOUR_OF_DAY) + ":" + String.format("%02d", calendar.get(Calendar.MINUTE));
+        viewHolder.date.setText(date);
+        //viewHolder.date.setContentDescription(context.getString(R.string.date_description, date));
+
+        String score = Utils.getScores(cursor.getInt(DatabaseContract.ScoresTable.INDEX_HOME_GOALS), cursor.getInt(DatabaseContract.ScoresTable.INDEX_AWAY_GOALS));
+        viewHolder.score.setText(score);
+        if(!score.trim().equals("-"))
+            viewHolder.score.setContentDescription(context.getString(R.string.score_description, score));
+
         viewHolder.matchId = cursor.getDouble(DatabaseContract.ScoresTable.INDEX_MATCH_ID);
+
         viewHolder.homeCrest.setImageResource(Utils.getTeamCrestByTeamName(cursor.getString(DatabaseContract.ScoresTable.INDEX_HOME)));
+        // Noise
+        // viewHolder.homeCrest.setContentDescription(context.getString(R.string.home_crest_description));
+
         viewHolder.awayCrest.setImageResource(Utils.getTeamCrestByTeamName(cursor.getString(DatabaseContract.ScoresTable.INDEX_AWAY)));
+        // Noise
+        //viewHolder.awayCrest.setContentDescription(context.getString(R.string.away_crest_description));
 
         LayoutInflater vi = (LayoutInflater) context.getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = vi.inflate(R.layout.detail_fragment, null);
@@ -58,9 +76,15 @@ public final class ScoresAdapter extends CursorAdapter {
         if(viewHolder.matchId == detailMatchId) {
             container.addView(v, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             TextView matchDay = (TextView) v.findViewById(R.id.matchday_textview);
-            matchDay.setText(Utils.getMatchDay(cursor.getInt(DatabaseContract.ScoresTable.INDEX_MATCH_DAY), cursor.getInt(DatabaseContract.ScoresTable.INDEX_LEAGUE)));
+
+            int matchDayStringId = Utils.getMatchDay(cursor.getInt(DatabaseContract.ScoresTable.INDEX_MATCH_DAY), cursor.getInt(DatabaseContract.ScoresTable.INDEX_LEAGUE));
+            if(matchDayStringId == R.string.matchday || matchDayStringId == R.string.cl_group_stage_text)
+                matchDay.setText(context.getString(matchDayStringId, cursor.getInt(DatabaseContract.ScoresTable.INDEX_MATCH_DAY)));
+            else
+                matchDay.setText(context.getString(matchDayStringId));
+
             TextView league = (TextView) v.findViewById(R.id.league_textview);
-            league.setText(Utils.getLeague(cursor.getInt(DatabaseContract.ScoresTable.INDEX_LEAGUE)));
+            league.setText(context.getString(Utils.getLeague(cursor.getInt(DatabaseContract.ScoresTable.INDEX_LEAGUE))));
             Button shareButton = (Button) v.findViewById(R.id.share_button);
 
             shareButton.setOnClickListener(new View.OnClickListener() {

@@ -47,20 +47,20 @@
                 android:resource="@xml/widget_last_score" />
         </receiver>
         <receiver
-            android:name=".widget.provider.AllScoresProvider"
-            android:label="@string/all_scores_widget">
+            android:name=".widget.provider.TodayScoresProvider"
+            android:label="@string/today_scores_widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="barqsoft.footballscores.ACTION_DATA_UPDATED" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider"
-                android:resource="@xml/widget_all_scores" />
+                android:resource="@xml/widget_today_scores" />
         </receiver>
 
         <service android:name=".service.FetchService" />
         <service android:name=".widget.service.LastScoreService" />
         <service
-            android:name=".widget.service.AllScoresService"
+            android:name=".widget.service.TodayScoresService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>

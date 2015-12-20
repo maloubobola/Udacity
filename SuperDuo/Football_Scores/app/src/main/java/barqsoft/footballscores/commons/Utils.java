@@ -1,48 +1,39 @@
 package barqsoft.footballscores.commons;
 
 import barqsoft.footballscores.R;
+import barqsoft.footballscores.contract.APIContract;
 
 /**
  * Created by yehya khaled on 3/3/2015.
  */
 public class Utils {
-    public static final int SERIE_A = 357;
-    public static final int PREMIER_LEGAUE = 354;
-    public static final int CHAMPIONS_LEAGUE = 362;
-    public static final int PRIMERA_DIVISION = 358;
-    public static final int BUNDESLIGA = 351;
-
-    public static String getLeague(int league_num) {
-        switch (league_num) {
-            case SERIE_A : return "Seria A";
-            case PREMIER_LEGAUE : return "Premier League";
-            case CHAMPIONS_LEAGUE : return "UEFA Champions League";
-            case PRIMERA_DIVISION : return "Primera Division";
-            case BUNDESLIGA : return "Bundesliga";
-            default: return "Not known League Please report";
+    public static int getLeague(int leagueNum) {
+        switch (leagueNum + "") {
+            case APIContract.SERIE_A : return R.string.seriaa;
+            case APIContract.PREMIER_LEAGUE : return R.string.premierleague;
+            case APIContract.CHAMPIONS_LEAGUE : return R.string.champions_league;
+            case APIContract.PRIMERA_DIVISION : return R.string.primeradivison;
+            case APIContract.BUNDESLIGA1 : return R.string.primeradivison;
+            case APIContract.BUNDESLIGA2 : return R.string.bundesliga;
+            default: return R.string.unknown_league_error;
         }
     }
 
-    public static String getMatchDay(int match_day,int league_num) {
-        if(league_num == CHAMPIONS_LEAGUE) {
-            if (match_day <= 6) {
-                return "Group Stages, Matchday : 6";
-            }
-            else if(match_day == 7 || match_day == 8) {
-                return "First Knockout round";
-            }
-            else if(match_day == 9 || match_day == 10) {
-                return "QuarterFinal";
-            }
-            else if(match_day == 11 || match_day == 12) {
-                return "SemiFinal";
-            }
-            else {
-                return "Final";
-            }
+    public static int getMatchDay(int matchDay, int leagueNum) {
+        if((leagueNum + "").equals(APIContract.CHAMPIONS_LEAGUE)) {
+            if (matchDay <= 6)
+                return R.string.cl_group_stage_text;
+            else if(matchDay == 7 || matchDay == 8)
+                return R.string.first_knockout_round;
+            else if(matchDay == 9 || matchDay == 10)
+                return R.string.quarter_final;
+            else if(matchDay == 11 || matchDay == 12)
+                return R.string.semi_final;
+            else
+                return R.string.final_text;
         }
         else {
-            return "Matchday : " + String.valueOf(match_day);
+            return R.string.matchday;
         }
     }
 
