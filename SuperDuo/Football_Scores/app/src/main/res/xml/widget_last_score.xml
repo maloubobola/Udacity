@@ -6,4 +6,4 @@
     android:minHeight="@dimen/widget_last_score_default_height"
     android:minWidth="@dimen/widget_last_score_default_width"
     android:updatePeriodMillis="0"
-    android:resizeMode="horizontal|vertical" />
+    android:resizeMode="horizontal|vertical"/>

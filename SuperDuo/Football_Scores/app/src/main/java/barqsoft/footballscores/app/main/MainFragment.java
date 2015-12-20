@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import barqsoft.footballscores.contract.BundleContract;
 import barqsoft.footballscores.contract.DatabaseContract;
 import barqsoft.footballscores.R;
 import barqsoft.footballscores.contract.LoaderContract;
@@ -36,6 +37,11 @@ public final class MainFragment extends Fragment implements LoaderManager.Loader
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            startOfDay = savedInstanceState.getLong(BundleContract.START_OF_DAY);
+            endOfDay = savedInstanceState.getLong(BundleContract.END_OF_DAY);
+        }
+
         this.updateScores();
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         scoreList = (ListView) rootView.findViewById(R.id.scores_list);
@@ -89,5 +95,12 @@ public final class MainFragment extends Fragment implements LoaderManager.Loader
 
     public void setEndOfDay(long endOfDay) {
         this.endOfDay = endOfDay;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putLong(BundleContract.START_OF_DAY, startOfDay);
+        outState.putLong(BundleContract.END_OF_DAY, endOfDay);
+        super.onSaveInstanceState(outState);
     }
 }

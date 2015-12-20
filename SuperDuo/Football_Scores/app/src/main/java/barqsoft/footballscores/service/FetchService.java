@@ -84,43 +84,43 @@ public class FetchService extends IntentService {
             Vector<ContentValues> values = new Vector <ContentValues> (matches.length());
             for(int i = 0;i < matches.length();i++) {
 
-                JSONObject match_data = matches.getJSONObject(i);
-                league = match_data.getJSONObject(APIContract.LINKS).getJSONObject(APIContract.SOCCER_SEASON).getString("href");
+                JSONObject matchData = matches.getJSONObject(i);
+                league = matchData.getJSONObject(APIContract.LINKS).getJSONObject(APIContract.SOCCER_SEASON).getString("href");
                 league = league.replace(APIContract.SEASON_URL,"");
 
                 if( league.equals(APIContract.PREMIER_LEAGUE) || league.equals(APIContract.SERIE_A) || league.equals(APIContract.BUNDESLIGA1) || league.equals(APIContract.BUNDESLIGA2) || league.equals(APIContract.PRIMERA_DIVISION)     ) {
-                    matchId = match_data.getJSONObject(APIContract.LINKS).getJSONObject(APIContract.SELF).getString("href");
+                    matchId = matchData.getJSONObject(APIContract.LINKS).getJSONObject(APIContract.SELF).getString("href");
                     matchId = matchId.replace(APIContract.MATCH_URL, "");
 
-                    date = match_data.getString(APIContract.MATCH_DATE);
+                    date = matchData.getString(APIContract.MATCH_DATE);
                     SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
                     isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
                     Date parsedDate = isoFormat.parse(date);
 
-                    home = match_data.getString(APIContract.HOME_TEAM);
-                    away = match_data.getString(APIContract.AWAY_TEAM);
-                    homeGoals = match_data.getJSONObject(APIContract.RESULT).getString(APIContract.HOME_GOALS);
-                    awayGoals = match_data.getJSONObject(APIContract.RESULT).getString(APIContract.AWAY_GOALS);
-                    matchDay = match_data.getString(APIContract.MATCH_DAY);
+                    home = matchData.getString(APIContract.HOME_TEAM);
+                    away = matchData.getString(APIContract.AWAY_TEAM);
+                    homeGoals = matchData.getJSONObject(APIContract.RESULT).getString(APIContract.HOME_GOALS);
+                    awayGoals = matchData.getJSONObject(APIContract.RESULT).getString(APIContract.AWAY_GOALS);
+                    matchDay = matchData.getString(APIContract.MATCH_DAY);
 
-                    ContentValues match_values = new ContentValues();
-                    match_values.put(DatabaseContract.ScoresTable.MATCH_ID,matchId);
-                    match_values.put(DatabaseContract.ScoresTable.DATE_COL, parsedDate.getTime());
-                    match_values.put(DatabaseContract.ScoresTable.HOME_COL,home);
-                    match_values.put(DatabaseContract.ScoresTable.AWAY_COL,away);
-                    match_values.put(DatabaseContract.ScoresTable.HOME_GOALS_COL,homeGoals);
-                    match_values.put(DatabaseContract.ScoresTable.AWAY_GOALS_COL,awayGoals);
-                    match_values.put(DatabaseContract.ScoresTable.LEAGUE_COL,league);
-                    match_values.put(DatabaseContract.ScoresTable.MATCH_DAY,matchDay);
+                    ContentValues matchValues = new ContentValues();
+                    matchValues.put(DatabaseContract.ScoresTable.MATCH_ID, matchId);
+                    matchValues.put(DatabaseContract.ScoresTable.DATE_COL, parsedDate.getTime());
+                    matchValues.put(DatabaseContract.ScoresTable.HOME_COL, home);
+                    matchValues.put(DatabaseContract.ScoresTable.AWAY_COL, away);
+                    matchValues.put(DatabaseContract.ScoresTable.HOME_GOALS_COL, homeGoals);
+                    matchValues.put(DatabaseContract.ScoresTable.AWAY_GOALS_COL, awayGoals);
+                    matchValues.put(DatabaseContract.ScoresTable.LEAGUE_COL, league);
+                    matchValues.put(DatabaseContract.ScoresTable.MATCH_DAY, matchDay);
 
-                    values.add(match_values);
+                    values.add(matchValues);
                 }
             }
-            int inserted_data = 0;
-            ContentValues[] insert_data = new ContentValues[values.size()];
-            values.toArray(insert_data);
-            inserted_data = mContext.getContentResolver().bulkInsert(DatabaseContract.BASE_CONTENT_URI,insert_data);
+            int insertedData = 0;
+            ContentValues[] insertData = new ContentValues[values.size()];
+            values.toArray(insertData);
+            insertedData = mContext.getContentResolver().bulkInsert(DatabaseContract.BASE_CONTENT_URI,insertData);
         }
         catch (JSONException e) {
             Log.e(TAG,e.getMessage());

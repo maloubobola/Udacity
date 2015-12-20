@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import barqsoft.footballscores.commons.Day;
  * Created by yehya khaled on 2/27/2015.
  */
 public final class PagerFragment extends Fragment {
+    private static final String TAG = PagerFragment.class.getSimpleName();
     private static final int NUM_PAGES = 5;
     public ViewPager pagerHandler;
     private PagerAdapter pagerAdapter;
@@ -37,11 +39,16 @@ public final class PagerFragment extends Fragment {
         for (int i = 0; i<NUM_PAGES; i++) {
             Calendar fragmentCalendar = Calendar.getInstance();
             fragmentCalendar.setTimeInMillis(System.currentTimeMillis());
+
             fragmentCalendar.add(Calendar.DATE, i - 2);
 
+            long current = fragmentCalendar.getTimeInMillis();
+            long start = Day.getStart(current);
+            long end = Day.getEnd(current);
+
             viewFragments[i] = new MainFragment();
-            viewFragments[i].setStartOfDay(Day.getStart(fragmentCalendar.getTime()));
-            viewFragments[i].setEndOfDay(Day.getEnd(fragmentCalendar.getTime()));
+            viewFragments[i].setStartOfDay(start);
+            viewFragments[i].setEndOfDay(end);
         }
 
         pagerHandler.setAdapter(pagerAdapter);

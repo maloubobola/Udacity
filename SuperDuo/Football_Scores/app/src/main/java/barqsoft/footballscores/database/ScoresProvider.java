@@ -7,6 +7,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.util.Log;
+
+import java.util.Arrays;
 
 import barqsoft.footballscores.contract.DatabaseContract;
 
@@ -99,11 +102,12 @@ public class ScoresProvider extends ContentProvider {
             case MATCHES_WITH_DATE:
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         DatabaseContract.SCORES_TABLE,
-                        projection,SCORES_BY_DATE,
+                        projection,
+                        SCORES_BY_DATE,
                         selectionArgs,
                         null,
                         null,
-                        DatabaseContract.ScoresTable.DATE_COL + " DESC"
+                        DatabaseContract.ScoresTable.DATE_COL + " ASC"
                 );
                 break;
             case MATCHES_WITH_ID:

@@ -5,6 +5,9 @@ package barqsoft.footballscores.contract;
  */
 public final class BundleContract {
 
+    public static final String START_OF_DAY = "start_of_day";
+    public static final String END_OF_DAY = "end_of_day";
+
     private BundleContract() {}
 
     public static final String MATCH_ID = "matchId";

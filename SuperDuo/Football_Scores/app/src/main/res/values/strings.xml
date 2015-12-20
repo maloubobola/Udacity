@@ -51,4 +51,5 @@
     <string name="away_crest_description">Away crest</string>
     <string name="vs" translatable="false">vs</string>
     <string name="unknown_league_error">League unknown, please report.</string>
+    <string name="no_scores">-</string>
 </resources>

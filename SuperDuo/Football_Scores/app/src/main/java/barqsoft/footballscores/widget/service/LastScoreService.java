@@ -76,7 +76,7 @@ public class LastScoreService extends IntentService {
         Cursor data = context.getContentResolver().query(
                 DatabaseContract.BASE_CONTENT_URI,
                 null,
-                DatabaseContract.ScoresTable.DATE_COL + " <= ?",
+                DatabaseContract.ScoresTable.AWAY_GOALS_COL + " > ? AND " + DatabaseContract.ScoresTable.DATE_COL + " <= ?",
                 new String[]{currentDate},
                 DatabaseContract.ScoresTable.DATE_COL + " DESC"
         );
@@ -89,33 +89,28 @@ public class LastScoreService extends IntentService {
             return;
         }
 
-        String home_name = data.getString(DatabaseContract.ScoresTable.INDEX_HOME);
-        String away_name = data.getString(DatabaseContract.ScoresTable.INDEX_AWAY);
-        String home_score = data.getString(DatabaseContract.ScoresTable.INDEX_HOME_GOALS);
-        String away_score = data.getString(DatabaseContract.ScoresTable.INDEX_AWAY_GOALS);
+        String homeName = data.getString(DatabaseContract.ScoresTable.INDEX_HOME);
+        String awayName = data.getString(DatabaseContract.ScoresTable.INDEX_AWAY);
+        String homeScore = data.getString(DatabaseContract.ScoresTable.INDEX_HOME_GOALS);
+        homeScore = homeScore.equals("-1") ? getString(R.string.no_scores) : homeScore;
+        String awayScore = data.getString(DatabaseContract.ScoresTable.INDEX_AWAY_GOALS);
+        awayScore = awayScore.equals("-1") ? getString(R.string.no_scores) : awayScore;
 
         // Perform this loop procedure for each Today widget
         for (int appWidgetId : appWidgetIds) {
-            int widgetWidth = getWidgetWidth(appWidgetManager, appWidgetId);
-            int largeWidth = getResources().getDimensionPixelSize(R.dimen.widget_last_score_large_width);
-            int layoutId;
-            if (widgetWidth >= largeWidth) {
-                layoutId = R.layout.widget_last_score_large;
-            } else {
-                layoutId = R.layout.widget_last_score;
-            }
+            int layoutId = R.layout.widget_last_score;
 
             RemoteViews views = new RemoteViews(context.getPackageName(), layoutId);
 
             // Content Descriptions for RemoteViews were only added in ICS MR1
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                setRemoteContentDescription(views, "description");
+                setRemoteContentDescription(views, homeName + " " + getString(R.string.vs) + " " + awayName);
             }
 
-            views.setTextViewText(R.id.home_name, home_name);
-            views.setTextViewText(R.id.away_name, away_name);
-            views.setTextViewText(R.id.home_score, home_score);
-            views.setTextViewText(R.id.away_score, away_score);
+            views.setTextViewText(R.id.home_name, homeName);
+            views.setTextViewText(R.id.away_name, awayName);
+            views.setTextViewText(R.id.home_score, homeScore);
+            views.setTextViewText(R.id.away_score, awayScore);
 
             // Create an Intent to launch MainActivity
             Intent launchIntent = new Intent(context, MainActivity.class);

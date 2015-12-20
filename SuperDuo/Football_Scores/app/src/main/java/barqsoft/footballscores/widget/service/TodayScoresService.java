@@ -51,7 +51,7 @@ public class TodayScoresService extends RemoteViewsService {
                         null,
                         null,
                         new String[]{Day.getCurrentStart() + "", Day.getCurrentEnd() + ""},
-                        DatabaseContract.ScoresTable.DATE_COL + " DESC"
+                        DatabaseContract.ScoresTable.DATE_COL + " ASC"
                 );
                 Binder.restoreCallingIdentity(identityToken);
             }
