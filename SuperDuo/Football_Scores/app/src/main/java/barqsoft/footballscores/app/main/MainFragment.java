@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import barqsoft.footballscores.contract.BundleContract;
 import barqsoft.footballscores.contract.DatabaseContract;
@@ -47,6 +48,10 @@ public final class MainFragment extends Fragment implements LoaderManager.Loader
         scoreList = (ListView) rootView.findViewById(R.id.scores_list);
         scoresAdapter = new ScoresAdapter(getActivity(),null,0);
         scoreList.setAdapter(scoresAdapter);
+
+        TextView emptyText = (TextView) rootView.findViewById(R.id.empty_list);
+        scoreList.setEmptyView(emptyText);
+
         getLoaderManager().initLoader(LoaderContract.SCORES_LOADER, null, this);
         scoresAdapter.setDetailMatchId(MainActivity.selectedMatchId);
 

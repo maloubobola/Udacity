@@ -43,8 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:fontFamily="sans-serif-condensed"
-            android:textAppearance="?android:textAppearanceLarge"
+            android:textSize="@dimen/medium_text"
             android:text="@string/empty_scores_list"/>
     </FrameLayout>
 </LinearLayout>
