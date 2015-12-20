@@ -8,12 +8,16 @@
     <dimen name="medium_padding">10dp</dimen>
     <dimen name="large_padding">20dp</dimen>
 
-    <dimen name="widget_last_score_default_width">110dp</dimen>
-    <dimen name="widget_last_score_default_height">110dp</dimen>
-    <dimen name="widget_today_scores_default_width">220dp</dimen>
-    <dimen name="widget_today_scores_default_height">110dp</dimen>
-    <dimen name="widget_last_score_min_resize_width">110dp</dimen>
-    <dimen name="widget_last_score_min_resize_height">@dimen/widget_last_score_default_height</dimen>
+
+    <dimen name="widget_grid_1">40dp</dimen>
+    <dimen name="widget_grid_2">110dp</dimen>
+    <dimen name="widget_grid_3">180dp</dimen>
+    <dimen name="widget_grid_4">250dp</dimen>
+
+    <dimen name="widget_last_score_default_width">@dimen/widget_grid_4</dimen>
+    <dimen name="widget_last_score_default_height">@dimen/widget_grid_1</dimen>
+    <dimen name="widget_today_scores_default_width">@dimen/widget_grid_4</dimen>
+    <dimen name="widget_today_scores_default_height">@dimen/widget_grid_2</dimen>
 
     <dimen name="divider_height">5dp</dimen>
 </resources>

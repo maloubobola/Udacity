@@ -73,11 +73,12 @@ public class LastScoreService extends IntentService {
 
         String currentDate = dateFormat.format(cal.getTime());
 
+
         Cursor data = context.getContentResolver().query(
                 DatabaseContract.BASE_CONTENT_URI,
                 null,
-                DatabaseContract.ScoresTable.AWAY_GOALS_COL + " > ? AND " + DatabaseContract.ScoresTable.DATE_COL + " <= ?",
-                new String[]{currentDate},
+                DatabaseContract.ScoresTable.DATE_COL + " <= ? AND " + DatabaseContract.ScoresTable.AWAY_GOALS_COL + " != -1 AND "  + DatabaseContract.ScoresTable.HOME_GOALS_COL + " != -1" ,
+                new String[]{System.currentTimeMillis() + ""},
                 DatabaseContract.ScoresTable.DATE_COL + " DESC"
         );
 
