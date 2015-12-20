@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.util.Patterns;
@@ -78,7 +79,7 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
     }
 
     @Override
-    public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(
                 getActivity(),
                 DatabaseContract.BookEntry.buildFullBookUri(Long.parseLong(ean)),
@@ -90,7 +91,7 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
     }
 
     @Override
-    public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (!data.moveToFirst()) {
             return;
         }
@@ -122,11 +123,6 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
 
         String categories = data.getString(data.getColumnIndex(DatabaseContract.CategoryEntry.CATEGORY));
         ((TextView) rootView.findViewById(R.id.categories)).setText(categories);
-
-        if(rootView.findViewById(R.id.right_container)!=null){
-            rootView.findViewById(R.id.backButton).setVisibility(View.INVISIBLE);
-        }
-
     }
 
     @Override

@@ -67,7 +67,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment nextFragment;
 
@@ -82,7 +81,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             case 2:
                 nextFragment = new AboutFragment();
                 break;
-
         }
 
         fragmentManager.beginTransaction()
@@ -162,10 +160,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 Toast.makeText(MainActivity.this, intent.getStringExtra(MESSAGE_KEY), Toast.LENGTH_LONG).show();
             }
         }
-    }
-
-    public void goBack(View view){
-        getSupportFragmentManager().popBackStack();
     }
 
     private boolean isTablet() {
