@@ -23,6 +23,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import it.jaschke.alexandria.R;
+import it.jaschke.alexandria.contract.PreferenceContract;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -79,7 +80,7 @@ public class NavigationDrawerFragment extends Fragment {
             mFromSavedInstanceState = true;
         }else{
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            mCurrentSelectedPosition = Integer.parseInt(prefs.getString("pref_startFragment","0"));
+            mCurrentSelectedPosition = Integer.parseInt(prefs.getString(PreferenceContract.START_FRAGMENT,"0"));
             selectItem(mCurrentSelectedPosition);
         }
 

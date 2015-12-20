@@ -46,7 +46,7 @@ public class BookService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if(!Network.isAvailable(getApplicationContext())) {
             Intent messageIntent = new Intent(MainActivity.MESSAGE_EVENT);
-            messageIntent.putExtra(MainActivity.MESSAGE_KEY, "No network");
+            messageIntent.putExtra(MainActivity.MESSAGE_KEY, getString(R.string.no_network_error));
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(messageIntent);
             return;
         }

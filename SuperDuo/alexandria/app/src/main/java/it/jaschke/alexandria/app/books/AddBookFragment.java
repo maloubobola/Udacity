@@ -129,7 +129,7 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
             EditText ean = (EditText) getActivity().findViewById(R.id.ean);
             ean.setText(scanContent);
         } else {
-            Toast.makeText(getActivity(),"No scan data received!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),getString(R.string.no_scan_data_error), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -171,7 +171,7 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
         String categories = data.getString(data.getColumnIndex(DatabaseContract.CategoryEntry.CATEGORY));
 
         if(bookTitle == null || bookSubTitle == null || categories == null || authors == null) {
-            Toast.makeText(getContext(),getResources().getString(R.string.corrupt_data_error),Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(),getString(R.string.corrupt_data_error),Toast.LENGTH_LONG).show();
         } else {
             String[] authorsArr = authors.split(",");
             ((TextView) rootView.findViewById(R.id.bookTitle)).setText(bookTitle);
@@ -233,7 +233,7 @@ public class AddBookFragment extends Fragment implements LoaderManager.LoaderCal
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     IntentIntegrator.forSupportFragment(this).initiateScan();
                 } else {
-                    Toast.makeText(getActivity(),"Access to camera denied. Please enter manually your book.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),getString(R.string.camera_access_denied), Toast.LENGTH_SHORT).show();
 
                 }
             }
