@@ -34,8 +34,6 @@
         During the off season, fake data will be added to the app.
     </string>
 
-    <string name="api_key" translatable="false">eab8b8c881d845f7883a79993cc2da54</string>
-
     <string name="last_score_widget">Last score</string>
     <string name="today_scores_widget">Today\'s scores</string>
     <string name="empty_scores_list">No scores to display</string>

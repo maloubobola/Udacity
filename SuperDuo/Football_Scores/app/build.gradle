@@ -16,6 +16,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        buildTypes.each {
+            it.buildConfigField 'String', 'FOOTBALL_SCORES_API_TOKEN', FOOTBALL_SCORES_API_TOKEN
+        }
     }
 }
 

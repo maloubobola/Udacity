@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Vector;
 
+import barqsoft.footballscores.BuildConfig;
 import barqsoft.footballscores.commons.Network;
 import barqsoft.footballscores.contract.APIContract;
 import barqsoft.footballscores.contract.DatabaseContract;
@@ -57,7 +58,7 @@ public class FetchService extends IntentService {
         String jsonData = null;
         if(Network.isAvailable(getApplicationContext())) {
             try {
-                jsonData = Network.executeGetRequest(uri, getString(R.string.api_key));
+                jsonData = Network.executeGetRequest(uri, BuildConfig.FOOTBALL_SCORES_API_TOKEN);
                 processJSONdata(jsonData, getApplicationContext(), true);
             } catch (IOException e) {
                 e.printStackTrace();
