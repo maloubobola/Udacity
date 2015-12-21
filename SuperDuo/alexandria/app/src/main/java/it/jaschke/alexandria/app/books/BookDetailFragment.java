@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.app.main.MainActivity;
@@ -102,27 +103,33 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text)+bookTitle);
-        shareActionProvider.setShareIntent(shareIntent);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text) + bookTitle);
+
+        if(shareActionProvider != null)
+            shareActionProvider.setShareIntent(shareIntent);
 
         String bookSubTitle = data.getString(data.getColumnIndex(DatabaseContract.BookEntry.SUBTITLE));
-        ((TextView) rootView.findViewById(R.id.fullBookSubTitle)).setText(bookSubTitle);
-
         String desc = data.getString(data.getColumnIndex(DatabaseContract.BookEntry.DESC));
-        ((TextView) rootView.findViewById(R.id.fullBookDesc)).setText(desc);
-
         String authors = data.getString(data.getColumnIndex(DatabaseContract.AuthorEntry.AUTHOR));
-        String[] authorsArr = authors.split(",");
-        ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
-        ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
         String imgUrl = data.getString(data.getColumnIndex(DatabaseContract.BookEntry.IMAGE_URL));
-        if(Patterns.WEB_URL.matcher(imgUrl).matches()){
-            new DownloadImageTask((ImageView) rootView.findViewById(R.id.fullBookCover)).execute(imgUrl);
-            rootView.findViewById(R.id.fullBookCover).setVisibility(View.VISIBLE);
-        }
-
         String categories = data.getString(data.getColumnIndex(DatabaseContract.CategoryEntry.CATEGORY));
-        ((TextView) rootView.findViewById(R.id.categories)).setText(categories);
+
+        if(bookTitle == null || bookSubTitle == null || categories == null || authors == null) {
+            Toast.makeText(getContext(), getString(R.string.corrupt_data_error), Toast.LENGTH_LONG).show();
+        } else {
+            String[] authorsArr = authors.split(",");
+            ((TextView) rootView.findViewById(R.id.fullBookSubTitle)).setText(bookSubTitle);
+            ((TextView) rootView.findViewById(R.id.fullBookDesc)).setText(desc);
+            ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
+            ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
+
+            if(Patterns.WEB_URL.matcher(imgUrl).matches()){
+                new DownloadImageTask((ImageView) rootView.findViewById(R.id.fullBookCover)).execute(imgUrl);
+                rootView.findViewById(R.id.fullBookCover).setVisibility(View.VISIBLE);
+            }
+
+            ((TextView) rootView.findViewById(R.id.categories)).setText(categories);
+        }
     }
 
     @Override
