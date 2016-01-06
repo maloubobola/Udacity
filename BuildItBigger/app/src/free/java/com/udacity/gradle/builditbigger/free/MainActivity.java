@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.udacity.gradle.builditbigger.BuildConfig;
 import com.udacity.gradle.builditbigger.EndPointTask;
 import com.udacity.gradle.builditbigger.IntentContract;
 import com.udacity.gradle.builditbigger.R;
@@ -30,7 +31,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterstitialAd.setAdUnitId(BuildConfig.AD_UNIT_ID);
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdClosed() {
@@ -89,5 +90,4 @@ public class MainActivity extends ActionBarActivity {
             startActivity(intent);
         }
     }
-
 }
