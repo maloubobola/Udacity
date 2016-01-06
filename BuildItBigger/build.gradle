@@ -17,3 +17,31 @@ allprojects {
         jcenter()
     }
 }
+
+task startServer() {
+    dependsOn ':cloud:appengineRun'
+}
+task runConnectedAndroidTest() {
+    dependsOn ':app:connectedAndroidTest'
+}
+task stopServer() {
+    dependsOn ':cloud:appengineStop'
+}
+
+task runTests() {
+    evaluationDependsOn ":cloud"
+
+    project(":cloud") {
+        appengine {
+            daemon true
+        }
+    }
+
+    dependsOn startServer
+    dependsOn runConnectedAndroidTest
+}
+
+//Run stop server at the end even if there is an error (like a finally block in java)
+startServer.finalizedBy stopServer
+runConnectedAndroidTest.mustRunAfter startServer
+stopServer.mustRunAfter runConnectedAndroidTest

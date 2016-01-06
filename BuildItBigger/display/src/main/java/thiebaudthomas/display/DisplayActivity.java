@@ -13,7 +13,7 @@ public class DisplayActivity extends AppCompatActivity {
         setContentView(R.layout.activity_display);
 
         Intent intent = getIntent();
-        String joke = intent.getStringExtra("JOKE");
+        String joke = intent.getStringExtra(IntentContract.JOKE);
 
         TextView jokeDisplay = (TextView) findViewById(R.id.joke_display);
         jokeDisplay.setText(joke);

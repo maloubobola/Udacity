@@ -1,7 +1,4 @@
 package thiebaudthomas.jokes.impl;
-
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 import thiebaudthomas.jokes.RandomInterface;

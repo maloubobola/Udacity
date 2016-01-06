@@ -10,8 +10,6 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 
-import javax.inject.Named;
-
 import thiebaudthomas.jokes.impl.Tell;
 
 /** An endpoint class we are exposing */
@@ -24,10 +22,10 @@ import thiebaudthomas.jokes.impl.Tell;
     packagePath=""
   )
 )
-public class MyEndpoint {
+public class JokeEndpoint {
     @ApiMethod(name = "tellAJoke")
-    public MyBean tellAJoke() {
-        MyBean response = new MyBean();
+    public JokeBean tellAJoke() {
+        JokeBean response = new JokeBean();
         response.setData(Tell.a().random().joke());
         return response;
     }
