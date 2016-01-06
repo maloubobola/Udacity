@@ -8,14 +8,28 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+
 import thiebaudthomas.display.DisplayActivity;
 
 public class MainActivity extends ActionBarActivity {
+
+    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+
+        mInterstitialAd.loadAd(adRequest);
     }
 
 
@@ -43,11 +57,17 @@ public class MainActivity extends ActionBarActivity {
             }
 
             @Override
-            protected void onPostExecute(String result) {
-                Intent intent = new Intent(getBaseContext(), DisplayActivity.class);
-                intent.putExtra(IntentContract.JOKE,result);
-                startActivity(intent);
-                progressBarLayout.setVisibility(View.GONE);
+            protected void onPostExecute(final String result) {
+                final Intent intent = new Intent(getBaseContext(), DisplayActivity.class);
+                mInterstitialAd.show();
+                mInterstitialAd.setAdListener(new AdListener() {
+                    @Override
+                    public void onAdClosed() {
+                        intent.putExtra(IntentContract.JOKE, result);
+                        startActivity(intent);
+                        progressBarLayout.setVisibility(View.GONE);
+                    }
+                });
             }
         }.execute();
     }
