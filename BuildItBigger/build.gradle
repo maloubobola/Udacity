@@ -18,6 +18,7 @@ allprojects {
     }
 }
 
+//Custom tasks to start GCE, run android connected tests and stop the endpoint (even if a failure is raised)
 task startServer() {
     dependsOn ':cloud:appengineRun'
 }
@@ -28,9 +29,8 @@ task stopServer() {
     dependsOn ':cloud:appengineStop'
 }
 
-task runTests() {
+task runAndroidTests() {
     evaluationDependsOn ":cloud"
-
     project(":cloud") {
         appengine {
             daemon true
