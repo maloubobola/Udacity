@@ -29,8 +29,6 @@ public class ArticleDetailActivity extends AppCompatActivity implements LoaderMa
     private Cursor mCursor;
     private long mStartId;
 
-    private long mSelectedItemId;
-
     private ViewPager mPager;
     private MyPagerAdapter mPagerAdapter;
     @Override
@@ -51,12 +49,9 @@ public class ArticleDetailActivity extends AppCompatActivity implements LoaderMa
         mPager.setPageMargin((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics()));
         mPager.setPageMarginDrawable(new ColorDrawable(0x22000000));
 
-        if (savedInstanceState == null) {
-            if (getIntent() != null && getIntent().getData() != null) {
+        if (savedInstanceState == null)
+            if (getIntent() != null && getIntent().getData() != null)
                 mStartId = ItemsContract.Items.getItemId(getIntent().getData());
-                mSelectedItemId = mStartId;
-            }
-        }
     }
 
     @Override
