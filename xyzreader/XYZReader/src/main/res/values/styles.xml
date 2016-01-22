@@ -16,13 +16,47 @@
 -->
 
 <resources>
-
-    <style name="Theme.Bacon" parent="@style/Theme.AppCompat.Light.NoActionBar">
-
+    <style name="Theme.Bacon" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
     </style>
 
-    <style name="Theme.Bacon.Detail">
-        <item name="android:statusBarColor">@android:color/transparent</item>
+    <style name="Theme.Bacon.Content.Title" parent="TextAppearance.AppCompat.Display1">
+        <item name="android:textColor">@color/primary_dark</item>
+        <item name="android:layout_marginTop">@dimen/big</item>
+        <item name="android:paddingTop">@dimen/big</item>
+        <item name="android:layout_marginBottom">@dimen/small</item>
+        <item name="android:layout_marginLeft">@dimen/big</item>
+        <item name="android:layout_marginRight">@dimen/big</item>
     </style>
 
+    <style name="Theme.Bacon.Content.Title.Thumb" parent="Theme.Bacon.Content.Title">
+        <item name="android:layout_marginTop">@dimen/small</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">4</item>
+    </style>
+
+    <style name="Theme.Bacon.Content.Subtitle" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:paddingBottom">@dimen/big</item>
+        <item name="android:paddingRight">@dimen/big</item>
+        <item name="android:paddingLeft">@dimen/big</item>
+    </style>
+
+    <style name="Theme.Bacon.Content.Subtitle.Thumb" parent="Theme.Bacon.Content.Subtitle">
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="Theme.Bacon.Content.Body" parent="TextAppearance.AppCompat.Body2">
+        <item name="android:fontFamily">regular</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingExtra">@dimen/regular</item>
+        <item name="android:textColor">@android:color/tertiary_text_light</item>
+        <item name="android:paddingBottom">@dimen/big</item>
+        <item name="android:paddingRight">@dimen/big</item>
+        <item name="android:paddingLeft">@dimen/big</item>
+    </style>
 </resources>
