@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.wearable.view.BoxInsetLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="@dimen/huge">
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_box="all"
+        android:columnCount="3"
+        android:background="@color/primary">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="MAY"
+            android:id="@+id/month"
+            android:textAllCaps="true"
+            android:background="@color/accent"
+            android:layout_columnWeight="1"/>
+
+        <TextView
+            android:layout_width="0dp"
+
+            android:layout_height="wrap_content"
+            android:text="14"
+            android:id="@+id/date"
+            android:background="@color/primary_light"
+            android:layout_columnWeight="1"/>
+        <TextView
+            android:layout_width="0dp"
+
+            android:layout_height="wrap_content"
+            android:text="THU"
+            android:id="@+id/day"
+            android:textAllCaps="true"
+            android:background="@color/primary_dark"
+
+            android:layout_columnWeight="1"/>
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:text="18"
+            android:id="@+id/hour"
+            android:layout_columnWeight="1"/>
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:text="HOURS"
+            android:id="@+id/hour_label"
+            android:layout_columnSpan="2"
+            android:layout_columnWeight="1"
+            android:gravity="center"/>
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:text="53"
+            android:id="@+id/minute"
+            android:layout_columnWeight="1"/>
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:text="MINUTES"
+            android:id="@+id/minute_label"
+            android:layout_columnSpan="2"
+            android:layout_columnWeight="1"
+            android:gravity="center"/>
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:text="27"
+            android:id="@+id/second"
+            android:layout_columnWeight="1"/>
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:text="SECONDS"
+            android:id="@+id/second_label"
+            android:layout_columnSpan="2"
+            android:layout_columnWeight="1"
+            android:gravity="center"/>
+    </GridLayout>
+</android.support.wearable.view.BoxInsetLayout>
