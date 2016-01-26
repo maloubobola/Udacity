@@ -107,7 +107,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
         private int specW, specH;
         private BoxInsetLayout myLayout;
-        private TextView day, date, month, hour, minute, second;
+        private TextView date, hour;
         private final Point displaySize = new Point();
 
         /**
@@ -138,12 +138,8 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             display.getSize(displaySize);
 
             // Find some views for later use
-            day = (TextView) myLayout.findViewById(R.id.day);
             date = (TextView) myLayout.findViewById(R.id.date);
-            month = (TextView) myLayout.findViewById(R.id.month);
             hour = (TextView) myLayout.findViewById(R.id.hour);
-            minute = (TextView) myLayout.findViewById(R.id.minute);
-            second = (TextView) myLayout.findViewById(R.id.second);
         }
 
         @Override
@@ -228,11 +224,11 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
                 // Show/hide the seconds fields
                 if (inAmbientMode) {
-                    second.setVisibility(View.GONE);
-                    myLayout.findViewById(R.id.second_label).setVisibility(View.GONE);
+                    //second.setVisibility(View.GONE);
+                    //myLayout.findViewById(R.id.second_label).setVisibility(View.GONE);
                 } else {
-                    second.setVisibility(View.VISIBLE);
-                    myLayout.findViewById(R.id.second_label).setVisibility(View.VISIBLE);
+                    //second.setVisibility(View.VISIBLE);
+                    //myLayout.findViewById(R.id.second_label).setVisibility(View.VISIBLE);
                 }
 /*
                 // Switch between bold & normal font
@@ -257,17 +253,21 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             // Get the current Time
             mTime.setToNow();
 
+            long millis = mTime.toMillis(false);
+
             // Apply it to the date fields
-            day.setText(String.format("%ta", mTime.toMillis(false)));
-            date.setText(String.format("%02d", mTime.monthDay));
-            month.setText(String.format("%tb", mTime.toMillis(false)));
+            date.setText(
+                    String.format("%ta", millis)
+                            + ", "
+                            + String.format("%02d", mTime.monthDay)
+                            + " "
+                            + String.format("%tb", millis)
+                            + " "
+                            + String.format("%ty", millis)
+            );
 
             // Apply it to the time fields
-            hour.setText(String.format("%02d", mTime.hour));
-            minute.setText(String.format("%02d", mTime.minute));
-            if (!mAmbient) {
-                second.setText(String.format("%02d", mTime.second));
-            }
+            hour.setText(String.format("%02d", mTime.hour) + ":" + String.format("%02d", mTime.minute));
 
             // Update the layout
             myLayout.measure(specW, specH);
