@@ -23,7 +23,6 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -34,22 +33,40 @@ import android.support.wearable.view.BoxInsetLayout;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowInsets;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.lang.ref.WeakReference;
+import com.example.android.sunshine.app.commons.contract.DataContract;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
+
 import java.util.TimeZone;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Digital watch face with seconds. In ambient mode, the seconds aren't displayed. On devices with
  * low-bit ambient mode, the text is drawn without anti-aliasing in ambient mode.
+ *
+ * Created from android digital sample
+ * Credits to https://sterlingudell.wordpress.com/2015/05/10/layout-based-watch-faces-for-android-wear/ which exmplain how to use a layout in a watchface.
+ * Modify by Thomas Thiebaud
  */
 public class SunshineWatchFace extends CanvasWatchFaceService {
     private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
@@ -58,20 +75,21 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
      * Update rate in milliseconds for interactive mode. We update once a second since seconds are
      * displayed in interactive mode.
      */
-    private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
+    private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.MINUTES.toMillis(1);
 
     @Override
     public Engine onCreateEngine() {
         return new Engine();
     }
 
-    private class Engine extends CanvasWatchFaceService.Engine {
-        static final int MSG_UPDATE_TIME = 0;
+    private class Engine extends CanvasWatchFaceService.Engine implements DataApi.DataListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
+        private final String TAG = Engine.class.getSimpleName();
+        private final int MSG_UPDATE_TIME = 0;
 
         /**
          * Handler to update the time periodically in interactive mode.
          */
-        final Handler mUpdateTimeHandler = new Handler() {
+        private final Handler mUpdateTimeHandler = new Handler() {
             @Override
             public void handleMessage(Message message) {
                 switch (message.what) {
@@ -79,8 +97,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                         invalidate();
                         if (shouldTimerBeRunning()) {
                             long timeMs = System.currentTimeMillis();
-                            long delayMs = INTERACTIVE_UPDATE_RATE_MS
-                                    - (timeMs % INTERACTIVE_UPDATE_RATE_MS);
+                            long delayMs = INTERACTIVE_UPDATE_RATE_MS - (timeMs % INTERACTIVE_UPDATE_RATE_MS);
                             mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
                         }
                         break;
@@ -88,7 +105,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             }
         };
 
-        final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
+        private final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 mTime.clear(intent.getStringExtra("time-zone"));
@@ -96,18 +113,22 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             }
         };
 
+        private GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(SunshineWatchFace.this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(Wearable.API)
+                .build();
+
         boolean mRegisteredTimeZoneReceiver = false;
 
         boolean mAmbient;
 
-        Time mTime;
-
-        float mXOffset = 0;
-        float mYOffset = 0;
+        private Time mTime;
 
         private int specW, specH;
-        private BoxInsetLayout myLayout;
-        private TextView date, hour;
+        private BoxInsetLayout layout;
+        private TextView date, hour, max, min;
+        private ImageView weather;
         private final Point displaySize = new Point();
 
         /**
@@ -125,21 +146,23 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                     .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
                     .setShowSystemUiTime(false)
                     .build());
-            Resources resources = SunshineWatchFace.this.getResources();
 
             mTime = new Time();
 
             // Inflate the layout that we're using for the watch face
             LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            myLayout = (BoxInsetLayout) inflater.inflate(R.layout.face, null);
+            layout = (BoxInsetLayout) inflater.inflate(R.layout.face, null);
 
-            // Load the display spec - we'll need this later for measuring myLayout
+            // Load the display spec - we'll need this later for measuring layout
             Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
             display.getSize(displaySize);
 
             // Find some views for later use
-            date = (TextView) myLayout.findViewById(R.id.date);
-            hour = (TextView) myLayout.findViewById(R.id.hour);
+            date = (TextView) layout.findViewById(R.id.date);
+            hour = (TextView) layout.findViewById(R.id.hour);
+            max = (TextView) layout.findViewById(R.id.max);
+            min = (TextView) layout.findViewById(R.id.min);
+            weather = (ImageView) layout.findViewById(R.id.weather);
         }
 
         @Override
@@ -153,6 +176,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             super.onVisibilityChanged(visible);
 
             if (visible) {
+                mGoogleApiClient.connect();
                 registerReceiver();
 
                 // Update time zone in case it changed while we weren't visible.
@@ -160,6 +184,10 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                 mTime.setToNow();
             } else {
                 unregisterReceiver();
+                if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+                    Wearable.DataApi.removeListener(mGoogleApiClient, this);
+                    mGoogleApiClient.disconnect();
+                }
             }
 
             // Whether the timer should be running depends on whether we're visible (as well as
@@ -187,21 +215,10 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         @Override
         public void onApplyWindowInsets(WindowInsets insets) {
             super.onApplyWindowInsets(insets);
-            myLayout.onApplyWindowInsets(insets);
-/*
-            if (insets.isRound()) {
-                // Shrink the face to fit on a round screen
-                //mYOffset = mXOffset = displaySize.x * 0.1f;
-                //displaySize.y -= 2 * mXOffset;
-                //displaySize.x -= 2 * mXOffset;
-            } else {
-                mXOffset = mYOffset = 0;
-            }
-*/
-            // Recompute the MeasureSpec fields - these determine the actual size of the layout
+            layout.onApplyWindowInsets(insets);
+
             specW = View.MeasureSpec.makeMeasureSpec(displaySize.x, View.MeasureSpec.EXACTLY);
             specH = View.MeasureSpec.makeMeasureSpec(displaySize.y, View.MeasureSpec.EXACTLY);
-
         }
 
         @Override
@@ -222,29 +239,21 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             if (mAmbient != inAmbientMode) {
                 mAmbient = inAmbientMode;
 
-                // Show/hide the seconds fields
                 if (inAmbientMode) {
-                    //second.setVisibility(View.GONE);
-                    //myLayout.findViewById(R.id.second_label).setVisibility(View.GONE);
+                    layout.setBackgroundColor(getResources().getColor(R.color.black));
+                    weather.setVisibility(View.GONE);
+                    max.setVisibility(View.GONE);
+                    min.setVisibility(View.GONE);
                 } else {
-                    //second.setVisibility(View.VISIBLE);
-                    //myLayout.findViewById(R.id.second_label).setVisibility(View.VISIBLE);
+                    layout.setBackgroundColor(getResources().getColor(R.color.primary));
+                    weather.setVisibility(View.VISIBLE);
+                    max.setVisibility(View.VISIBLE);
+                    min.setVisibility(View.VISIBLE);
                 }
-/*
-                // Switch between bold & normal font
-                Typeface font = Typeface.create("sans-serif-condensed",
-                        inAmbientMode ? Typeface.NORMAL : Typeface.BOLD);
-                ViewGroup group = (ViewGroup) myLayout;
-                for (int i = group.getChildCount() - 1; i >= 0; i--) {
-                    // We only get away with this because every child is a TextView
-                    ((TextView) group.getChildAt(i)).setTypeface(font);
-                }
-*/
+
                 invalidate();
             }
 
-            // Whether the timer should be running depends on whether we're visible (as well as
-            // whether we're in ambient mode), so we may need to start or stop the timer.
             updateTimer();
         }
 
@@ -270,13 +279,12 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             hour.setText(String.format("%02d", mTime.hour) + ":" + String.format("%02d", mTime.minute));
 
             // Update the layout
-            myLayout.measure(specW, specH);
-            myLayout.layout(0, 0, myLayout.getMeasuredWidth(), myLayout.getMeasuredHeight());
+            layout.measure(specW, specH);
+            layout.layout(0, 0, layout.getMeasuredWidth(), layout.getMeasuredHeight());
 
             // Draw it to the Canvas
             canvas.drawColor(Color.BLACK);
-            //canvas.translate(mXOffset, mYOffset);
-            myLayout.draw(canvas);
+            layout.draw(canvas);
         }
 
         /**
@@ -296,6 +304,64 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
          */
         private boolean shouldTimerBeRunning() {
             return isVisible() && !isInAmbientMode();
+        }
+
+        @Override
+        public void onConnected(Bundle bundle) {
+            Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
+            retrieveWeatherInfo();
+        }
+
+        @Override
+        public void onDataChanged(DataEventBuffer dataEventBuffer) {
+            for (DataEvent dataEvent : dataEventBuffer) {
+                if (dataEvent.getType() == DataEvent.TYPE_CHANGED) {
+                    DataMap dataMap = DataMapItem.fromDataItem(dataEvent.getDataItem()).getDataMap();
+                    String path = dataEvent.getDataItem().getUri().getPath();
+                    if (path.equals(DataContract.WEATHER_DETAILS)) {
+                        if (dataMap.containsKey(DataContract.MAX_KEY))
+                            max.setText(dataMap.getString(DataContract.MAX_KEY));
+
+                        if (dataMap.containsKey(DataContract.MIN_KEY))
+                            min.setText(dataMap.getString(DataContract.MIN_KEY));
+
+                        if (dataMap.containsKey(DataContract.WEATHER_KEY)) {
+                            int weatherId = dataMap.getInt(DataContract.WEATHER_KEY);
+                            weather.setImageResource(weatherId);
+                        }
+                        invalidate();
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onConnectionSuspended(int i) {
+            Log.e(TAG, "Connection suspended");
+        }
+
+        @Override
+        public void onConnectionFailed(ConnectionResult connectionResult) {
+            Log.e(TAG, "Connection failed");
+        }
+
+        public void retrieveWeatherInfo() {
+            PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(DataContract.WEATHER);
+            putDataMapRequest.getDataMap().putString(DataContract.UUID_KEY, UUID.randomUUID().toString());
+            PutDataRequest request = putDataMapRequest.asPutDataRequest();
+
+            Wearable.DataApi.putDataItem(mGoogleApiClient, request)
+                    .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+                        @Override
+                        public void onResult(DataApi.DataItemResult dataItemResult) {
+                            if (dataItemResult.getStatus().isSuccess()) {
+                                Log.e(TAG, "Successfully asked phone in order to retrieve weather data");
+                            } else {
+                                Log.e(TAG, "Error asking phone for weather data");
+                            }
+                        }
+                    });
+
         }
     }
 }
